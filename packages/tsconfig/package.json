@@ -1,0 +1,9 @@
+{
+  "name": "@cipibot/tsconfig",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [],
+  "author": "JonanekDev",
+  "license": "ISC",
+  "packageManager": "pnpm@10.25.0"
+}

@@ -1,0 +1,21 @@
+{
+  "name": "cipibot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "turbo run format",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [],
+  "author": "JonanekDev",
+  "license": "ISC",
+  "packageManager": "pnpm@10.25.0",
+  "devDependencies": {
+    "prettier": "^3.7.4",
+    "tsx": "^4.21.0",
+    "turbo": "^2.6.3",
+    "typescript": "^5.9.3"
+  }
+}

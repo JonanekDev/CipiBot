@@ -1,0 +1,11 @@
+{
+  "extends": "@cipibot/tsconfig/base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "paths": {
+      "@cipibot/*": ["../../packages/*"]
+    }
+  },
+  "include": ["src"]
+}

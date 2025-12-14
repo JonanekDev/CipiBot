@@ -1,0 +1,23 @@
+{
+  "name": "@cipibot/kafka",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "format": "prettier --write src/"
+  },
+  "keywords": [],
+  "author": "JonanekDev",
+  "license": "ISC",
+  "packageManager": "pnpm@10.25.0",
+  "devDependencies": {
+    "@cipibot/tsconfig": "workspace:*",
+    "@types/node": "^25.0.1"
+  },
+  "dependencies": {
+    "kafkajs": "^2.2.4"
+  }
+}

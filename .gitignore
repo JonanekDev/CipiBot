@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.turbo/
+tscommand-*.tmp
+
+# Env
+.env
+.env.local
+.env.development.local
+
+# Logs
+logs/
+*.log
+
+# IDE files
+.vscode/
+.idea/
+
+# Prisma
+prisma/migrations/dev.db
+prisma/*.db
+prisma/*.db-journal
+.prisma/
