@@ -26,3 +26,6 @@ prisma/migrations/dev.db
 prisma/*.db
 prisma/*.db-journal
 .prisma/
+**/generated/
+# Ignore migrations during early development (remove this when going to production)
+**/prisma/migrations/

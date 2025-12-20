@@ -1,0 +1,6 @@
+{
+    "leveling": {
+        "levelUpTitle": "🎉 Reached a new level! 🎉",
+        "levelUpDescription": "Congratulations {{user}}, you reached level {{level}}!"
+    }
+}

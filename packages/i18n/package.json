@@ -1,10 +1,9 @@
 {
-  "name": "@cipibot/kafka",
+  "name": "@cipibot/i18n",
   "version": "0.0.1",
   "description": "",
+  "main": "dist/index.js",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write src/"
@@ -15,9 +14,10 @@
   "packageManager": "pnpm@10.25.0",
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",
+    "@cipibot/schemas": "workspace:*",
     "@types/node": "^25.0.1"
   },
   "dependencies": {
-    "kafkajs": "^2.2.4"
+    "i18next": "^25.7.3"
   }
 }

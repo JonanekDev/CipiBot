@@ -4,6 +4,9 @@
 
 [![Status](https://img.shields.io/badge/status-early%20WIP-yellow)]()
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)]()
+[![Node.js](https://img.shields.io/badge/Node.js-20+-green)]()
+[![License](https://img.shields.io/badge/license-MIT-blue)]()
+[![pnpm](https://img.shields.io/badge/pnpm-9+-orange)]()
 
 ## Overview
 
@@ -26,14 +29,30 @@ CipiBot is an all-in-one Discord bot designed to combine the best features from 
 | **Prisma** | Type-safe ORM for database operations |
 | **Kafka** | Event streaming between microservices |
 | **Fastify** | High-performance HTTP API framework |
+| **Redis** | In-memory caching for fast data access |
+
+## Development Status
+
+🚧 This project is in early development. Features and architecture may change significantly.
+
+## Contributing
+
+This is my first project using microservices architecture, and I'm learning as I go! If you have suggestions, improvements, or spot something that could be done better — I'd love to hear from you.
+
+Feel free to:
+- 🐛 Open an issue with feedback or questions
+- 💡 Submit a pull request with improvements
+- 💬 Reach out with advice or best practices
+
+All contributions and constructive criticism are welcome! 🙌
 
 ## Microservices
 
-- **Gateway** - Receives Discord events and publishes to Kafka
+- **Discord-WS** - Receives Discord events and publishes to Kafka
 - **Leveling** - Manages XP and level progression system
 - **Config** - Handles guild-specific feature toggles and settings
 - **Discord-REST** - Centralized Discord API interactions
-- **More comming...**
+- **More coming...**
 
 ## Planned Features
 
@@ -62,7 +81,3 @@ CipiBot is an all-in-one Discord bot designed to combine the best features from 
 - 🎵 **Music Player** - Multi-source audio streaming
 - 🔧 **Web Panel** - Browser-based bot configuration
 - 🎨 **Embed Builder** - Visual embed creation tool
-
-## Development Status
-
-🚧 This project is in early development. Features and architecture may change significantly.

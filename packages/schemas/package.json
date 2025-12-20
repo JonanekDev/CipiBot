@@ -1,10 +1,9 @@
 {
-  "name": "@cipibot/kafka",
+  "name": "@cipibot/schemas",
   "version": "0.0.1",
   "description": "",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write src/"
@@ -13,11 +12,12 @@
   "author": "JonanekDev",
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
+  "dependencies": {
+    "discord-api-types": "^0.38.37",
+    "zod": "^4.1.13"
+  },
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",
     "@types/node": "^25.0.1"
-  },
-  "dependencies": {
-    "kafkajs": "^2.2.4"
   }
 }

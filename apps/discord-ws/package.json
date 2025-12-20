@@ -1,5 +1,5 @@
 {
-  "name": "gateway-service",
+  "name": "discord-ws-service",
   "type": "module",
   "version": "0.0.1",
   "description": "",
@@ -14,15 +14,15 @@
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
   "dependencies": {
-    "@cipibot/kafka": "workspace:*",
     "@discordjs/core": "^2.4.0",
     "@discordjs/rest": "^2.6.0",
     "@discordjs/ws": "^2.0.4",
     "discord-api-types": "^0.38.37",
-    "dotenv": "^17.2.3"
+    "@cipibot/kafka": "workspace:*"
   },
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",
-    "@types/node": "^25.0.1"
+    "@types/node": "^25.0.1",
+    "dotenv": "^17.2.3"
   }
 }

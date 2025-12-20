@@ -13,21 +13,14 @@ datasource db {
   provider = "postgresql"
 }
 
-model UserLevel {
-  id        String   @id @default(cuid())
+model Guild {
+  id        String   @id
   
-  guildId   String
-  userId    String
+  name      String?
+  icon      String?
 
-  xp Int      @default(0)
-  level      Int      @default(0)
-
-  messageCount Int      @default(0)
+  config        Json     @default("{}")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@unique([guildId, userId])
-  @@index([guildId])
-  @@index([guildId, xp(sort: Desc)])
 }

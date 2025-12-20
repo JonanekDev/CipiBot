@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx src/index.ts",
+    "dev": "tsx -r dotenv/config src/index.ts",
     "build": "tsc",
     "db:migrate": "prisma migrate deploy",
     "format": "prettier --write src/ prisma/"
@@ -22,7 +22,11 @@
     "express": "^5.2.1",
     "fastify": "^5.6.2",
     "pg": "^8.16.3",
-    "prisma": "^7.1.0"
+    "prisma": "^7.1.0",
+    "@cipibot/config-client": "workspace:*",
+    "@cipibot/schemas": "workspace:*",
+    "@cipibot/i18n": "workspace:*",
+    "@cipibot/constants": "workspace:*"
   },
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",

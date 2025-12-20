@@ -1,0 +1,119 @@
+import { DiscordMessagePayloadType, GuildConfigType, GuildMessage } from '@cipibot/schemas';
+import { UserLevel } from './generated/prisma/browser';
+import { PrismaClient } from './generated/prisma/client';
+import { getGuildConfig } from '@cipibot/config-client';
+import { APIEmbed, RESTPostAPIChannelMessageJSONBody } from 'discord-api-types/v10';
+import { t } from '@cipibot/i18n';
+import { BRANDING, COLORS } from '@cipibot/constants';
+import { sendEvent } from '@cipibot/kafka';
+
+export class LevelingService {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  async createUser(guildId: string, userId: string, initialXp: number = 0): Promise<UserLevel> {
+    const record = await this.prisma.userLevel.create({
+      data: {
+        guildId,
+        userId,
+        xp: initialXp,
+        messageCount: initialXp > 0 ? 1 : 0,
+      },
+    });
+    return record;
+  }
+
+  async getUserStats(guildId: string, userId: string): Promise<UserLevel | null> {
+    const record = await this.prisma.userLevel.findUnique({
+      where: {
+        guildId_userId: {
+          guildId,
+          userId,
+        },
+      },
+    });
+    return record;
+  }
+
+  async handleMessage(message: GuildMessage): Promise<void> {
+    const guildId = message.guild_id;
+    if (!guildId) return;
+    getGuildConfig(guildId).then((config) => {
+      const levelingConfig = config.leveling;
+      if (levelingConfig.enabled) {
+        this.processMessage(
+          guildId,
+          config,
+          message.author.id,
+          message.content,
+          message.channel_id,
+        );
+      }
+    });
+  }
+
+  async processMessage(
+    guildId: string,
+    config: GuildConfigType,
+    userId: string,
+    message: string,
+    channelId: string,
+  ): Promise<void> {
+    const record = await this.getUserStats(guildId, userId);
+
+    const wordsCount = message.trim().split(/\s+/).length;
+    const wordsXp = wordsCount * config.leveling.xpPerWord;
+    const xpPerMessage = config.leveling.xpPerMessage;
+    const totalXpGain = wordsXp + xpPerMessage;
+
+    // Cap is without multiplier
+    const cappedXpGain = Math.floor(
+      Math.min(totalXpGain, config.leveling.maxXPPersMessage) * config.leveling.xpMultiplier,
+    );
+
+    // TODO: Role based XP bonuses ?
+
+    if (record) {
+      const xpNeededForNextLevel = 100 * (record.level + 1) * (record.level + 1);
+      let levelUp = false;
+      if (record.xp + cappedXpGain >= xpNeededForNextLevel) {
+        levelUp = true;
+        // Default level up message
+        if (!config.leveling.levelUpMessage) {
+          const levelUpEmbed: APIEmbed = {
+            title: t(config.language, 'leveling.levelUpTitle'),
+            description: t(config.language, 'leveling.levelUpDescription', {
+              level: record.level + 1,
+              user: `<@${userId}>`,
+            }),
+            color: COLORS.PRIMARY,
+            footer: { text: BRANDING.DEFAULT_FOOTER_TEXT },
+          };
+          const eventData: DiscordMessagePayloadType = {
+            channelId: config.leveling.levelUpMessageChannelId ?? channelId,
+            body: {
+              embeds: [levelUpEmbed],
+            },
+          };
+          sendEvent('discord.outbound.message.create', eventData);
+        }
+        //TODO: Custom level up message
+        //TODO: Level role rewards?
+      }
+      await this.prisma.userLevel.update({
+        where: {
+          guildId_userId: {
+            guildId,
+            userId,
+          },
+        },
+        data: {
+          xp: { increment: cappedXpGain },
+          level: levelUp ? { increment: 1 } : undefined,
+          messageCount: { increment: 1 },
+        },
+      });
+    } else {
+      await this.createUser(guildId, userId, totalXpGain);
+    }
+  }
+}
