@@ -18,7 +18,8 @@
     "@discordjs/rest": "^2.6.0",
     "@discordjs/ws": "^2.0.4",
     "discord-api-types": "^0.38.37",
-    "@cipibot/kafka": "workspace:*"
+    "@cipibot/kafka": "workspace:*",
+    "@cipibot/schemas": "workspace:*"
   },
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",

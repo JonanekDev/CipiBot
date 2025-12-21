@@ -1,8 +1,8 @@
-import { DiscordMessagePayloadType, GuildConfigType, GuildMessage } from '@cipibot/schemas';
+import { DiscordMessagePayloadType, GuildConfigType } from '@cipibot/schemas';
 import { UserLevel } from './generated/prisma/browser';
 import { PrismaClient } from './generated/prisma/client';
 import { getGuildConfig } from '@cipibot/config-client';
-import { APIEmbed, RESTPostAPIChannelMessageJSONBody } from 'discord-api-types/v10';
+import { APIEmbed } from 'discord-api-types/v10';
 import { t } from '@cipibot/i18n';
 import { BRANDING, COLORS } from '@cipibot/constants';
 import { sendEvent } from '@cipibot/kafka';
@@ -34,20 +34,45 @@ export class LevelingService {
     return record;
   }
 
-  async handleMessage(message: GuildMessage): Promise<void> {
-    const guildId = message.guild_id;
+  async handleMessage(
+    author_id: string,
+    content: string,
+    channel_id: string,
+    guild_id?: string,
+  ): Promise<void> {
+    const guildId = guild_id;
     if (!guildId) return;
     getGuildConfig(guildId).then((config) => {
       const levelingConfig = config.leveling;
       if (levelingConfig.enabled) {
-        this.processMessage(
-          guildId,
-          config,
-          message.author.id,
-          message.content,
-          message.channel_id,
-        );
+        this.processMessage(guildId, config, author_id, content, channel_id);
       }
+    });
+  }
+
+  async handleMemberAdd(guildId: string, userId: string): Promise<void> {
+    // USes updateMany so i don't have to check if the user exists
+    await this.prisma.userLevel.updateMany({
+      where: {
+        userId,
+        guildId,
+      },
+      data: {
+        left: false,
+      },
+    });
+  }
+
+  async handleMemberRemove(guildId: string, userId: string): Promise<void> {
+    // USes updateMany so i don't have to check if the user exists
+    await this.prisma.userLevel.updateMany({
+      where: {
+        userId,
+        guildId,
+      },
+      data: {
+        left: true,
+      },
     });
   }
 
@@ -110,10 +135,24 @@ export class LevelingService {
           xp: { increment: cappedXpGain },
           level: levelUp ? { increment: 1 } : undefined,
           messageCount: { increment: 1 },
+          left: record.left ? false : undefined,
         },
       });
     } else {
       await this.createUser(guildId, userId, totalXpGain);
     }
+  }
+
+  async getLeaderboard(guildId: string): Promise<UserLevel[]> {
+    const leaderboard = await this.prisma.userLevel.findMany({
+      where: {
+        guildId,
+      },
+      orderBy: {
+        xp: 'desc',
+      },
+      take: 10,
+    });
+    return leaderboard;
   }
 }
