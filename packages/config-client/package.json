@@ -13,9 +13,10 @@
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
   "dependencies": {
+    "@cipibot/constants": "workspace:*",
     "@cipibot/redis": "workspace:*",
     "@cipibot/schemas": "workspace:*",
-    "@cipibot/constants": "workspace:*"
+    "axios": "^1.13.2"
   },
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",

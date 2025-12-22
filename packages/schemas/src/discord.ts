@@ -52,3 +52,11 @@ export const DiscordMessagePayloadSchema = z.object({
 });
 
 export type DiscordMessagePayloadType = z.infer<typeof DiscordMessagePayloadSchema>;
+
+export const RolePayloadSchema = z.object({
+  guildId: z.string(),
+  userId: z.string(),
+  roleId: z.string(),
+});
+
+export type RolePayloadType = z.infer<typeof RolePayloadSchema>;

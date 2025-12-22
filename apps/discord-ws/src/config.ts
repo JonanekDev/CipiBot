@@ -1,7 +1,4 @@
 import { GatewayIntentBits } from '@discordjs/core';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 if (!process.env.DISCORD_BOT_TOKEN) {
   throw new Error('DISCORD_BOT_TOKEN is not set');

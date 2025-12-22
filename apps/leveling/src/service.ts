@@ -1,4 +1,4 @@
-import { DiscordMessagePayloadType, GuildConfigType } from '@cipibot/schemas';
+import { DiscordMessagePayloadType, GuildConfigType, RolePayloadType } from '@cipibot/schemas';
 import { UserLevel } from './generated/prisma/browser';
 import { PrismaClient } from './generated/prisma/client';
 import { getGuildConfig } from '@cipibot/config-client';
@@ -44,9 +44,9 @@ export class LevelingService {
     if (!guildId) return;
     getGuildConfig(guildId).then((config) => {
       const levelingConfig = config.leveling;
-      if (levelingConfig.enabled) {
-        this.processMessage(guildId, config, author_id, content, channel_id);
-      }
+      if (!levelingConfig.enabled) return;
+      if (levelingConfig.ignoreChannelIds.includes(channel_id)) return;
+      this.processMessage(guildId, config, author_id, content, channel_id);
     });
   }
 
@@ -122,7 +122,15 @@ export class LevelingService {
           sendEvent('discord.outbound.message.create', eventData);
         }
         //TODO: Custom level up message
-        //TODO: Level role rewards?
+        const roleId = config.leveling.roleRewards[(record.level + 1).toString()];
+        if (roleId) {
+          const eventData: RolePayloadType = {
+            guildId,
+            userId,
+            roleId,
+          };
+          sendEvent('discord.outbound.member.role.add', eventData);
+        }
       }
       await this.prisma.userLevel.update({
         where: {

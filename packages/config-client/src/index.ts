@@ -1,6 +1,7 @@
 import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
 import { getRedis } from '@cipibot/redis';
 import { GuildConfigSchema, GuildConfigType } from '@cipibot/schemas';
+import axios from 'axios';
 
 const CONFIG_SERVICE_URL = process.env.CONFIG_SERVICE_URL || 'http://localhost:3000';
 
@@ -14,13 +15,9 @@ export async function getGuildConfig(guildId: string): Promise<GuildConfigType> 
     return GuildConfigSchema.parse(JSON.parse(cached));
   }
 
-  const response = await fetch(`${CONFIG_SERVICE_URL}/guilds/${guildId}/config`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch guild config: ${response.statusText}`);
-  }
-  const rawConfig = await response.json();
-
-  const result = GuildConfigSchema.safeParse(rawConfig ?? {});
+  const response = await axios.get(`${CONFIG_SERVICE_URL}/guilds/${guildId}/config`);
+  
+  const result = GuildConfigSchema.safeParse(response.data ?? {});
 
   if (!result.success) {
     console.error(`[ConfigClient] Invalid config data from service for ${guildId}`, result.error);
@@ -30,4 +27,14 @@ export async function getGuildConfig(guildId: string): Promise<GuildConfigType> 
   const validConfig = result.data;
 
   return validConfig;
+}
+
+export async function getKnownGuilds(guildIds: string[]): Promise<string[]> {
+  //TODO: Cache
+  const response = await axios.get<string[]>(`${CONFIG_SERVICE_URL}/guilds/known`, {
+    params: { ids: guildIds },
+  });
+
+  return response.data;
+  
 }

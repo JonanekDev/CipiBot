@@ -41,16 +41,24 @@ export class ConfigService {
     const current = await this.getGuildConfig(guildId);
     const merged = defu(patch, current) as DeepPartial<GuildConfigType>;
 
+    const cleanConfig = {
+      ...merged,
+      leveling: {
+        ...merged.leveling,
+        ignoreChannelIds: merged.leveling?.ignoreChannelIds?.filter((id): id is string => id !== undefined) ?? []
+      }
+    }
+
     await this.prisma.guild.upsert({
       where: { id: guildId },
-      create: { id: guildId, config: merged },
-      update: { config: merged },
+      create: { id: guildId, config: cleanConfig },
+      update: { config: cleanConfig },
     });
 
     const cacheKey = this.getGuildConfigCacheKey(guildId);
-    await this.redis.setex(cacheKey, CACHE_TTL.GUILD_CONFIG, JSON.stringify(merged));
+    await this.redis.setex(cacheKey, CACHE_TTL.GUILD_CONFIG, JSON.stringify(cleanConfig));
 
-    return merged;
+    return cleanConfig;
   }
 
   async upsertGuild(guild: APIGuild): Promise<void> {
@@ -61,5 +69,13 @@ export class ConfigService {
     });
     const cacheKey = this.getGuildConfigCacheKey(guild.id);
     await this.redis.setex(cacheKey, CACHE_TTL.GUILD_CONFIG, JSON.stringify(guildRecord.config));
+  }
+
+  async filterKnownGuilds(guildIds: string[]): Promise<string[]> {
+    const knownGuilds = await this.prisma.guild.findMany({
+      where: { id: { in: guildIds } },
+      select: { id: true },
+    });
+    return knownGuilds.map(g => g.id);
   }
 }

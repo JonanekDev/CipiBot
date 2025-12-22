@@ -6,6 +6,10 @@ interface GuildParams {
   id: string;
 }
 
+interface KnownGuildsQuery {
+  ids: string[];
+}
+
 export async function registerConfigRoutes(
   app: FastifyInstance,
   service: ConfigService,
@@ -36,4 +40,9 @@ export async function registerConfigRoutes(
       }
     },
   );
+
+  app.get<{ Querystring: KnownGuildsQuery }>('/guilds/known', async (request) => {
+    const { ids } = request.query;
+    return await service.filterKnownGuilds(ids);
+  });
 }
