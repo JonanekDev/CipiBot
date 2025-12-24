@@ -1,8 +1,10 @@
 {
-  "name": "api",
+  "name": "@cipibot/api",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "exports": {
+    "./router": "./src/router.ts"
+  },
   "scripts": {
     "dev": "tsx -r dotenv/config src/index.ts",
     "build": "tsc",
@@ -13,6 +15,8 @@
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
   "devDependencies": {
+    "@cipibot/config": "workspace:*",
+    "@cipibot/leveling": "workspace:*",
     "@cipibot/tsconfig": "workspace:*",
     "@types/node": "^25.0.1",
     "@types/pg": "^8.16.0",
@@ -27,9 +31,12 @@
     "@fastify/jwt": "^10.0.0",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.2.0",
+    "@trpc/client": "^11.8.1",
+    "@trpc/server": "^11.8.1",
     "axios": "^1.13.2",
     "discord-api-types": "^0.38.37",
     "fastify": "^5.6.2",
-    "fastify-type-provider-zod": "^6.1.0"
+    "fastify-type-provider-zod": "^6.1.0",
+    "zod": "^4.1.13"
   }
 }

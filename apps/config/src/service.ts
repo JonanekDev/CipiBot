@@ -45,9 +45,10 @@ export class ConfigService {
       ...merged,
       leveling: {
         ...merged.leveling,
-        ignoreChannelIds: merged.leveling?.ignoreChannelIds?.filter((id): id is string => id !== undefined) ?? []
-      }
-    }
+        ignoreChannelIds:
+          merged.leveling?.ignoreChannelIds?.filter((id): id is string => id !== undefined) ?? [],
+      },
+    };
 
     await this.prisma.guild.upsert({
       where: { id: guildId },
@@ -76,6 +77,6 @@ export class ConfigService {
       where: { id: { in: guildIds } },
       select: { id: true },
     });
-    return knownGuilds.map(g => g.id);
+    return knownGuilds.map((g) => g.id);
   }
 }

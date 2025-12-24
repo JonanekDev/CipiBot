@@ -16,8 +16,6 @@ export class DiscordRestService {
   }
 
   async handleMemberRoleAdd(payload: RolePayloadType): Promise<void> {
-    await this.rest.put(
-      Routes.guildMemberRole(payload.guildId, payload.userId, payload.roleId),
-    );
+    await this.rest.put(Routes.guildMemberRole(payload.guildId, payload.userId, payload.roleId));
   }
 }

@@ -1,6 +1,11 @@
 {
     "leveling": {
         "levelUpTitle": "🎉 Dosažení dalšího levelu! 🎉",
-        "levelUpDescription": "Gratulujeme {{user}}, dosáhl jsi {{level}}. levelu!"
+        "levelUpDescription": "Gratulujeme {{user}}, dosáhl jsi {{level}}. levelu!",
+        "levelCommandTitle": "Level uživatele {{user}}",
+        "levelCommandDescription": "Uživatel {{user}} je na levelu {{level}} s {{currentXP}} XP ({{xpForNextLevel}} XP potřebných pro další level) a poslal celkem {{messageCount}} zpráv.",
+        "leaderboardTitle": "🏆 Level žebříček pro server {{guildName}} 🏆",
+        "leaderboardEntry": "{{position}}. {{user}} - Level {{level}} ({{currentXP}} XP)",
+        "noData": "Žádná level data nebyla nalezena."
     }
 }

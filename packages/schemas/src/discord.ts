@@ -60,3 +60,10 @@ export const RolePayloadSchema = z.object({
 });
 
 export type RolePayloadType = z.infer<typeof RolePayloadSchema>;
+
+export const UserSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  avatar: z.string().nullable(),
+  global_name: z.string().nullable(),
+});

@@ -1,8 +1,9 @@
 {
-  "name": "@cipibot/redis",
+  "name": "@cipibot/commands",
   "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write src/"
@@ -11,12 +12,14 @@
   "author": "JonanekDev",
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
-  "devDependencies": {
+    "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",
     "@types/node": "^25.0.1"
   },
   "dependencies": {
-    "ioredis": "^5.8.2",
-    "@cipibot/constants": "workspace:*"
+    "@cipibot/redis": "workspace:*",
+    "@cipibot/constants": "workspace:*",
+    "@cipibot/kafka": "workspace:*",
+    "discord-api-types": "^0.38.37"
   }
 }

@@ -1,12 +1,11 @@
 import Fastify from 'fastify';
 import { PrismaClient } from './generated/prisma/client';
 import { getRedis } from '@cipibot/redis';
-import { registerTopicHandler, startConsumer } from '@cipibot/kafka';
-import { registerConfigRoutes } from './routes';
 import { ConfigService } from './service';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { APIGuild } from 'discord-api-types/v10';
 import { registerConsumers, shutdownConsumers } from './consumers';
+import { createConfigRouter } from './router';
+import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 
 async function main() {
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL || '' });
@@ -25,7 +24,14 @@ async function main() {
   });
 
   // Register routes
-  await registerConfigRoutes(app, configService);
+  const configRouter = createConfigRouter(configService);
+
+  app.register(fastifyTRPCPlugin, {
+    prefix: '/trpc',
+    trpcOptions: {
+      router: configRouter,
+    },
+  });
 
   // Start server
   const APP_PORT = parseInt(process.env.PORT || '3000', 10);

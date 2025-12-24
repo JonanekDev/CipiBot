@@ -1,9 +1,11 @@
 {
-  "name": "config-service",
+  "name": "@cipibot/config",
   "version": "0.0.1",
   "description": "",
   "type": "module",
-  "main": "index.js",
+  "exports": {
+    "./router": "./src/router.ts"
+  },
   "scripts": {
     "dev": "tsx -r dotenv/config src/index.ts",
     "build": "tsc",
@@ -21,12 +23,13 @@
     "prisma": "^7.2.0"
   },
   "dependencies": {
+    "@cipibot/constants": "workspace:*",
     "@cipibot/kafka": "workspace:*",
     "@cipibot/redis": "workspace:*",
     "@cipibot/schemas": "workspace:*",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.2.0",
-    "@cipibot/constants": "workspace:*",
+    "@trpc/server": "^11.8.1",
     "defu": "^6.1.4",
     "discord-api-types": "^0.38.37",
     "fastify": "^5.6.2",

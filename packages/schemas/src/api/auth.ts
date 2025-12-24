@@ -1,17 +1,17 @@
-import z from "zod";
+import z from 'zod';
 
 export const DashboardGuildSchema = z.object({
   id: z.string(),
   name: z.string(),
   icon: z.string().nullable(),
-  isKnown: z.boolean(), 
+  isKnown: z.boolean(),
 });
 
 export type DashboardGuild = z.infer<typeof DashboardGuildSchema>;
 
 export const LoginReqSchema = z.object({
-    code: z.string().min(2),
-}) 
+  code: z.string().min(2),
+});
 
 export type LoginReqType = z.infer<typeof LoginReqSchema>;
 

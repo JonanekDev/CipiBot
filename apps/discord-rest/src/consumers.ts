@@ -1,20 +1,37 @@
 import { disconnectConsumers, registerTopicHandler, startConsumer } from '@cipibot/kafka';
 import { DiscordRestService } from './service';
 import { DiscordMessagePayloadType, RolePayloadType } from '@cipibot/schemas';
+import { CommandsService } from './services/commands.service';
+import { KAFKA_TOPICS } from '@cipibot/constants';
 
 const CONSUMER_GROUP = 'discord-rest-service-group';
 
-export async function registerConsumers(discordRestService: DiscordRestService) {
+export async function registerConsumers(
+  discordRestService: DiscordRestService,
+  commandsService: CommandsService,
+) {
   await registerTopicHandler<DiscordMessagePayloadType>(
     CONSUMER_GROUP,
-    'discord.outbound.message.create',
-    discordRestService.handleMessageCreate.bind(discordRestService),
+    KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE,
+    async (payload) => {
+      await discordRestService.handleMessageCreate(payload);
+    },
   );
 
   await registerTopicHandler<RolePayloadType>(
     CONSUMER_GROUP,
-    'discord.outbound.member.role.add',
-    discordRestService.handleMemberRoleAdd.bind(discordRestService),
+    KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_ADD,
+    async (payload) => {
+      await discordRestService.handleMemberRoleAdd(payload);
+    },
+  );
+
+  await registerTopicHandler<any>(
+    CONSUMER_GROUP,
+    KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE,
+    async (payload) => {
+      commandsService.triggerSync();
+    },
   );
 
   await startConsumer(CONSUMER_GROUP);

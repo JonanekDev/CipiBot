@@ -1,8 +1,10 @@
 {
-  "name": "leveling-service",
+  "name": "@cipibot/leveling",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "exports": {
+    "./router": "./src/router.ts"
+  },
   "scripts": {
     "dev": "tsx -r dotenv/config src/index.ts",
     "build": "tsc",
@@ -14,19 +16,22 @@
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
   "dependencies": {
+    "@cipibot/config-client": "workspace:*",
+    "@cipibot/constants": "workspace:*",
+    "@cipibot/i18n": "workspace:*",
     "@cipibot/kafka": "workspace:*",
+    "@cipibot/redis": "workspace:*",
+    "@cipibot/schemas": "workspace:*",
+    "@cipibot/commands": "workspace:*",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
+    "@trpc/server": "^11.8.1",
     "discord-api-types": "^0.38.37",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "fastify": "^5.6.2",
     "pg": "^8.16.3",
-    "prisma": "^7.1.0",
-    "@cipibot/config-client": "workspace:*",
-    "@cipibot/schemas": "workspace:*",
-    "@cipibot/i18n": "workspace:*",
-    "@cipibot/constants": "workspace:*"
+    "prisma": "^7.1.0"
   },
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",

@@ -1,17 +1,17 @@
-import { getRedis } from "@cipibot/redis";
-import Fastify from "fastify";
-import { registerAPIRoutes } from "./routes";
-import { AuthService } from "./services/auth.service";
-import { AuthController } from "./controllers/auth.controller";
-import fastifyCookie from "@fastify/cookie";
-import fastifyJwt from "@fastify/jwt";
-import { PrismaClient } from "./generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { CONFIG } from "./config";
-import { serializerCompiler, validatorCompiler, ZodTypeProvider } from "fastify-type-provider-zod";
+import { getRedis } from '@cipibot/redis';
+import Fastify from 'fastify';
+import { AuthService } from './services/auth.service';
+import fastifyCookie from '@fastify/cookie';
+import fastifyJwt from '@fastify/jwt';
+import { PrismaClient } from './generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { CONFIG } from './config';
+import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
+import { createContext } from './context';
+import { createAppRouter } from './router';
 
 async function main() {
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL || '' });
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL || '' });
 
   const prisma = new PrismaClient({ adapter });
 
@@ -22,29 +22,29 @@ const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL || '' 
     logger: true,
   });
 
-  // For zod validation
-  app.setValidatorCompiler(validatorCompiler);
-  app.setSerializerCompiler(serializerCompiler);
+  app.register(fastifyCookie);
 
-  const zodApp = app.withTypeProvider<ZodTypeProvider>();
-
-  app.register(fastifyCookie, {
-    hook: 'onRequest',
-  });
   app.register(fastifyJwt, {
     secret: CONFIG.JWT_SECRET,
     cookie: {
-        cookieName: 'access_token',
-        signed: false
-    }
-  })
+      cookieName: 'access_token',
+      signed: false,
+    },
+  });
 
-  // Register routes
-  await registerAPIRoutes(zodApp, { authController: new AuthController(authService) });
+  const appRouter = createAppRouter(authService);
+
+  app.register(fastifyTRPCPlugin, {
+    prefix: '/trpc',
+    trpcOptions: {
+      router: appRouter,
+      createContext,
+    },
+  });
 
   // Start server
   const APP_PORT = parseInt(process.env.PORT || '3002', 10);
-  await app.listen({ port: APP_PORT });
+  await app.listen({ port: APP_PORT, host: '0.0.0.0' });
 
   console.log(`API service listening on port ${APP_PORT}`);
 
@@ -64,4 +64,3 @@ main().catch((error) => {
   console.error('Fatal error:', error);
   process.exit(1);
 });
-

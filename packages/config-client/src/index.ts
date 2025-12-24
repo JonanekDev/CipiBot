@@ -1,9 +1,18 @@
 import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
 import { getRedis } from '@cipibot/redis';
 import { GuildConfigSchema, GuildConfigType } from '@cipibot/schemas';
-import axios from 'axios';
+import { createTRPCClient, httpBatchLink } from '@trpc/client';
+import type { ConfigRouter } from '@cipibot/config/router';
 
-const CONFIG_SERVICE_URL = process.env.CONFIG_SERVICE_URL || 'http://localhost:3000';
+const CONFIG_SERVICE_URL = process.env.CONFIG_SERVICE_URL || 'http://localhost:3000/trpc';
+
+const trpc = createTRPCClient<ConfigRouter>({
+  links: [
+    httpBatchLink({
+      url: CONFIG_SERVICE_URL,
+    }),
+  ],
+});
 
 export async function getGuildConfig(guildId: string): Promise<GuildConfigType> {
   const redis = getRedis();
@@ -15,26 +24,17 @@ export async function getGuildConfig(guildId: string): Promise<GuildConfigType> 
     return GuildConfigSchema.parse(JSON.parse(cached));
   }
 
-  const response = await axios.get(`${CONFIG_SERVICE_URL}/guilds/${guildId}/config`);
-  
-  const result = GuildConfigSchema.safeParse(response.data ?? {});
+  const configWithotuDefault = await trpc.getGuildConfig.query({ id: guildId });
 
-  if (!result.success) {
-    console.error(`[ConfigClient] Invalid config data from service for ${guildId}`, result.error);
-    throw new Error('Invalid configuration data received');
+  const config = GuildConfigSchema.safeParse(configWithotuDefault ?? {});
+
+  if (!config.success) {
+    throw new Error(`[ConfigClient] Error parsing guild config for ${guildId}`);
   }
 
-  const validConfig = result.data;
-
-  return validConfig;
+  return config.data;
 }
 
 export async function getKnownGuilds(guildIds: string[]): Promise<string[]> {
-  //TODO: Cache
-  const response = await axios.get<string[]>(`${CONFIG_SERVICE_URL}/guilds/known`, {
-    params: { ids: guildIds },
-  });
-
-  return response.data;
-  
+  return await trpc.filterKnownGuilds.query({ ids: guildIds });
 }

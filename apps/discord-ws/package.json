@@ -1,5 +1,5 @@
 {
-  "name": "discord-ws-service",
+  "name": "@cipibot/discord-ws",
   "type": "module",
   "version": "0.0.1",
   "description": "",
@@ -19,6 +19,8 @@
     "@discordjs/ws": "^2.0.4",
     "discord-api-types": "^0.38.37",
     "@cipibot/kafka": "workspace:*",
+    "@cipibot/constants": "workspace:*",
+    "@cipibot/commands": "workspace:*",
     "@cipibot/schemas": "workspace:*"
   },
   "devDependencies": {

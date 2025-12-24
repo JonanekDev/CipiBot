@@ -4,7 +4,7 @@ import { PrismaClient } from './generated/prisma/client';
 import { getGuildConfig } from '@cipibot/config-client';
 import { APIEmbed } from 'discord-api-types/v10';
 import { t } from '@cipibot/i18n';
-import { BRANDING, COLORS } from '@cipibot/constants';
+import { BRANDING, COLORS, KAFKA_TOPICS } from '@cipibot/constants';
 import { sendEvent } from '@cipibot/kafka';
 
 export class LevelingService {
@@ -119,7 +119,7 @@ export class LevelingService {
               embeds: [levelUpEmbed],
             },
           };
-          sendEvent('discord.outbound.message.create', eventData);
+          sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
         }
         //TODO: Custom level up message
         const roleId = config.leveling.roleRewards[(record.level + 1).toString()];
@@ -129,7 +129,7 @@ export class LevelingService {
             userId,
             roleId,
           };
-          sendEvent('discord.outbound.member.role.add', eventData);
+          sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_ADD, eventData);
         }
       }
       await this.prisma.userLevel.update({
@@ -152,7 +152,31 @@ export class LevelingService {
   }
 
   async getLeaderboard(guildId: string): Promise<UserLevel[]> {
-    const leaderboard = await this.prisma.userLevel.findMany({
+    const config = await getGuildConfig(guildId);
+
+    if (!config.leveling.enabled) {
+      return [];
+    }
+
+    return this.fetchLeaderboardData(guildId);
+  }
+
+  async getWebLeaderboard(guildId: string): Promise<UserLevel[]> {
+    const config = await getGuildConfig(guildId);
+
+    if (!config.leveling.enabled) {
+      throw new Error('Leveling is disabled for this guild');
+    }
+
+    if (!config.leveling.webLeaderboardEnabled) {
+      throw new Error('Web leaderboard is disabled for this guild');
+    }
+
+    return this.fetchLeaderboardData(guildId);
+  }
+
+  private async fetchLeaderboardData(guildId: string): Promise<UserLevel[]> {
+    return await this.prisma.userLevel.findMany({
       where: {
         guildId,
       },
@@ -161,6 +185,5 @@ export class LevelingService {
       },
       take: 10,
     });
-    return leaderboard;
   }
 }

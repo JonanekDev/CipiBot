@@ -16,9 +16,10 @@
     "@cipibot/constants": "workspace:*",
     "@cipibot/redis": "workspace:*",
     "@cipibot/schemas": "workspace:*",
-    "axios": "^1.13.2"
+    "@trpc/client": "^11.8.1"
   },
   "devDependencies": {
+    "@cipibot/config": "workspace:*",
     "@cipibot/tsconfig": "workspace:*",
     "@types/node": "^25.0.1"
   }

@@ -4,6 +4,8 @@ import { handleGuildEvent } from './handlers/guild';
 import { handleMemberAdd } from './handlers/memberAdd';
 import { handleMemberRemove } from './handlers/memberRemove';
 import { handleGuildDelete } from './handlers/guildDelete';
+import { handleInteractionCreate } from './handlers/interactionCreate';
+import { KAFKA_TOPICS } from '@cipibot/constants';
 
 export async function dispatchEvent(event: GatewayDispatchPayload) {
   try {
@@ -13,11 +15,11 @@ export async function dispatchEvent(event: GatewayDispatchPayload) {
         break;
 
       case GatewayDispatchEvents.GuildCreate:
-        await handleGuildEvent('discord.guild.create', event.d);
+        await handleGuildEvent(KAFKA_TOPICS.DISCORD_INBOUND.GUILD_CREATE, event.d);
         break;
 
       case GatewayDispatchEvents.GuildUpdate:
-        await handleGuildEvent('discord.guild.update', event.d);
+        await handleGuildEvent(KAFKA_TOPICS.DISCORD_INBOUND.GUILD_UPDATE, event.d);
         break;
 
       case GatewayDispatchEvents.GuildDelete:
@@ -30,6 +32,13 @@ export async function dispatchEvent(event: GatewayDispatchPayload) {
 
       case GatewayDispatchEvents.GuildMemberRemove:
         await handleMemberRemove(event.d);
+        break;
+      case GatewayDispatchEvents.InteractionCreate:
+        await handleInteractionCreate(event.d);
+        break;
+
+      default:
+        console.warn(`Unhandled event type: ${event.t}`);
         break;
     }
   } catch (error) {
