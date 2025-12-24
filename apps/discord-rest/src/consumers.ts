@@ -1,14 +1,20 @@
 import { disconnectConsumers, registerTopicHandler, startConsumer } from '@cipibot/kafka';
 import { DiscordRestService } from './service';
-import { DiscordMessagePayloadType, RolePayloadType } from '@cipibot/schemas';
+import {
+  DiscordInteractionReplyType,
+  DiscordMessagePayloadType,
+  RolePayloadType,
+} from '@cipibot/schemas';
 import { CommandsService } from './services/commands.service';
 import { KAFKA_TOPICS } from '@cipibot/constants';
+import { InteractionsService } from './services/interactions.service';
 
 const CONSUMER_GROUP = 'discord-rest-service-group';
 
 export async function registerConsumers(
   discordRestService: DiscordRestService,
   commandsService: CommandsService,
+  interactionsService: InteractionsService,
 ) {
   await registerTopicHandler<DiscordMessagePayloadType>(
     CONSUMER_GROUP,
@@ -31,6 +37,14 @@ export async function registerConsumers(
     KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE,
     async (payload) => {
       commandsService.triggerSync();
+    },
+  );
+
+  await registerTopicHandler<DiscordInteractionReplyType>(
+    CONSUMER_GROUP,
+    KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY,
+    async (payload) => {
+      await interactionsService.sendReply(payload);
     },
   );
 

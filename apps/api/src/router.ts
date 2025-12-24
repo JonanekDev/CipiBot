@@ -2,7 +2,7 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { Context } from './context';
 import { AuthService } from './services/auth.service';
-import { LoginReqSchema, LoginResSchema, GuildConfigPatchSchema } from '@cipibot/schemas';
+import { LoginReqSchema, GuildConfigPatchSchema } from '@cipibot/schemas';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import type { ConfigRouter } from '@cipibot/config/router';
 import type { LevelingRouter } from '@cipibot/leveling/router';

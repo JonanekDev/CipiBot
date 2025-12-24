@@ -8,7 +8,7 @@ import {
   APIEmbed,
 } from 'discord-api-types/v10';
 import { sendEvent } from '@cipibot/kafka';
-import { DiscordMessagePayloadType } from '@cipibot/schemas';
+import { DiscordInteractionReplyType, DiscordMessagePayloadType } from '@cipibot/schemas';
 import { t } from '@cipibot/i18n';
 import { getGuildConfig } from '@cipibot/config-client';
 import { BRANDING, COLORS, KAFKA_TOPICS } from '@cipibot/constants';
@@ -66,14 +66,16 @@ export function createLevelCommand(service: LevelingService): Command {
         footer: { text: BRANDING.DEFAULT_FOOTER_TEXT },
       };
 
-      const eventData: DiscordMessagePayloadType = {
-        channelId: channelId,
+      const eventData: DiscordInteractionReplyType = {
+        interactionId: interaction.id,
+        interactionToken: interaction.token,
         body: {
           embeds: [levelEmbed],
         },
+        ephemeral: false,
       };
 
-      await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
+      await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY, eventData);
     },
   };
 }

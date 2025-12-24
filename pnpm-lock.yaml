@@ -157,9 +157,18 @@ importers:
       '@discordjs/rest':
         specifier: ^2.6.0
         version: 2.6.0
+      '@trpc/server':
+        specifier: ^11.8.1
+        version: 11.8.1(typescript@5.9.3)
       discord-api-types:
         specifier: ^0.38.37
         version: 0.38.37
+      fastify:
+        specifier: ^5.6.2
+        version: 5.6.2
+      zod:
+        specifier: ^4.1.13
+        version: 4.1.13
     devDependencies:
       '@cipibot/tsconfig':
         specifier: workspace:*
@@ -176,6 +185,9 @@ importers:
       '@cipibot/constants':
         specifier: workspace:*
         version: link:../../packages/constants
+      '@cipibot/discord-rest':
+        specifier: workspace:*
+        version: link:../discord-rest
       '@cipibot/kafka':
         specifier: workspace:*
         version: link:../../packages/kafka
@@ -191,6 +203,9 @@ importers:
       '@discordjs/ws':
         specifier: ^2.0.4
         version: 2.0.4
+      '@trpc/client':
+        specifier: ^11.8.1
+        version: 11.8.1(@trpc/server@11.8.1(typescript@5.9.3))(typescript@5.9.3)
       discord-api-types:
         specifier: ^0.38.37
         version: 0.38.37

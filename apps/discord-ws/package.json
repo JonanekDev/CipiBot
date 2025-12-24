@@ -14,14 +14,16 @@
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
   "dependencies": {
+    "@cipibot/commands": "workspace:*",
+    "@cipibot/constants": "workspace:*",
+    "@cipibot/kafka": "workspace:*",
+    "@cipibot/schemas": "workspace:*",
+    "@cipibot/discord-rest": "workspace:*",
     "@discordjs/core": "^2.4.0",
     "@discordjs/rest": "^2.6.0",
     "@discordjs/ws": "^2.0.4",
-    "discord-api-types": "^0.38.37",
-    "@cipibot/kafka": "workspace:*",
-    "@cipibot/constants": "workspace:*",
-    "@cipibot/commands": "workspace:*",
-    "@cipibot/schemas": "workspace:*"
+    "@trpc/client": "^11.8.1",
+    "discord-api-types": "^0.38.37"
   },
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",

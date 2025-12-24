@@ -6,8 +6,13 @@ import { handleMemberRemove } from './handlers/memberRemove';
 import { handleGuildDelete } from './handlers/guildDelete';
 import { handleInteractionCreate } from './handlers/interactionCreate';
 import { KAFKA_TOPICS } from '@cipibot/constants';
+import { DiscordRestRouter } from '@cipibot/discord-rest/router';
+import { TRPCClient } from '@trpc/client';
 
-export async function dispatchEvent(event: GatewayDispatchPayload) {
+export async function dispatchEvent(
+  event: GatewayDispatchPayload,
+  trpc: TRPCClient<DiscordRestRouter>,
+): Promise<void> {
   try {
     switch (event.t) {
       case GatewayDispatchEvents.MessageCreate:
@@ -34,7 +39,7 @@ export async function dispatchEvent(event: GatewayDispatchPayload) {
         await handleMemberRemove(event.d);
         break;
       case GatewayDispatchEvents.InteractionCreate:
-        await handleInteractionCreate(event.d);
+        await handleInteractionCreate(event.d, trpc);
         break;
 
       default:
