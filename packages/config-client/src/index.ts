@@ -24,9 +24,9 @@ export async function getGuildConfig(guildId: string): Promise<GuildConfigType> 
     return GuildConfigSchema.parse(JSON.parse(cached));
   }
 
-  const configWithotuDefault = await trpc.getGuildConfig.query({ id: guildId });
+  const configWithoutDefault = await trpc.getGuildConfig.query({ id: guildId });
 
-  const config = GuildConfigSchema.safeParse(configWithotuDefault ?? {});
+  const config = GuildConfigSchema.safeParse(configWithoutDefault ?? {});
 
   if (!config.success) {
     throw new Error(`[ConfigClient] Error parsing guild config for ${guildId}`);

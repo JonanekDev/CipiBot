@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { EmbedSchemna } from './discord';
+import { EmbedSchema } from './discord';
 import { SUPPORTED_LANGUAGES } from '@cipibot/i18n';
 import { LevelingConfigSchema } from './leveling';
 import { withDefaults } from './defaults';
@@ -8,9 +8,9 @@ export const WelcomeConfigSchema = z.object({
   enabled: z.boolean().default(true),
   welcomeEnabled: z.boolean().default(true),
   leaveEnabled: z.boolean().default(true),
-  welcomeMessage: z.union([z.string(), EmbedSchemna]).nullable().default(null),
-  leaveMessage: z.union([z.string(), EmbedSchemna]).nullable().default(null),
-  channelId: z.union([z.string(), EmbedSchemna]).nullable().default(null),
+  welcomeMessage: z.union([z.string(), EmbedSchema]).nullable().default(null),
+  leaveMessage: z.union([z.string(), EmbedSchema]).nullable().default(null),
+  channelId: z.union([z.string(), EmbedSchema]).nullable().default(null),
 });
 
 export const GuildConfigSchema = z.object({

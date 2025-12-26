@@ -5,7 +5,7 @@ export type GuildMessage = APIMessage & {
   guild_id?: string;
 };
 // Bcs we need schema for zod validation..
-export const EmbedSchemna = z.object({
+export const EmbedSchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
   author: z
@@ -44,7 +44,7 @@ export const EmbedSchemna = z.object({
     .optional(),
 });
 
-export type EmbedType = z.infer<typeof EmbedSchemna>;
+export type EmbedType = z.infer<typeof EmbedSchema>;
 
 export const DiscordMessagePayloadSchema = z.object({
   channelId: z.string(),
