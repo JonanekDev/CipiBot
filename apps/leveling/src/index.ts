@@ -7,6 +7,7 @@ import { createLevelingRouter } from './router';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 import { startCommandHeartbeat, publishCommandDefinitions } from '@cipibot/commands';
 import { createCommands } from './commands';
+import { LevelingRepository } from './repository';
 
 const SERVICE_NAME = 'leveling';
 
@@ -14,7 +15,8 @@ async function main() {
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL || '' });
 
   const prisma = new PrismaClient({ adapter });
-  const levelingService = new LevelingService(prisma);
+  const levelingRepository = new LevelingRepository(prisma);
+  const levelingService = new LevelingService(levelingRepository);
 
   // Register Commands
   const commandsMap = createCommands(levelingService);

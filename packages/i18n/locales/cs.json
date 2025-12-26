@@ -4,14 +4,16 @@
         "levelUpDescription": "Gratulujeme {{userMention}}, dosáhl jsi {{level}}. levelu!",
         "levelCommandTitle": "Level uživatele {{username}}",
         "levelCommandDescription": "Uživatel {{userMention}} je na levelu {{level}} s {{currentXP}} XP ({{xpForNextLevel}} XP potřebných pro další level) a poslal celkem {{messageCount}} zpráv.",
-        "leaderboardTitle": "🏆 Level žebříček pro server {{guildName}} 🏆",
-        "leaderboardEntry": "{{position}}. {{user}} - Level {{level}} ({{currentXP}} XP)",
+        "leaderboardTitle": "🏆 Level žebříček 🏆",
+        "leaderboardDescription": "{{ entries}}",
+        "leaderboardEntry": "{{position}}. {{userMention}} - Level {{level}} ({{currentXP}} XP)",
         "noData": "Žádná level data nebyla nalezena."
     },
     "errors":
     {
         "errorTitle": "❌ Chyba ❌",
         "MODULE_DISABLED": "Modul {{modul}} je na tomto serveru vypnut.",
-        "COMMAND_OPTION_USER_NO_BOT": "Nemůžeš pro tento příkaz vybrat bota jako uživatele."
+        "COMMAND_OPTION_USER_NO_BOT": "Nemůžeš pro tento příkaz vybrat bota jako uživatele.",
+        "USER_NOT_FOUND": "Uživatel s ID {{userId}} nebyl nalezen."
     }
 }

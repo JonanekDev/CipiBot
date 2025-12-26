@@ -14,7 +14,6 @@
   "packageManager": "pnpm@10.25.0",
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",
-    "@cipibot/schemas": "workspace:*",
     "@types/node": "^25.0.1"
   },
   "dependencies": {

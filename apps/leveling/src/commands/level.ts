@@ -14,7 +14,7 @@ import { KAFKA_TOPICS } from '@cipibot/constants';
 import { calculateXpForLevel } from '../calculator';
 import { createErrorEmbed } from '@cipibot/embeds';
 import { createLevelVariables, LevelVariables } from '@cipibot/templating/modules/leveling';
-import { renderDiscordMessage } from '@cipibot/templating/discord';
+import { renderDiscordMessage } from '@cipibot/embeds/discord';
 
 export function createLevelCommand(service: LevelingService): Command {
   return {
@@ -33,9 +33,8 @@ export function createLevelCommand(service: LevelingService): Command {
     },
     handler: async (interaction: APIChatInputApplicationCommandInteraction) => {
       const guildId = interaction.guild_id;
-      const channelId = interaction.channel.id;
 
-      if (!guildId || !channelId) return;
+      if (!guildId) return;
 
       const config = await getGuildConfig(guildId);
       if (!config.leveling.enabled) {
@@ -43,7 +42,7 @@ export function createLevelCommand(service: LevelingService): Command {
           interactionId: interaction.id,
           interactionToken: interaction.token,
           body: {
-            embeds: [ createErrorEmbed('MODULE_DISABLED', { module: 'Leveling' }, config.language) ],
+            embeds: [createErrorEmbed('MODULE_DISABLED', { module: 'Leveling' }, config.language)],
           },
           ephemeral: true,
         };
@@ -61,7 +60,7 @@ export function createLevelCommand(service: LevelingService): Command {
           interactionId: interaction.id,
           interactionToken: interaction.token,
           body: {
-            embeds: [ createErrorEmbed('COMMAND_OPTION_USER_NO_BOT', {}, config.language) ],
+            embeds: [createErrorEmbed('COMMAND_OPTION_USER_NO_BOT', {}, config.language)],
           },
           ephemeral: true,
         };
@@ -73,33 +72,36 @@ export function createLevelCommand(service: LevelingService): Command {
 
       const user = await service.getUser(guildId, targetUser.id);
 
-       const eventData: DiscordInteractionReplyType = {
-          interactionId: interaction.id,
-          interactionToken: interaction.token,
-          body: {},
-          ephemeral: config.leveling.commands.level.ephemeral,
-        };
+      const eventData: DiscordInteractionReplyType = {
+        interactionId: interaction.id,
+        interactionToken: interaction.token,
+        body: {},
+        ephemeral: config.leveling.commands.level.ephemeral,
+      };
 
-      const levelUpVariables = createLevelVariables({
-                  userId: targetUser.id,
-                  username: targetUser.global_name || targetUser.username,
-                  avatar: targetUser.avatar || undefined,
-                },{
-            level: user?.level || 0,
-            currentXP: user?.xp || 0,
-            messageCount: user ? user.messageCount : 0,
-          }, calculateXpForLevel((user?.level || 0) + 1)
-                );
-        
-              eventData.body = renderDiscordMessage<LevelVariables>(
-                config.leveling.levelUpMessage,
-                levelUpVariables,
-                {
-                  title: t(config.language, 'leveling.levelCommandTitle'),
-                  description: t(config.language, 'leveling.levelCommandDescription'),
-                  thumbnail: { url: `{{avatarUrl}}` },
-                }
-              );
+      const levelUpVariables = createLevelVariables(
+        {
+          userId: targetUser.id,
+          username: targetUser.global_name || targetUser.username,
+          avatar: targetUser.avatar || undefined,
+        },
+        {
+          level: user?.level || 0,
+          currentXP: user?.xp || 0,
+          messageCount: user ? user.messageCount : 0,
+        },
+        calculateXpForLevel((user?.level || 0) + 1),
+      );
+
+      eventData.body = renderDiscordMessage<LevelVariables>(
+        config.leveling.commands.level.customMessage,
+        levelUpVariables,
+        {
+          title: t(config.language, 'leveling.levelCommandTitle'),
+          description: t(config.language, 'leveling.levelCommandDescription'),
+          thumbnail: { url: `{{avatarUrl}}` },
+        },
+      );
 
       await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY, eventData);
     },

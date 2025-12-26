@@ -1,43 +1,47 @@
-import { createUserVariables, UserVariables } from "./common";
+import { createUserVariables, UserVariables } from './common';
 
 export interface LevelUpVariables extends UserVariables {
-    level: number;
-    currentXP: number;
-    messageCount: number;
+  level: number;
+  currentXP: number;
+  messageCount: number;
 }
 
 export function createLevelUpVariables(
-    user: Parameters<typeof createUserVariables>[0],
-    level: { level: number,
-    currentXP: number,
-    messageCount: number }
+  user: Parameters<typeof createUserVariables>[0],
+  level: { level: number; currentXP: number; messageCount: number },
 ): LevelUpVariables {
-    return {
-        ...createUserVariables(user),
-        level: level.level,
-        currentXP: level.currentXP,
-        messageCount: level.messageCount,
-    };
+  return {
+    ...createUserVariables(user),
+    level: level.level,
+    currentXP: level.currentXP,
+    messageCount: level.messageCount,
+  };
 }
 
-export interface LeaderboardEntryVariables extends UserVariables {
-    position: number;
-    level: number;
-    currentXP: number;
-    messageCount: number;
+export interface LeaderboardEntryVariables {
+  position: number;
+  userId: string;
+  userMention: string;
+  level: number;
+  currentXP: number;
+  messageCount: number;
+}
+
+export interface LeaderboardVariables {
+  entries: string;
 }
 
 export interface LevelVariables extends LevelUpVariables {
-    xpForNextLevel: number;
+  xpForNextLevel: number;
 }
 
 export function createLevelVariables(
-    user: Parameters<typeof createUserVariables>[0],
-    level: Parameters<typeof createLevelUpVariables>[1],
-    xpForNextLevel: number
+  user: Parameters<typeof createUserVariables>[0],
+  level: Parameters<typeof createLevelUpVariables>[1],
+  xpForNextLevel: number,
 ): LevelVariables {
-    return {
-        ...createLevelUpVariables(user, level),
-        xpForNextLevel,
-    };
+  return {
+    ...createLevelUpVariables(user, level),
+    xpForNextLevel,
+  };
 }

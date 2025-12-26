@@ -1,4 +1,3 @@
-import { PrismaClient } from './generated/prisma/client';
 import type { Redis } from '@cipibot/redis';
 import { DeepPartial, type GuildConfigType } from '@cipibot/schemas';
 import { APIGuild } from 'discord-api-types/v10';
@@ -24,7 +23,9 @@ export class ConfigService {
       return JSON.parse(cached);
     }
 
-    const guild = await this.configRepository.getGuildConfig(guildId) as { config: GuildConfigType } | null;
+    const guild = (await this.configRepository.getGuildConfig(guildId)) as {
+      config: GuildConfigType;
+    } | null;
 
     const config = (guild?.config ?? {}) as DeepPartial<GuildConfigType>;
     await this.redis.setex(cacheKey, CACHE_TTL.GUILD_CONFIG, JSON.stringify(config));

@@ -1,4 +1,9 @@
-import { APIApplicationCommandInteractionDataUserOption, APIChatInputApplicationCommandInteraction, APIUser, ApplicationCommandOptionType } from "discord-api-types/v10";
+import {
+  APIApplicationCommandInteractionDataUserOption,
+  APIChatInputApplicationCommandInteraction,
+  APIUser,
+  ApplicationCommandOptionType,
+} from 'discord-api-types/v10';
 
 export function getUserOption(
   interaction: APIChatInputApplicationCommandInteraction,

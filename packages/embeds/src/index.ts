@@ -6,25 +6,28 @@ import { SupportedLanguage, t } from '@cipibot/i18n';
 import { renderTemplate } from '@cipibot/templating';
 
 export function createEmbed(embed: EmbedType): APIEmbed {
-    return {
-        color: COLORS.PRIMARY,
-        ...embed,
-        timestamp: new Date().toISOString(),
-        footer: {
-            text: BRANDING.DEFAULT_FOOTER_TEXT + (embed.footer?.text ? ` | ${embed.footer.text}` : ''),
-        },
-    }
+  return {
+    color: COLORS.PRIMARY,
+    ...embed,
+    timestamp: new Date().toISOString(),
+    footer: {
+      text: BRANDING.DEFAULT_FOOTER_TEXT + (embed.footer?.text ? ` | ${embed.footer.text}` : ''),
+    },
+  };
 }
 
-export function createErrorEmbed<T extends ErrorType>(type: T, variables: ErrorVariables[T], lang: SupportedLanguage): APIEmbed {
+export function createErrorEmbed<T extends ErrorType>(
+  type: T,
+  variables: ErrorVariables[T],
+  lang: SupportedLanguage,
+): APIEmbed {
+  const template = t(lang, `errors.${type}`, variables);
 
-    const template = t(lang, `errors.${type}`, variables);
+  const description = renderTemplate(template, variables);
 
-    const description = renderTemplate(template, variables);
-
-    return createEmbed({
-        title: t(lang, 'errors.errorTitle'),
-        description,
-        color: COLORS.ERROR,
-    })
+  return createEmbed({
+    title: t(lang, 'errors.errorTitle'),
+    description,
+    color: COLORS.ERROR,
+  });
 }

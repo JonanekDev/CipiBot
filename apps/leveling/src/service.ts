@@ -1,4 +1,9 @@
-import { DiscordMessagePayloadType, EmbedType, GuildConfigType, RolePayloadType } from '@cipibot/schemas';
+import {
+  DiscordMessagePayloadType,
+  EmbedType,
+  GuildConfigType,
+  RolePayloadType,
+} from '@cipibot/schemas';
 import { UserLevel } from './generated/prisma/browser';
 import { PrismaClient } from './generated/prisma/client';
 import { getGuildConfig } from '@cipibot/config-client';
@@ -8,15 +13,11 @@ import { KAFKA_TOPICS } from '@cipibot/constants';
 import { sendEvent } from '@cipibot/kafka';
 import { calculateXpForLevel, calculateXpFromMessage } from './calculator';
 import { LevelingRepository } from './repository';
-import { renderDiscordMessage } from '@cipibot/templating/discord';
+import { renderDiscordMessage } from '@cipibot/embeds/discord';
 import { createLevelUpVariables, LevelUpVariables } from '@cipibot/templating/modules/leveling';
 
 export class LevelingService {
-  private levelingRepository: LevelingRepository;
-
-  constructor(private readonly prisma: PrismaClient) {
-    this.levelingRepository = new LevelingRepository(prisma);
-  }
+  constructor(private readonly levelingRepository: LevelingRepository) {}
 
   async syncMemberPresence(guildId: string, userId: string, left: boolean): Promise<void> {
     await this.levelingRepository.setUserLeftStatus(guildId, userId, left);
@@ -35,60 +36,56 @@ export class LevelingService {
     const currentLevel = record ? record.level : 0;
     const currentXp = record ? record.xp : 0;
     const xpNeededForNextLevel = calculateXpForLevel(currentLevel + 1);
-      let levelUp = false;
-      if (currentXp + xpAdded >= xpNeededForNextLevel) {
-        levelUp = true;
-        let eventData: DiscordMessagePayloadType = {
-               channelId: config.leveling.levelUpMessageChannelId ?? channelId,
-                body: {}
+    let levelUp = false;
+    if (currentXp + xpAdded >= xpNeededForNextLevel) {
+      levelUp = true;
+      let eventData: DiscordMessagePayloadType = {
+        channelId: config.leveling.levelUpMessageChannelId ?? channelId,
+        body: {},
+      };
+
+      const levelUpVariables = createLevelUpVariables(
+        {
+          userId: user.id,
+          username: user.global_name || user.username,
+          avatar: user.avatar || undefined,
+        },
+        {
+          level: currentLevel + 1,
+          currentXP: currentXp + xpAdded,
+          messageCount: record ? record.messageCount + 1 : 1,
+        },
+      );
+
+      eventData.body = renderDiscordMessage<LevelUpVariables>(
+        config.leveling.levelUpMessage,
+        levelUpVariables,
+        {
+          title: t(config.language, 'leveling.levelUpTitle'),
+          description: t(config.language, 'leveling.levelUpDescription'),
+          thumbnail: { url: `{{avatarUrl}}` },
+        },
+      );
+
+      sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
+
+      // Role reward
+      const roleId = config.leveling.roleRewards[(currentLevel + 1).toString()];
+      if (roleId) {
+        const eventData: RolePayloadType = {
+          guildId,
+          userId: user.id,
+          roleId,
         };
-        
-          const levelUpVariables = createLevelUpVariables({
-            userId: user.id,
-            username: user.global_name || user.username,
-            avatar: user.avatar || undefined,
-          },
-          {
-            level: currentLevel + 1,
-            currentXP: currentXp + xpAdded,
-            messageCount: record ? record.messageCount + 1 : 1,
-          });
-  
-        eventData.body = renderDiscordMessage<LevelUpVariables>(
-          config.leveling.levelUpMessage,
-          levelUpVariables,
-          {
-            title: t(config.language, 'leveling.levelUpTitle'),
-            description: t(config.language, 'leveling.levelUpDescription'),
-            thumbnail: { url: `{{avatarUrl}}` },
-          }
-        );
-        
-        sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
-
-        // Role reward
-        const roleId = config.leveling.roleRewards[(currentLevel + 1).toString()];
-        if (roleId) {
-          const eventData: RolePayloadType = {
-            guildId,
-            userId: user.id,
-            roleId,
-          };
-          sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_ADD, eventData);
-        }
+        sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_ADD, eventData);
       }
-
-      await this.levelingRepository.upsertUser(guildId, user.id, xpAdded, levelUp);
-  }
-
-  async getLeaderboard(guildId: string): Promise<UserLevel[]> {
-    const config = await getGuildConfig(guildId);
-
-    if (!config.leveling.enabled) {
-      return [];
     }
 
-    return this.levelingRepository.getLeaderboard(guildId);
+    await this.levelingRepository.upsertUser(guildId, user.id, xpAdded, levelUp);
+  }
+
+  async getLeaderboard(guildId: string, limit?: number): Promise<UserLevel[]> {
+    return this.levelingRepository.getLeaderboard(guildId, limit);
   }
 
   async getWebLeaderboard(guildId: string): Promise<UserLevel[]> {

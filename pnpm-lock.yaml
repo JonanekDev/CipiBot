@@ -377,9 +377,6 @@ importers:
         specifier: ^25.7.3
         version: 25.7.3(typescript@5.9.3)
     devDependencies:
-      '@cipibot/schemas':
-        specifier: workspace:*
-        version: link:../schemas
       '@cipibot/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -440,9 +437,6 @@ importers:
       '@cipibot/discord-utils':
         specifier: workspace:*
         version: link:../discord-utils
-      '@cipibot/embeds':
-        specifier: workspace:*
-        version: link:../embeds
       '@cipibot/schemas':
         specifier: workspace:*
         version: link:../schemas

@@ -17,7 +17,10 @@ i18next.init({
 });
 
 export type SupportedLanguage = keyof typeof resources;
-export const SUPPORTED_LANGUAGES = Object.keys(resources) as [SupportedLanguage, ...SupportedLanguage[]];
+export const SUPPORTED_LANGUAGES = Object.keys(resources) as [
+  SupportedLanguage,
+  ...SupportedLanguage[],
+];
 export type keyPath = RecursiveKeyOf<typeof en>;
 
 type RecursiveKeyOf<TObj extends object> = {

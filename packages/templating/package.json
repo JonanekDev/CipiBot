@@ -6,8 +6,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./modules/*": "./src/modules/*.ts",
-    "./discord": "./src/discord.ts"
+    "./modules/*": "./src/modules/*.ts"
   },
   "scripts": {
     "build": "tsc",
@@ -19,7 +18,6 @@
   "packageManager": "pnpm@10.25.0",
   "dependencies": {
     "@cipibot/discord-utils": "workspace:*",
-    "@cipibot/embeds": "workspace:*",
     "@cipibot/schemas": "workspace:*",
     "discord-api-types": "^0.38.37"
   },

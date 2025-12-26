@@ -3,15 +3,11 @@ import { EmbedSchemna } from './discord';
 import { CommandSchema } from './commands';
 import { withDefaults } from './defaults';
 
-export const LeaderboardEntry = z.object({
-  userId: z.string(),
-  level: z.number().int(),
-  xp: z.number().int(),
-  messageCount: z.number().int(),
-  left: z.boolean(),
+export const LeaderboardCommandSchema = CommandSchema.extend({
+  leaderboardEntry: z.string().nullable().default(null),
 });
 
-export type LeaderboardEntryType = z.infer<typeof LeaderboardEntry>;
+export type LeaderboardCommandType = z.infer<typeof LeaderboardCommandSchema>;
 
 export const LevelingConfigSchema = z.object({
   enabled: z.boolean().default(true),
@@ -33,13 +29,11 @@ export const LevelingConfigSchema = z.object({
   xpMultiplier: z.number().min(0.1).max(10).default(1.0),
   webLeaderboardEnabled: z.boolean().default(true),
   commands: withDefaults(
-      z.object({
-        level: withDefaults(CommandSchema),
-        leaderboard: withDefaults(CommandSchema),
-      }),
-    ),
+    z.object({
+      level: withDefaults(CommandSchema),
+      leaderboard: withDefaults(LeaderboardCommandSchema),
+    }),
+  ),
 });
 
 export type LevelingConfigType = z.infer<typeof LevelingConfigSchema>;
-
-export const Leaderboard = z.array(LeaderboardEntry);

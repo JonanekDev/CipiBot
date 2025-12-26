@@ -24,13 +24,19 @@ export async function registerConsumers(
     async (message) => {
       if (message.author.bot) return;
       const guildId = message.guild_id;
-          if (!guildId) return;
-          getGuildConfig(guildId).then((config) => {
-            const levelingConfig = config.leveling;
-            if (!levelingConfig.enabled) return;
-            if (levelingConfig.ignoreChannelIds.includes(message.channel_id)) return;
-            levelingService.processMessage(guildId, config, message.author, message.content, message.channel_id);
-          });
+      if (!guildId) return;
+      getGuildConfig(guildId).then((config) => {
+        const levelingConfig = config.leveling;
+        if (!levelingConfig.enabled) return;
+        if (levelingConfig.ignoreChannelIds.includes(message.channel_id)) return;
+        levelingService.processMessage(
+          guildId,
+          config,
+          message.author,
+          message.content,
+          message.channel_id,
+        );
+      });
     },
   );
 
