@@ -23,6 +23,8 @@
     "@cipibot/redis": "workspace:*",
     "@cipibot/schemas": "workspace:*",
     "@cipibot/commands": "workspace:*",
+    "@cipibot/embeds": "workspace:*",
+    "@cipibot/templating": "workspace:*",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
     "@trpc/server": "^11.8.1",

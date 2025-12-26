@@ -1,22 +1,17 @@
 {
-  "name": "@cipibot/schemas",
+  "name": "@cipibot/discord-utils",
   "version": "0.0.1",
   "description": "",
-  "type": "module",
   "main": "src/index.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write src/"
   },
   "keywords": [],
-  "author": "JonanekDev",
+  "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
-  "dependencies": {
-    "discord-api-types": "^0.38.37",
-    "zod": "^4.1.13",
-    "@cipibot/i18n": "workspace:*"
-  },
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",
     "@types/node": "^25.0.1"

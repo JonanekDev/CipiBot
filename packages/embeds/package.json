@@ -1,5 +1,5 @@
 {
-  "name": "@cipibot/i18n",
+  "name": "@cipibot/embeds",
   "version": "0.0.1",
   "description": "",
   "main": "src/index.ts",
@@ -13,11 +13,13 @@
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
   "devDependencies": {
-    "@cipibot/tsconfig": "workspace:*",
-    "@cipibot/schemas": "workspace:*",
-    "@types/node": "^25.0.1"
+    "@cipibot/tsconfig": "workspace:*"
   },
   "dependencies": {
-    "i18next": "^25.7.3"
+    "@cipibot/constants": "workspace:*",
+    "@cipibot/schemas": "workspace:*",
+    "@cipibot/i18n": "workspace:*",
+    "@cipibot/templating": "workspace:*",
+    "discord-api-types": "^0.38.37"
   }
 }

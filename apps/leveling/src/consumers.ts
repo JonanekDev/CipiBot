@@ -6,11 +6,11 @@ import { Command } from '@cipibot/commands';
 import {
   GatewayGuildMemberAddDispatchData,
   GatewayGuildMemberRemoveDispatchData,
-  APIInteraction,
   InteractionType,
   APIChatInputApplicationCommandInteraction,
 } from 'discord-api-types/v10';
 import { KAFKA_TOPICS } from '@cipibot/constants';
+import { getGuildConfig } from '@cipibot/config-client';
 
 const CONSUMER_GROUP = 'leveling-service-group';
 
@@ -23,12 +23,14 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_INBOUND.MESSAGE_CREATE,
     async (message) => {
       if (message.author.bot) return;
-      await levelingService.handleMessage(
-        message.author.id,
-        message.content,
-        message.channel_id,
-        message.guild_id,
-      );
+      const guildId = message.guild_id;
+          if (!guildId) return;
+          getGuildConfig(guildId).then((config) => {
+            const levelingConfig = config.leveling;
+            if (!levelingConfig.enabled) return;
+            if (levelingConfig.ignoreChannelIds.includes(message.channel_id)) return;
+            levelingService.processMessage(guildId, config, message.author, message.content, message.channel_id);
+          });
     },
   );
 
@@ -36,7 +38,7 @@ export async function registerConsumers(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_MEMBER_ADD,
     async (data) => {
-      await levelingService.handleMemberAdd(data.guild_id, data.user.id);
+      await levelingService.syncMemberPresence(data.guild_id, data.user.id, false);
     },
   );
 
@@ -44,7 +46,7 @@ export async function registerConsumers(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_MEMBER_REMOVE,
     async (data) => {
-      await levelingService.handleMemberRemove(data.guild_id, data.user.id);
+      await levelingService.syncMemberPresence(data.guild_id, data.user.id, true);
     },
   );
 

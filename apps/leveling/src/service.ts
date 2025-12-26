@@ -1,154 +1,84 @@
-import { DiscordMessagePayloadType, GuildConfigType, RolePayloadType } from '@cipibot/schemas';
+import { DiscordMessagePayloadType, EmbedType, GuildConfigType, RolePayloadType } from '@cipibot/schemas';
 import { UserLevel } from './generated/prisma/browser';
 import { PrismaClient } from './generated/prisma/client';
 import { getGuildConfig } from '@cipibot/config-client';
-import { APIEmbed } from 'discord-api-types/v10';
+import { APIUser } from 'discord-api-types/v10';
 import { t } from '@cipibot/i18n';
-import { BRANDING, COLORS, KAFKA_TOPICS } from '@cipibot/constants';
+import { KAFKA_TOPICS } from '@cipibot/constants';
 import { sendEvent } from '@cipibot/kafka';
+import { calculateXpForLevel, calculateXpFromMessage } from './calculator';
+import { LevelingRepository } from './repository';
+import { renderDiscordMessage } from '@cipibot/templating/discord';
+import { createLevelUpVariables, LevelUpVariables } from '@cipibot/templating/modules/leveling';
 
 export class LevelingService {
-  constructor(private readonly prisma: PrismaClient) {}
+  private levelingRepository: LevelingRepository;
 
-  async createUser(guildId: string, userId: string, initialXp: number = 0): Promise<UserLevel> {
-    const record = await this.prisma.userLevel.create({
-      data: {
-        guildId,
-        userId,
-        xp: initialXp,
-        messageCount: initialXp > 0 ? 1 : 0,
-      },
-    });
-    return record;
+  constructor(private readonly prisma: PrismaClient) {
+    this.levelingRepository = new LevelingRepository(prisma);
   }
 
-  async getUserStats(guildId: string, userId: string): Promise<UserLevel | null> {
-    const record = await this.prisma.userLevel.findUnique({
-      where: {
-        guildId_userId: {
-          guildId,
-          userId,
-        },
-      },
-    });
-    return record;
-  }
-
-  async handleMessage(
-    author_id: string,
-    content: string,
-    channel_id: string,
-    guild_id?: string,
-  ): Promise<void> {
-    const guildId = guild_id;
-    if (!guildId) return;
-    getGuildConfig(guildId).then((config) => {
-      const levelingConfig = config.leveling;
-      if (!levelingConfig.enabled) return;
-      if (levelingConfig.ignoreChannelIds.includes(channel_id)) return;
-      this.processMessage(guildId, config, author_id, content, channel_id);
-    });
-  }
-
-  async handleMemberAdd(guildId: string, userId: string): Promise<void> {
-    // USes updateMany so i don't have to check if the user exists
-    await this.prisma.userLevel.updateMany({
-      where: {
-        userId,
-        guildId,
-      },
-      data: {
-        left: false,
-      },
-    });
-  }
-
-  async handleMemberRemove(guildId: string, userId: string): Promise<void> {
-    // USes updateMany so i don't have to check if the user exists
-    await this.prisma.userLevel.updateMany({
-      where: {
-        userId,
-        guildId,
-      },
-      data: {
-        left: true,
-      },
-    });
+  async syncMemberPresence(guildId: string, userId: string, left: boolean): Promise<void> {
+    await this.levelingRepository.setUserLeftStatus(guildId, userId, left);
   }
 
   async processMessage(
     guildId: string,
     config: GuildConfigType,
-    userId: string,
+    user: APIUser,
     message: string,
     channelId: string,
   ): Promise<void> {
-    const record = await this.getUserStats(guildId, userId);
-
-    const wordsCount = message.trim().split(/\s+/).length;
-    const wordsXp = wordsCount * config.leveling.xpPerWord;
-    const xpPerMessage = config.leveling.xpPerMessage;
-    const totalXpGain = wordsXp + xpPerMessage;
-
-    // Cap is without multiplier
-    const cappedXpGain = Math.floor(
-      Math.min(totalXpGain, config.leveling.maxXPPersMessage) * config.leveling.xpMultiplier,
-    );
-
+    const record = await this.levelingRepository.getUser(guildId, user.id);
+    const xpAdded = calculateXpFromMessage(message, config.leveling);
     // TODO: Role based XP bonuses ?
-
-    if (record) {
-      const xpNeededForNextLevel = 100 * (record.level + 1) * (record.level + 1);
+    const currentLevel = record ? record.level : 0;
+    const currentXp = record ? record.xp : 0;
+    const xpNeededForNextLevel = calculateXpForLevel(currentLevel + 1);
       let levelUp = false;
-      if (record.xp + cappedXpGain >= xpNeededForNextLevel) {
+      if (currentXp + xpAdded >= xpNeededForNextLevel) {
         levelUp = true;
-        // Default level up message
-        if (!config.leveling.levelUpMessage) {
-          const levelUpEmbed: APIEmbed = {
+        let eventData: DiscordMessagePayloadType = {
+               channelId: config.leveling.levelUpMessageChannelId ?? channelId,
+                body: {}
+        };
+        
+          const levelUpVariables = createLevelUpVariables({
+            userId: user.id,
+            username: user.global_name || user.username,
+            avatar: user.avatar || undefined,
+          },
+          {
+            level: currentLevel + 1,
+            currentXP: currentXp + xpAdded,
+            messageCount: record ? record.messageCount + 1 : 1,
+          });
+  
+        eventData.body = renderDiscordMessage<LevelUpVariables>(
+          config.leveling.levelUpMessage,
+          levelUpVariables,
+          {
             title: t(config.language, 'leveling.levelUpTitle'),
-            description: t(config.language, 'leveling.levelUpDescription', {
-              level: record.level + 1,
-              user: `<@${userId}>`,
-            }),
-            color: COLORS.PRIMARY,
-            footer: { text: BRANDING.DEFAULT_FOOTER_TEXT },
-          };
-          const eventData: DiscordMessagePayloadType = {
-            channelId: config.leveling.levelUpMessageChannelId ?? channelId,
-            body: {
-              embeds: [levelUpEmbed],
-            },
-          };
-          sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
-        }
-        //TODO: Custom level up message
-        const roleId = config.leveling.roleRewards[(record.level + 1).toString()];
+            description: t(config.language, 'leveling.levelUpDescription'),
+            thumbnail: { url: `{{avatarUrl}}` },
+          }
+        );
+        
+        sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
+
+        // Role reward
+        const roleId = config.leveling.roleRewards[(currentLevel + 1).toString()];
         if (roleId) {
           const eventData: RolePayloadType = {
             guildId,
-            userId,
+            userId: user.id,
             roleId,
           };
           sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_ADD, eventData);
         }
       }
-      await this.prisma.userLevel.update({
-        where: {
-          guildId_userId: {
-            guildId,
-            userId,
-          },
-        },
-        data: {
-          xp: { increment: cappedXpGain },
-          level: levelUp ? { increment: 1 } : undefined,
-          messageCount: { increment: 1 },
-          left: record.left ? false : undefined,
-        },
-      });
-    } else {
-      await this.createUser(guildId, userId, totalXpGain);
-    }
+
+      await this.levelingRepository.upsertUser(guildId, user.id, xpAdded, levelUp);
   }
 
   async getLeaderboard(guildId: string): Promise<UserLevel[]> {
@@ -158,7 +88,7 @@ export class LevelingService {
       return [];
     }
 
-    return this.fetchLeaderboardData(guildId);
+    return this.levelingRepository.getLeaderboard(guildId);
   }
 
   async getWebLeaderboard(guildId: string): Promise<UserLevel[]> {
@@ -172,18 +102,10 @@ export class LevelingService {
       throw new Error('Web leaderboard is disabled for this guild');
     }
 
-    return this.fetchLeaderboardData(guildId);
+    return this.levelingRepository.getLeaderboard(guildId);
   }
 
-  private async fetchLeaderboardData(guildId: string): Promise<UserLevel[]> {
-    return await this.prisma.userLevel.findMany({
-      where: {
-        guildId,
-      },
-      orderBy: {
-        xp: 'desc',
-      },
-      take: 10,
-    });
+  async getUser(guildId: string, userId: string): Promise<UserLevel | null> {
+    return this.levelingRepository.getUser(guildId, userId);
   }
 }

@@ -4,11 +4,12 @@ import { DeepPartial, type GuildConfigType } from '@cipibot/schemas';
 import { APIGuild } from 'discord-api-types/v10';
 import { defu } from 'defu';
 import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
+import { ConfigRepository } from './repository';
 
 export class ConfigService {
   constructor(
-    private readonly prisma: PrismaClient,
     private readonly redis: Redis,
+    private readonly configRepository: ConfigRepository,
   ) {}
 
   getGuildConfigCacheKey(guildId: string): string {
@@ -23,10 +24,7 @@ export class ConfigService {
       return JSON.parse(cached);
     }
 
-    const guild = await this.prisma.guild.findUnique({
-      where: { id: guildId },
-      select: { config: true },
-    });
+    const guild = await this.configRepository.getGuildConfig(guildId) as { config: GuildConfigType } | null;
 
     const config = (guild?.config ?? {}) as DeepPartial<GuildConfigType>;
     await this.redis.setex(cacheKey, CACHE_TTL.GUILD_CONFIG, JSON.stringify(config));
@@ -50,11 +48,7 @@ export class ConfigService {
       },
     };
 
-    await this.prisma.guild.upsert({
-      where: { id: guildId },
-      create: { id: guildId, config: cleanConfig },
-      update: { config: cleanConfig },
-    });
+    await this.configRepository.upsertGuildConfig(guildId, cleanConfig);
 
     const cacheKey = this.getGuildConfigCacheKey(guildId);
     await this.redis.setex(cacheKey, CACHE_TTL.GUILD_CONFIG, JSON.stringify(cleanConfig));
@@ -63,20 +57,16 @@ export class ConfigService {
   }
 
   async upsertGuild(guild: APIGuild): Promise<void> {
-    const guildRecord = await this.prisma.guild.upsert({
-      where: { id: guild.id },
-      create: { id: guild.id, name: guild.name, icon: guild.icon },
-      update: { name: guild.name, icon: guild.icon },
-    });
+    const guildRecord = await this.configRepository.upsertGuildWithoutConfig(
+      guild.id,
+      guild.name,
+      guild.icon,
+    );
     const cacheKey = this.getGuildConfigCacheKey(guild.id);
     await this.redis.setex(cacheKey, CACHE_TTL.GUILD_CONFIG, JSON.stringify(guildRecord.config));
   }
 
   async filterKnownGuilds(guildIds: string[]): Promise<string[]> {
-    const knownGuilds = await this.prisma.guild.findMany({
-      where: { id: { in: guildIds } },
-      select: { id: true },
-    });
-    return knownGuilds.map((g) => g.id);
+    return this.configRepository.filterKnownGuilds(guildIds);
   }
 }

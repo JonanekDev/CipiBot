@@ -12,10 +12,10 @@ export function createLevelingRouter(service: LevelingService) {
         const data = await service.getWebLeaderboard(input.guildId);
         return Leaderboard.parse(data);
       }),
-    getUserStats: t.procedure
+    getUser: t.procedure
       .input(z.object({ guildId: z.string(), userId: z.string() }))
       .query(async ({ input }) => {
-        return await service.getUserStats(input.guildId, input.userId);
+        return await service.getUser(input.guildId, input.userId);
       }),
   });
 }

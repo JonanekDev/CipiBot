@@ -1,0 +1,29 @@
+{
+  "name": "@cipibot/templating",
+  "version": "0.0.1",
+  "description": "",
+  "main": "src/index.ts",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./modules/*": "./src/modules/*.ts",
+    "./discord": "./src/discord.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write src/"
+  },
+  "keywords": [],
+  "author": "JonanekDev",
+  "license": "ISC",
+  "packageManager": "pnpm@10.25.0",
+  "dependencies": {
+    "@cipibot/discord-utils": "workspace:*",
+    "@cipibot/embeds": "workspace:*",
+    "@cipibot/schemas": "workspace:*",
+    "discord-api-types": "^0.38.37"
+  },
+  "devDependencies": {
+    "@cipibot/tsconfig": "workspace:*"
+  }
+}

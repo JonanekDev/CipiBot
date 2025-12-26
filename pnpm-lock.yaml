@@ -231,6 +231,9 @@ importers:
       '@cipibot/constants':
         specifier: workspace:*
         version: link:../../packages/constants
+      '@cipibot/embeds':
+        specifier: workspace:*
+        version: link:../../packages/embeds
       '@cipibot/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -243,6 +246,9 @@ importers:
       '@cipibot/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
+      '@cipibot/templating':
+        specifier: workspace:*
+        version: link:../../packages/templating
       '@prisma/adapter-pg':
         specifier: ^7.1.0
         version: 7.1.0
@@ -334,6 +340,37 @@ importers:
         specifier: workspace:*
         version: link:../tsconfig
 
+  packages/discord-utils:
+    devDependencies:
+      '@cipibot/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: ^25.0.1
+        version: 25.0.1
+
+  packages/embeds:
+    dependencies:
+      '@cipibot/constants':
+        specifier: workspace:*
+        version: link:../constants
+      '@cipibot/i18n':
+        specifier: workspace:*
+        version: link:../i18n
+      '@cipibot/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+      '@cipibot/templating':
+        specifier: workspace:*
+        version: link:../templating
+      discord-api-types:
+        specifier: ^0.38.37
+        version: 0.38.37
+    devDependencies:
+      '@cipibot/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+
   packages/i18n:
     dependencies:
       i18next:
@@ -381,6 +418,9 @@ importers:
 
   packages/schemas:
     dependencies:
+      '@cipibot/i18n':
+        specifier: workspace:*
+        version: link:../i18n
       discord-api-types:
         specifier: ^0.38.37
         version: 0.38.37
@@ -394,6 +434,25 @@ importers:
       '@types/node':
         specifier: ^25.0.1
         version: 25.0.1
+
+  packages/templating:
+    dependencies:
+      '@cipibot/discord-utils':
+        specifier: workspace:*
+        version: link:../discord-utils
+      '@cipibot/embeds':
+        specifier: workspace:*
+        version: link:../embeds
+      '@cipibot/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+      discord-api-types:
+        specifier: ^0.38.37
+        version: 0.38.37
+    devDependencies:
+      '@cipibot/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
 
   packages/tsconfig: {}
 

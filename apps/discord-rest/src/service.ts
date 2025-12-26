@@ -10,9 +10,7 @@ export class DiscordRestService {
   }
 
   async handleMessageCreate(payload: DiscordMessagePayloadType): Promise<void> {
-    await this.rest.post(Routes.channelMessages(payload.channelId), {
-      body: payload.body,
-    });
+    await this.rest.post(Routes.channelMessages(payload.channelId), payload);
   }
 
   async handleMemberRoleAdd(payload: RolePayloadType): Promise<void> {

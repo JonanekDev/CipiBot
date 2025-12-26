@@ -6,13 +6,15 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { registerConsumers, shutdownConsumers } from './consumers';
 import { createConfigRouter } from './router';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
+import { ConfigRepository } from './repository';
 
 async function main() {
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL || '' });
 
   const prisma = new PrismaClient({ adapter });
   const redis = getRedis();
-  const configService = new ConfigService(prisma, redis);
+  const configRepository = new ConfigRepository(prisma);
+  const configService = new ConfigService(redis, configRepository);
 
   registerConsumers(configService).catch((error) => {
     console.error('Failed to start consumers: ', error);

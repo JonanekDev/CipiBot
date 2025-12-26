@@ -1,17 +1,20 @@
 import { Command } from '@cipibot/commands';
+import { getUserOption } from '@cipibot/commands/options';
 import { LevelingService } from '../service';
 import {
   ApplicationCommandOptionType,
   ApplicationCommandType,
   APIChatInputApplicationCommandInteraction,
-  APIApplicationCommandInteractionDataUserOption,
-  APIEmbed,
 } from 'discord-api-types/v10';
 import { sendEvent } from '@cipibot/kafka';
-import { DiscordInteractionReplyType, DiscordMessagePayloadType } from '@cipibot/schemas';
+import { DiscordInteractionReplyType } from '@cipibot/schemas';
 import { t } from '@cipibot/i18n';
 import { getGuildConfig } from '@cipibot/config-client';
-import { BRANDING, COLORS, KAFKA_TOPICS } from '@cipibot/constants';
+import { KAFKA_TOPICS } from '@cipibot/constants';
+import { calculateXpForLevel } from '../calculator';
+import { createErrorEmbed } from '@cipibot/embeds';
+import { createLevelVariables, LevelVariables } from '@cipibot/templating/modules/leveling';
+import { renderDiscordMessage } from '@cipibot/templating/discord';
 
 export function createLevelCommand(service: LevelingService): Command {
   return {
@@ -35,45 +38,68 @@ export function createLevelCommand(service: LevelingService): Command {
       if (!guildId || !channelId) return;
 
       const config = await getGuildConfig(guildId);
-      if (!config.leveling.enabled) return; //TODO: ERROR message
+      if (!config.leveling.enabled) {
+        const eventData: DiscordInteractionReplyType = {
+          interactionId: interaction.id,
+          interactionToken: interaction.token,
+          body: {
+            embeds: [ createErrorEmbed('MODULE_DISABLED', { module: 'Leveling' }, config.language) ],
+          },
+          ephemeral: true,
+        };
 
-      let targetUserId = interaction.member?.user.id || interaction.user?.id;
-      if (!targetUserId) return;
+        await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY, eventData);
 
-      const options = interaction.data.options;
-      if (options) {
-        const userOption = options.find(
-          (o): o is APIApplicationCommandInteractionDataUserOption =>
-            o.name === 'user' && o.type === ApplicationCommandOptionType.User,
-        );
-
-        if (userOption) {
-          targetUserId = userOption.value;
-        }
+        return;
       }
 
-      const stats = await service.getUserStats(guildId, targetUserId);
+      const userOptionResult = getUserOption(interaction, 'user')?.user;
+      const targetUser = userOptionResult || interaction.member?.user || interaction.user;
+      if (!targetUser) return; //TODO: ERROR
+      if (targetUser.bot) {
+        const eventData: DiscordInteractionReplyType = {
+          interactionId: interaction.id,
+          interactionToken: interaction.token,
+          body: {
+            embeds: [ createErrorEmbed('COMMAND_OPTION_USER_NO_BOT', {}, config.language) ],
+          },
+          ephemeral: true,
+        };
 
-      const levelEmbed: APIEmbed = {
-        title: t(config.language, 'leveling.levelCommandTitle', { user: `<@${targetUserId}>` }),
-        description: t(config.language, 'leveling.levelCommandDescription', {
-          user: `<@${targetUserId}>`,
-          currentXP: stats?.xp ?? 0,
-          level: stats ? stats.level : 0,
-          messageCount: stats?.messageCount ?? 0,
-        }),
-        color: COLORS.PRIMARY,
-        footer: { text: BRANDING.DEFAULT_FOOTER_TEXT },
-      };
+        await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY, eventData);
 
-      const eventData: DiscordInteractionReplyType = {
-        interactionId: interaction.id,
-        interactionToken: interaction.token,
-        body: {
-          embeds: [levelEmbed],
-        },
-        ephemeral: false,
-      };
+        return;
+      }
+
+      const user = await service.getUser(guildId, targetUser.id);
+
+       const eventData: DiscordInteractionReplyType = {
+          interactionId: interaction.id,
+          interactionToken: interaction.token,
+          body: {},
+          ephemeral: config.leveling.commands.level.ephemeral,
+        };
+
+      const levelUpVariables = createLevelVariables({
+                  userId: targetUser.id,
+                  username: targetUser.global_name || targetUser.username,
+                  avatar: targetUser.avatar || undefined,
+                },{
+            level: user?.level || 0,
+            currentXP: user?.xp || 0,
+            messageCount: user ? user.messageCount : 0,
+          }, calculateXpForLevel((user?.level || 0) + 1)
+                );
+        
+              eventData.body = renderDiscordMessage<LevelVariables>(
+                config.leveling.levelUpMessage,
+                levelUpVariables,
+                {
+                  title: t(config.language, 'leveling.levelCommandTitle'),
+                  description: t(config.language, 'leveling.levelCommandDescription'),
+                  thumbnail: { url: `{{avatarUrl}}` },
+                }
+              );
 
       await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY, eventData);
     },
