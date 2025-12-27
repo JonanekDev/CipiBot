@@ -2,15 +2,15 @@
   "name": "@cipibot/commands",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/index.js",
+  "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "build": "tsc",
     "format": "prettier --write src/"
   },
   "exports": {
     ".": "./src/index.ts",
-    "./options": "./src/options.ts"
+    "./options": "./src/options.ts",
+    "./commandsMeta": "./src/commandsMeta.ts"
   },
   "keywords": [],
   "author": "JonanekDev",
@@ -24,6 +24,7 @@
     "@cipibot/redis": "workspace:*",
     "@cipibot/constants": "workspace:*",
     "@cipibot/kafka": "workspace:*",
+    "@cipibot/schemas": "workspace:*",
     "discord-api-types": "^0.38.37"
   }
 }

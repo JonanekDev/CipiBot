@@ -1,7 +1,8 @@
-import z, { custom } from 'zod';
-import { EmbedSchema } from './discord';
-import { CommandSchema } from './commands';
-import { withDefaults } from './defaults';
+import z from 'zod';
+import { EmbedSchema } from '../discord';
+import { CommandSchema } from '../commands';
+import { withDefaults } from '../defaults';
+import { BaseModuleSchema } from '.';
 
 export const LeaderboardCommandSchema = CommandSchema.extend({
   leaderboardEntry: z.string().nullable().default(null),
@@ -9,8 +10,7 @@ export const LeaderboardCommandSchema = CommandSchema.extend({
 
 export type LeaderboardCommandType = z.infer<typeof LeaderboardCommandSchema>;
 
-export const LevelingConfigSchema = z.object({
-  enabled: z.boolean().default(true),
+export const LevelingConfigSchema = BaseModuleSchema.extend({
   levelUpMessage: z.union([z.string(), EmbedSchema]).nullable().default(null),
   levelUpMessageChannelId: z.string().nullable().default(null),
   ignoreChannelIds: z.array(z.string()).default([]),

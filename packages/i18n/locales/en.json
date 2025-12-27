@@ -1,20 +1,20 @@
 {
-    "leveling": {
-        "levelUpTitle": "🎉 Reached a new level! 🎉",
-        "levelUpDescription": "Congratulations {{userMention}}, you reached level {{level}}!",
-        "levelCommandTitle": "Level of user {{username}}",
-        "levelCommandDescription": "User {{userMention}} is at level {{level}} with {{currentXP}} XP ({{xpForNextLevel}} XP needed for the next level) and has sent a total of {{messageCount}} messages.",
-        "leaderboardTitle": "🏆 Level leaderboard 🏆",
-        "leaderboardDescription": "{{ entries}}",
-        "leaderboardEntry": "{{position}}. {{userMention}} - Level {{level}} ({{currentXP}} XP)",
-        "noData": "No level data found."
-    },
-    "errors":
-    {
-        "errorTitle": "❌ Error ❌",
-        "MODULE_DISABLED": "Module {{module}} is disabled on this server.",
-        "COMMAND_OPTION_USER_NO_BOT": "You cannot select a bot as a user for this command.",
-                "USER_NOT_FOUND": "User with ID {{userId}} was not found."
-        
-    }
+  "leveling": {
+    "levelUpTitle": "🎉 Reached a new level! 🎉",
+    "levelUpDescription": "Congratulations {{userMention}}, you reached level {{level}}!",
+    "levelCommandTitle": "Level of user {{username}}",
+    "levelCommandDescription": "User {{userMention}} is at level {{level}} with {{currentXP}} XP ({{xpForNextLevel}} XP needed for the next level) and has sent a total of {{messageCount}} messages.",
+    "leaderboardTitle": "🏆 Level leaderboard 🏆",
+    "leaderboardDescription": "{{ entries}}",
+    "leaderboardEntry": "{{position}}. {{userMention}} - Level {{level}} ({{currentXP}} XP)",
+    "noData": "No level data found."
+  },
+  "errors": {
+    "errorTitle": "❌ Error ❌",
+    "MODULE_DISABLED": "Module {{module}} is disabled on this server.",
+    "COMMAND_OPTION_USER_NO_BOT": "You cannot select a bot as a user for this command.",
+    "USER_NOT_FOUND": "User with ID {{userId}} was not found.",
+    "COMMAND_DISABLED": "Command `/{{command}}` is disabled on this server.",
+    "COMMAND_UNAVAILABLE": "Command `/{{command}}` is currently unavailable. Try again later."
+  }
 }

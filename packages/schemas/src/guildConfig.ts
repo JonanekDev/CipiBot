@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { EmbedSchema } from './discord';
 import { SUPPORTED_LANGUAGES } from '@cipibot/i18n';
-import { LevelingConfigSchema } from './leveling';
+import { LevelingConfigSchema } from './modules/leveling';
 import { withDefaults } from './defaults';
 
 export const WelcomeConfigSchema = z.object({

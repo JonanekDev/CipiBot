@@ -6,7 +6,7 @@ import {
   APIChatInputApplicationCommandInteraction,
 } from 'discord-api-types/v10';
 import { sendEvent } from '@cipibot/kafka';
-import { DiscordInteractionReplyType } from '@cipibot/schemas';
+import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
 import { t } from '@cipibot/i18n';
 import { getGuildConfig } from '@cipibot/config-client';
 import { KAFKA_TOPICS } from '@cipibot/constants';
@@ -30,28 +30,12 @@ export function createLeaderboardCommand(service: LevelingService): Command {
       if (!guildId) return;
 
       const config = await getGuildConfig(guildId);
-      if (!config.leveling.enabled) {
-        const eventData: DiscordInteractionReplyType = {
-          interactionId: interaction.id,
-          interactionToken: interaction.token,
-          body: {
-            embeds: [createErrorEmbed('MODULE_DISABLED', { module: 'Leveling' }, config.language)],
-          },
-          ephemeral: true,
-        };
-
-        await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY, eventData);
-
-        return;
-      }
-
       const leaderboard = await service.getLeaderboard(guildId, 5);
 
-      const eventData: DiscordInteractionReplyType = {
+      const eventData: DiscordInteractionReplyUpdateType = {
         interactionId: interaction.id,
         interactionToken: interaction.token,
         body: {},
-        ephemeral: config.leveling.commands.level.ephemeral,
       };
       let leaderboardEntries: string = '';
       const entryTemplate = config.leveling.commands.leaderboard.leaderboardEntry
@@ -79,7 +63,7 @@ export function createLeaderboardCommand(service: LevelingService): Command {
         },
       );
 
-      await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY, eventData);
+      await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE, eventData);
     },
   };
 }

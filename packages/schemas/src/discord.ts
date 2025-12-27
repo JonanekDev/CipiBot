@@ -53,14 +53,13 @@ export const DiscordMessagePayloadSchema = z.object({
 
 export type DiscordMessagePayloadType = z.infer<typeof DiscordMessagePayloadSchema>;
 
-export const DiscordInteractionReplySchema = z.object({
+export const DiscordInteractionReplyUpdateSchema = z.object({
   interactionId: z.string(),
   interactionToken: z.string(),
   body: z.custom<RESTPostAPIChannelMessageJSONBody>(),
-  ephemeral: z.boolean().optional().default(false),
 });
 
-export type DiscordInteractionReplyType = z.infer<typeof DiscordInteractionReplySchema>;
+export type DiscordInteractionReplyUpdateType = z.infer<typeof DiscordInteractionReplyUpdateSchema>;
 
 export const RolePayloadSchema = z.object({
   guildId: z.string(),

@@ -7,7 +7,7 @@ import {
   APIChatInputApplicationCommandInteraction,
 } from 'discord-api-types/v10';
 import { sendEvent } from '@cipibot/kafka';
-import { DiscordInteractionReplyType } from '@cipibot/schemas';
+import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
 import { t } from '@cipibot/i18n';
 import { getGuildConfig } from '@cipibot/config-client';
 import { KAFKA_TOPICS } from '@cipibot/constants';
@@ -37,46 +37,30 @@ export function createLevelCommand(service: LevelingService): Command {
       if (!guildId) return;
 
       const config = await getGuildConfig(guildId);
-      if (!config.leveling.enabled) {
-        const eventData: DiscordInteractionReplyType = {
-          interactionId: interaction.id,
-          interactionToken: interaction.token,
-          body: {
-            embeds: [createErrorEmbed('MODULE_DISABLED', { module: 'Leveling' }, config.language)],
-          },
-          ephemeral: true,
-        };
-
-        await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY, eventData);
-
-        return;
-      }
 
       const userOptionResult = getUserOption(interaction, 'user')?.user;
       const targetUser = userOptionResult || interaction.member?.user || interaction.user;
       if (!targetUser) return; //TODO: ERROR
       if (targetUser.bot) {
-        const eventData: DiscordInteractionReplyType = {
+        const eventData: DiscordInteractionReplyUpdateType = {
           interactionId: interaction.id,
           interactionToken: interaction.token,
           body: {
             embeds: [createErrorEmbed('COMMAND_OPTION_USER_NO_BOT', {}, config.language)],
           },
-          ephemeral: true,
         };
 
-        await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY, eventData);
+        await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE, eventData);
 
         return;
       }
 
       const user = await service.getUser(guildId, targetUser.id);
 
-      const eventData: DiscordInteractionReplyType = {
+      const eventData: DiscordInteractionReplyUpdateType = {
         interactionId: interaction.id,
         interactionToken: interaction.token,
         body: {},
-        ephemeral: config.leveling.commands.level.ephemeral,
       };
 
       const levelUpVariables = createLevelVariables(
@@ -103,7 +87,7 @@ export function createLevelCommand(service: LevelingService): Command {
         },
       );
 
-      await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY, eventData);
+      await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE, eventData);
     },
   };
 }

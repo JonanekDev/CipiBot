@@ -1,7 +1,7 @@
 import { disconnectConsumers, registerTopicHandler, startConsumer } from '@cipibot/kafka';
 import { DiscordRestService } from './service';
 import {
-  DiscordInteractionReplyType,
+  DiscordInteractionReplyUpdateType,
   DiscordMessagePayloadType,
   RolePayloadType,
 } from '@cipibot/schemas';
@@ -40,11 +40,15 @@ export async function registerConsumers(
     },
   );
 
-  await registerTopicHandler<DiscordInteractionReplyType>(
+  await registerTopicHandler<DiscordInteractionReplyUpdateType>(
     CONSUMER_GROUP,
-    KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY,
+    KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE,
     async (payload) => {
-      await interactionsService.sendReply(payload);
+      await interactionsService.updateReply(
+        payload.interactionId,
+        payload.interactionToken,
+        payload.body,
+      );
     },
   );
 

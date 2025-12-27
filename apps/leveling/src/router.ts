@@ -1,6 +1,6 @@
 import { initTRPC } from '@trpc/server';
 import { LevelingService } from './service';
-import { z, Leaderboard } from '@cipibot/schemas';
+import { z } from '@cipibot/schemas';
 
 const t = initTRPC.create();
 
@@ -9,8 +9,7 @@ export function createLevelingRouter(service: LevelingService) {
     getWebLeaderboard: t.procedure
       .input(z.object({ guildId: z.string() }))
       .query(async ({ input }) => {
-        const data = await service.getWebLeaderboard(input.guildId);
-        return Leaderboard.parse(data);
+        return await service.getWebLeaderboard(input.guildId);
       }),
     getUser: t.procedure
       .input(z.object({ guildId: z.string(), userId: z.string() }))

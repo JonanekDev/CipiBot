@@ -8,8 +8,8 @@ export class CommandsService {
   private readonly DEBOUNCE_MS = 30000;
 
   constructor(
-    private rest: REST,
-    private clientId: string,
+    private readonly rest: REST,
+    private readonly clientId: string,
   ) {}
 
   public triggerSync() {

@@ -9,7 +9,6 @@
     "./modules/*": "./src/modules/*.ts"
   },
   "scripts": {
-    "build": "tsc",
     "format": "prettier --write src/"
   },
   "keywords": [],

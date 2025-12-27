@@ -11,7 +11,7 @@ export const KAFKA_TOPICS = {
   DISCORD_OUTBOUND: {
     MEMBER_ROLE_ADD: 'discord.outbound.member.role.add',
     SEND_MESSAGE: 'discord.outbound.send.message',
-    INTERACTION_REPLY: 'discord.outbound.interaction.reply',
+    INTERACTION_REPLY_UPDATE: 'discord.outbound.interaction.reply.update',
   },
   SYSTEM: {
     COMMANDS_UPDATE: 'system.commands.update',
