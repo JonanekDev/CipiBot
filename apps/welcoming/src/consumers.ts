@@ -1,4 +1,4 @@
-import { disconnectConsumers, registerTopicHandler, startConsumer } from '@cipibot/kafka';
+import { KafkaClient } from '@cipibot/kafka';
 import { WelcomingService } from './service';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import {
@@ -10,8 +10,8 @@ import {
 
 const CONSUMER_GROUP = 'welcoming-service-group';
 
-export async function registerConsumers(welcomingService: WelcomingService) {
-  await registerTopicHandler<GuildMemberPayloadType>(
+export async function registerConsumers(kafka: KafkaClient, welcomingService: WelcomingService) {
+  await kafka.registerHandler<GuildMemberPayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_MEMBER_ADD,
     GuildMemberPayloadSchema,
@@ -26,7 +26,7 @@ export async function registerConsumers(welcomingService: WelcomingService) {
     },
   );
 
-  await registerTopicHandler<GuildMemberRemovePayloadType>(
+  await kafka.registerHandler<GuildMemberRemovePayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_MEMBER_REMOVE,
     GuildMemberRemovePayloadSchema,
@@ -41,9 +41,5 @@ export async function registerConsumers(welcomingService: WelcomingService) {
     },
   );
 
-  await startConsumer(CONSUMER_GROUP);
-}
-
-export async function shutdownConsumers() {
-  await disconnectConsumers(CONSUMER_GROUP);
+  await kafka.startConsumer(CONSUMER_GROUP);
 }

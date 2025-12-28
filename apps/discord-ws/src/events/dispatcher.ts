@@ -8,45 +8,53 @@ import { handleInteractionCreate } from './handlers/interactionCreate';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import { DiscordRestRouter } from '@cipibot/discord-rest/router';
 import { TRPCClient } from '@trpc/client';
+import { KafkaClient } from '@cipibot/kafka';
+import { Logger } from '@cipibot/logger';
+import { CommandRegistry } from '@cipibot/commands';
+import { ConfigClient } from '@cipibot/config-client';
 
 export async function dispatchEvent(
   event: GatewayDispatchPayload,
   trpc: TRPCClient<DiscordRestRouter>,
+  kafka: KafkaClient,
+  logger: Logger,
+  commandRegistry: CommandRegistry,
+  configClient: ConfigClient,
 ): Promise<void> {
   try {
     switch (event.t) {
       case GatewayDispatchEvents.MessageCreate:
-        await handleMessageCreate(event.d);
+        await handleMessageCreate(kafka, event.d);
         break;
 
       case GatewayDispatchEvents.GuildCreate:
-        await handleGuildEvent(KAFKA_TOPICS.DISCORD_INBOUND.GUILD_CREATE, event.d);
+        await handleGuildEvent(kafka, KAFKA_TOPICS.DISCORD_INBOUND.GUILD_CREATE, event.d);
         break;
 
       case GatewayDispatchEvents.GuildUpdate:
-        await handleGuildEvent(KAFKA_TOPICS.DISCORD_INBOUND.GUILD_UPDATE, event.d);
+        await handleGuildEvent(kafka, KAFKA_TOPICS.DISCORD_INBOUND.GUILD_UPDATE, event.d);
         break;
 
       case GatewayDispatchEvents.GuildDelete:
-        await handleGuildDelete(event.d);
+        await handleGuildDelete(kafka, event.d);
         break;
 
       case GatewayDispatchEvents.GuildMemberAdd:
-        await handleMemberAdd(event.d);
+        await handleMemberAdd(kafka, event.d);
         break;
 
       case GatewayDispatchEvents.GuildMemberRemove:
-        await handleMemberRemove(event.d);
+        await handleMemberRemove(kafka, event.d);
         break;
       case GatewayDispatchEvents.InteractionCreate:
-        await handleInteractionCreate(event.d, trpc);
+        await handleInteractionCreate(kafka, logger, event.d, trpc, commandRegistry, configClient);
         break;
 
       default:
-        console.warn(`Unhandled event type: ${event.t}`);
+        logger.warn({ eventType: event.t },`Unhandled event type`);
         break;
     }
   } catch (error) {
-    console.error(`Error processing event ${event.t}:`, error);
+    logger.error({ eventType: event.t, error }, `Error processing event`);
   }
 }

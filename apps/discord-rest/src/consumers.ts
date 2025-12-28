@@ -1,4 +1,4 @@
-import { disconnectConsumers, registerTopicHandler, startConsumer } from '@cipibot/kafka';
+import { KafkaClient } from '@cipibot/kafka';
 import {
   DiscordDMPayloadSchema,
   DiscordDMPayloadType,
@@ -20,12 +20,13 @@ import { RolesService } from './services/roles.service';
 const CONSUMER_GROUP = 'discord-rest-service-group';
 
 export async function registerConsumers(
+  kafka: KafkaClient,
   commandsService: CommandsService,
   interactionsService: InteractionsService,
   messagesService: MessagesService,
   rolesService: RolesService,
 ) {
-  await registerTopicHandler<DiscordMessagePayloadType>(
+  await kafka.registerHandler<DiscordMessagePayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE,
     DiscordMessagePayloadSchema,
@@ -34,7 +35,7 @@ export async function registerConsumers(
     },
   );
 
-  await registerTopicHandler<DiscordDMPayloadType>(
+  await kafka.registerHandler<DiscordDMPayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_DM,
     DiscordDMPayloadSchema,
@@ -43,7 +44,7 @@ export async function registerConsumers(
     },
   );
 
-  await registerTopicHandler<RolePayloadType>(
+  await kafka.registerHandler<RolePayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_ADD,
     RolePayloadSchema,
@@ -52,7 +53,7 @@ export async function registerConsumers(
     },
   );
 
-  await registerTopicHandler<RolePayloadType>(
+  await kafka.registerHandler<RolePayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_REMOVE,
     RolePayloadSchema,
@@ -61,7 +62,7 @@ export async function registerConsumers(
     },
   );
 
-  await registerTopicHandler<UpdateCommandPayloadType>(
+  await kafka.registerHandler<UpdateCommandPayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE,
     UpdateCommandPayloadSchema,
@@ -70,7 +71,7 @@ export async function registerConsumers(
     },
   );
 
-  await registerTopicHandler<DiscordInteractionReplyUpdateType>(
+  await kafka.registerHandler<DiscordInteractionReplyUpdateType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE,
     DiscordInteractionReplyUpdateSchema,
@@ -83,10 +84,5 @@ export async function registerConsumers(
     },
   );
 
-  await startConsumer(CONSUMER_GROUP);
-}
-
-export async function shutdownConsumers() {
-  console.log(`Disconnecting Kafka consumer group: ${CONSUMER_GROUP}`);
-  await disconnectConsumers(CONSUMER_GROUP);
+  await kafka.startConsumer(CONSUMER_GROUP);
 }

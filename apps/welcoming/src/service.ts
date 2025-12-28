@@ -1,14 +1,19 @@
-import { getGuildConfig } from '@cipibot/config-client';
-import { GuildMemberPayloadType, GuildMemberRemovePayloadType } from '@cipibot/schemas/discord';
+import { ConfigClient } from '@cipibot/config-client';
 import { DiscordDMPayloadType, DiscordMessagePayloadType } from '@cipibot/schemas';
 import { createUserVariables } from '@cipibot/templating/modules/common';
 import { renderDiscordMessage } from '@cipibot/embeds/discord';
-import { sendEvent } from '@cipibot/kafka';
+import { KafkaClient } from '@cipibot/kafka';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import { t } from '@cipibot/i18n';
 
 export class WelcomingService {
-  constructor() {}
+  private kafka: KafkaClient;
+  private configClient: ConfigClient;
+
+  constructor(kafka: KafkaClient, configClient: ConfigClient) {
+    this.kafka = kafka;
+    this.configClient = configClient;
+  }
 
   async welcomeMessage(
     guildId: string,
@@ -17,7 +22,7 @@ export class WelcomingService {
     avatar: string | null,
     globalName: string | null,
   ) {
-    const config = await getGuildConfig(guildId);
+    const config = await this.configClient.getGuildConfig(guildId);
     if (!config.welcoming.enabled || !config.welcoming.welcomeEnabled) return;
 
     const usersVariables = createUserVariables({
@@ -32,7 +37,7 @@ export class WelcomingService {
         body: {},
       };
       dmEventData.body = renderDiscordMessage(config.welcoming.dmWelcomeMessage, usersVariables);
-      sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_DM, dmEventData);
+      this.kafka.sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_DM, dmEventData);
     }
 
     if (!config.welcoming.channelId) return; //TODO: Something?
@@ -47,8 +52,10 @@ export class WelcomingService {
       description: t(config.language, 'welcoming.welcomeDescription'),
       thumbnail: { url: `{{avatarUrl}}` },
     });
-    sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
+    this.kafka.sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
   }
+
+
   async leaveMessage(
     guildId: string,
     userId: string,
@@ -56,7 +63,7 @@ export class WelcomingService {
     avatar: string | null,
     globalName: string | null,
   ) {
-    const config = await getGuildConfig(guildId);
+    const config = await this.configClient.getGuildConfig(guildId);
     if (!config.welcoming.enabled || !config.welcoming.leaveEnabled) return;
     if (!config.welcoming.channelId) return;
     const usersVariables = createUserVariables({
@@ -74,6 +81,6 @@ export class WelcomingService {
       description: t(config.language, 'welcoming.leaveDescription'),
       thumbnail: { url: `{{avatarUrl}}` },
     });
-    sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
+    this.kafka.sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
   }
 }

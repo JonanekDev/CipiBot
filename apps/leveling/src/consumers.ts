@@ -1,4 +1,4 @@
-import { disconnectConsumers, registerTopicHandler, startConsumer } from '@cipibot/kafka';
+import { KafkaClient } from '@cipibot/kafka';
 import { LevelingService } from './service';
 import {
   CommandInteraction,
@@ -10,18 +10,22 @@ import {
   MessageSchema,
   MessageType,
 } from '@cipibot/schemas/discord';
-import { getServiceCommandTopic } from '@cipibot/commands';
-import { Command } from '@cipibot/commands';
+import { Command, CommandRegistry } from '@cipibot/commands';
 import { KAFKA_TOPICS } from '@cipibot/constants';
-import { getGuildConfig } from '@cipibot/config-client';
+import { ConfigClient } from '@cipibot/config-client';
+import { Logger } from '@cipibot/logger';
 
 const CONSUMER_GROUP = 'leveling-service-group';
 
 export async function registerConsumers(
+  kafka: KafkaClient,
+  commandRegistry: CommandRegistry,
   levelingService: LevelingService,
+  configClient: ConfigClient,
+  logger: Logger,
   commands: Map<string, Command>,
 ) {
-  await registerTopicHandler<MessageType>(
+  await kafka.registerHandler<MessageType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.MESSAGE_CREATE,
     MessageSchema,
@@ -29,7 +33,7 @@ export async function registerConsumers(
       if (message.author.bot) return;
       const guildId = message.guild_id;
       if (!guildId) return;
-      getGuildConfig(guildId).then((config) => {
+      configClient.getGuildConfig(guildId).then((config) => {
         const levelingConfig = config.leveling;
         if (!levelingConfig.enabled) return;
         if (levelingConfig.ignoreChannelIds.includes(message.channel_id)) return;
@@ -44,7 +48,7 @@ export async function registerConsumers(
     },
   );
 
-  await registerTopicHandler<GuildMemberPayloadType>(
+  await kafka.registerHandler<GuildMemberPayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_MEMBER_ADD,
     GuildMemberPayloadSchema,
@@ -53,7 +57,7 @@ export async function registerConsumers(
     },
   );
 
-  await registerTopicHandler<GuildMemberRemovePayloadType>(
+  await kafka.registerHandler<GuildMemberRemovePayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_MEMBER_REMOVE,
     GuildMemberRemovePayloadSchema,
@@ -62,9 +66,9 @@ export async function registerConsumers(
     },
   );
 
-  await registerTopicHandler<CommandInteraction>(
+  await kafka.registerHandler<CommandInteraction>(
     CONSUMER_GROUP,
-    getServiceCommandTopic('leveling'),
+    commandRegistry.getServiceCommandTopic(),
     CommandInteractionSchema,
     async (interaction) => {
       const commandName = interaction.data.name;
@@ -72,22 +76,18 @@ export async function registerConsumers(
 
       if (command) {
         try {
-          console.log(`Executing command: ${commandName}`);
+          logger.info({ commandName, guildId: interaction.guild_id }, `Executing command: ${commandName}`);
           await command.handler(interaction);
         } catch (error) {
-          console.error(`Error executing command ${commandName}:`, error);
+          logger.error({ commandName, error, guildId: interaction.guild_id }, `Error executing command: ${commandName}`);
           // TODO: Send error response to user
         }
       } else {
-        console.warn(`Received command '${commandName}' but no handler found.`);
+        logger.warn({ commandName, guildId: interaction.guild_id }, `Received command '${commandName}' but no handler found.`);
       }
     },
   );
 
-  await startConsumer(CONSUMER_GROUP);
+  await kafka.startConsumer(CONSUMER_GROUP);
 }
 
-export async function shutdownConsumers() {
-  console.log(`Disconnecting Kafka consumer group: ${CONSUMER_GROUP}`);
-  await disconnectConsumers(CONSUMER_GROUP);
-}

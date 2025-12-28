@@ -2,18 +2,19 @@ import { Command } from '@cipibot/commands';
 import { getUserOption } from '@cipibot/commands/options';
 import { LevelingService } from '../service';
 import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord-api-types/v10';
-import { sendEvent } from '@cipibot/kafka';
 import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
 import { t } from '@cipibot/i18n';
-import { getGuildConfig } from '@cipibot/config-client';
+import { ConfigClient } from '@cipibot/config-client';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import { calculateXpForLevel } from '../calculator';
 import { createErrorEmbed } from '@cipibot/embeds';
 import { createLevelVariables, LevelVariables } from '@cipibot/templating/modules/leveling';
 import { renderDiscordMessage } from '@cipibot/embeds/discord';
-import { CommandInteraction, Interaction } from '@cipibot/schemas/discord';
+import { CommandInteraction } from '@cipibot/schemas/discord';
+import { Logger } from '@cipibot/logger';
+import { KafkaClient } from '@cipibot/kafka';
 
-export function createLevelCommand(service: LevelingService): Command {
+export function createLevelCommand(service: LevelingService, kafka: KafkaClient, configClient: ConfigClient, logger: Logger): Command {
   return {
     definition: {
       name: 'level',
@@ -33,7 +34,7 @@ export function createLevelCommand(service: LevelingService): Command {
 
       if (!guildId) return;
 
-      const config = await getGuildConfig(guildId);
+      const config = await configClient.getGuildConfig(guildId);
 
       const userOptionResult = getUserOption(interaction, 'user')?.user;
       const targetUser = userOptionResult || interaction.member?.user || interaction.user;
@@ -47,7 +48,7 @@ export function createLevelCommand(service: LevelingService): Command {
           },
         };
 
-        await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE, eventData);
+        await kafka.sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE, eventData);
 
         return;
       }
@@ -84,7 +85,7 @@ export function createLevelCommand(service: LevelingService): Command {
         },
       );
 
-      await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE, eventData);
+      await kafka.sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE, eventData);
     },
   };
 }

@@ -27,6 +27,7 @@
     "@cipibot/kafka": "workspace:*",
     "@cipibot/redis": "workspace:*",
     "@cipibot/schemas": "workspace:*",
+    "@cipibot/logger": "workspace:*",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.2.0",
     "@trpc/server": "^11.8.1",

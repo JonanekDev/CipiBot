@@ -1,40 +1,62 @@
 import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
-import { getRedis } from '@cipibot/redis';
+import { RedisClient } from '@cipibot/redis';
 import { GuildConfigSchema, GuildConfigType } from '@cipibot/schemas';
-import { createTRPCClient, httpBatchLink } from '@trpc/client';
+import { createTRPCClient, httpBatchLink, TRPCClient } from '@trpc/client';
 import type { ConfigRouter } from '@cipibot/config/router';
+import { Logger } from '@cipibot/logger';
 
 const CONFIG_SERVICE_URL = process.env.CONFIG_SERVICE_URL || 'http://localhost:3000/trpc';
 
-const trpc = createTRPCClient<ConfigRouter>({
-  links: [
-    httpBatchLink({
-      url: CONFIG_SERVICE_URL,
-    }),
-  ],
-});
+export class ConfigClient {
+  private readonly redis: RedisClient;
+  private readonly logger: Logger;
+  private trpc: TRPCClient<ConfigRouter>;
 
-export async function getGuildConfig(guildId: string): Promise<GuildConfigType> {
-  const redis = getRedis();
-  const cacheKey = `${REDIS_KEYS.GUILD_CONFIG}${guildId}`;
-
-  const cached = await redis.getex(cacheKey, 'EX', CACHE_TTL.GUILD_CONFIG);
-
-  if (cached) {
-    return GuildConfigSchema.parse(JSON.parse(cached));
+  constructor(redis: RedisClient, logger: Logger) {
+    this.redis = redis;
+    this.logger = logger.child({ package: 'ConfigClient' });
+    this.trpc = createTRPCClient<ConfigRouter>({
+      links: [
+        httpBatchLink({
+          url: CONFIG_SERVICE_URL,
+        }),
+      ],
+    });
   }
 
-  const configWithoutDefault = await trpc.getGuildConfig.query({ id: guildId });
+  async getGuildConfig(guildId: string): Promise<GuildConfigType> {
+    const cacheKey = `${REDIS_KEYS.GUILD_CONFIG}${guildId}`;
 
-  const config = GuildConfigSchema.safeParse(configWithoutDefault ?? {});
+    try {
+      const cached = await this.redis.get(cacheKey, 'EX', CACHE_TTL.GUILD_CONFIG);
 
-  if (!config.success) {
-    throw new Error(`[ConfigClient] Error parsing guild config for ${guildId}`);
+      if (cached) {
+        return GuildConfigSchema.parse(JSON.parse(cached));
+      }
+    } catch (error) {
+      this.logger.error({ error, guildId }, 'Failed to get guild config from Redis cache');
+    }
+    try {
+      const configWithoutDefault = await this.trpc.getGuildConfig.query({ id: guildId });
+
+      const config = GuildConfigSchema.safeParse(configWithoutDefault ?? {});
+      if (!config.success) {
+        this.logger.error({ guildId, errors: config.error }, 'Invalid guild config data');
+        throw new Error(`[ConfigClient] Error parsing guild config for ${guildId}`);
+      }
+      return config.data;
+    } catch (error) {
+      this.logger.error({ error, guildId }, 'Failed to fetch guild config from Config service');
+      throw error;
+    }
   }
 
-  return config.data;
-}
-
-export async function getKnownGuilds(guildIds: string[]): Promise<string[]> {
-  return await trpc.filterKnownGuilds.query({ ids: guildIds });
+  async getKnownGuilds(guildIds: string[]): Promise<string[]> {
+    try {
+      return await this.trpc.filterKnownGuilds.query({ ids: guildIds });
+    } catch (error) {
+      this.logger.error({ error, guildIds }, 'Failed to fetch known guilds from Config service');
+      throw error;
+    }
+  }
 }

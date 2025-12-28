@@ -1,37 +1,45 @@
 import Fastify from 'fastify';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
-import { registerConsumers, shutdownConsumers } from './consumers';
+import { registerConsumers } from './consumers';
 import { createDiscordRestRouter } from './router';
 import { CommandsService } from './services/commands.service';
 import { REST } from '@discordjs/rest';
 import { InteractionsService } from './services/interactions.service';
 import { RolesService } from './services/roles.service';
 import { MessagesService } from './services/messages.service';
+import { createLogger } from '@cipibot/logger';
+import { KafkaClient } from '@cipibot/kafka';
+import { RedisClient } from '@cipibot/redis';
+
+const logger = createLogger('discord-rest');
 
 async function main() {
   const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
   const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 
   if (!DISCORD_BOT_TOKEN || !DISCORD_CLIENT_ID) {
-    console.error('DISCORD_BOT_TOKEN or DISCORD_CLIENT_ID is not set in environment variables.');
+    logger.error('DISCORD_BOT_TOKEN or DISCORD_CLIENT_ID is not set in environment variables.');
     process.exit(1);
   }
 
   const rest = new REST({ version: '10' }).setToken(DISCORD_BOT_TOKEN);
-  const commandsService = new CommandsService(rest, DISCORD_CLIENT_ID);
-  const interactionsService = new InteractionsService(rest, DISCORD_CLIENT_ID);
-  const messagesService = new MessagesService(rest);
-  const rolesService = new RolesService(rest);
+  const kafka = new KafkaClient(logger);
+  const redis = new RedisClient(logger);
 
-  registerConsumers(commandsService, interactionsService, messagesService, rolesService).catch(
+  const commandsService = new CommandsService(rest, logger, redis, DISCORD_CLIENT_ID);
+  const interactionsService = new InteractionsService(rest, logger, DISCORD_CLIENT_ID);
+  const messagesService = new MessagesService(rest, logger);
+  const rolesService = new RolesService(rest, logger);
+
+  registerConsumers(kafka, commandsService, interactionsService, messagesService, rolesService).catch(
     (error) => {
-      console.error('Failed to start consumers: ', error);
+      logger.error(error, 'Failed to start consumers: ');
       process.exit(1);
     },
   );
 
   const app = Fastify({
-    logger: true,
+    loggerInstance: logger,
   });
 
   // Register routes
@@ -47,12 +55,12 @@ async function main() {
   // Start server
   const APP_PORT = parseInt(process.env.PORT || '3003', 10);
   await app.listen({ port: APP_PORT });
-  console.log(`Discord REST service listening on port ${APP_PORT}`);
+  logger.info(`Discord REST service listening on port ${APP_PORT}`);
 
   const shutdown = async () => {
-    console.log('Shutting down...');
+    logger.info('Shutting down...');
     await app.close();
-    await shutdownConsumers();
+    await kafka.shutdown();
     process.exit(0);
   };
 
@@ -61,6 +69,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error('Fatal error:', error);
+  logger.error(error, 'Fatal error');
   process.exit(1);
 });

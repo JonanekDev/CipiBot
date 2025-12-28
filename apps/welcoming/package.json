@@ -21,7 +21,9 @@
     "@cipibot/config-client": "workspace:*",
     "@cipibot/templating": "workspace:*",
     "@cipibot/embeds": "workspace:*",
-    "@cipibot/i18n": "workspace:*"
+    "@cipibot/i18n": "workspace:*",
+    "@cipibot/logger": "workspace:*",
+    "@cipibot/redis": "workspace:*"
   },
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",

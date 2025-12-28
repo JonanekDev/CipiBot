@@ -24,6 +24,7 @@
     "@cipibot/redis": "workspace:*",
     "@cipibot/constants": "workspace:*",
     "@cipibot/kafka": "workspace:*",
+    "@cipibot/logger": "workspace:*",
     "@cipibot/schemas": "workspace:*",
     "discord-api-types": "^0.38.37"
   }

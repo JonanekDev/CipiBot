@@ -1,13 +1,13 @@
-import type { Redis } from '@cipibot/redis';
 import { DeepPartial, type GuildConfigType } from '@cipibot/schemas';
 import { defu } from 'defu';
 import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
 import { ConfigRepository } from './repository';
 import { GuildUpdatePayload } from '@cipibot/schemas/discord';
+import { RedisClient } from '@cipibot/redis';
 
 export class ConfigService {
   constructor(
-    private readonly redis: Redis,
+    private readonly redis: RedisClient,
     private readonly configRepository: ConfigRepository,
   ) {}
 
@@ -28,7 +28,7 @@ export class ConfigService {
     } | null;
 
     const config = (guild?.config ?? {}) as DeepPartial<GuildConfigType>;
-    await this.redis.setex(cacheKey, CACHE_TTL.GUILD_CONFIG, JSON.stringify(config));
+    await this.redis.set(cacheKey, JSON.stringify(config), 'EX', CACHE_TTL.GUILD_CONFIG);
 
     return config;
   }
@@ -52,7 +52,7 @@ export class ConfigService {
     await this.configRepository.upsertGuildConfig(guildId, cleanConfig);
 
     const cacheKey = this.getGuildConfigCacheKey(guildId);
-    await this.redis.setex(cacheKey, CACHE_TTL.GUILD_CONFIG, JSON.stringify(cleanConfig));
+    await this.redis.set(cacheKey, JSON.stringify(cleanConfig), 'EX', CACHE_TTL.GUILD_CONFIG);
 
     return cleanConfig;
   }
@@ -64,7 +64,7 @@ export class ConfigService {
       guild.icon,
     );
     const cacheKey = this.getGuildConfigCacheKey(guild.id);
-    await this.redis.setex(cacheKey, CACHE_TTL.GUILD_CONFIG, JSON.stringify(guildRecord.config));
+    await this.redis.set(cacheKey, JSON.stringify(guildRecord.config), 'EX', CACHE_TTL.GUILD_CONFIG);
   }
 
   async filterKnownGuilds(guildIds: string[]): Promise<string[]> {

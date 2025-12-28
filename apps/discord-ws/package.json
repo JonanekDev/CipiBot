@@ -21,6 +21,8 @@
     "@cipibot/discord-rest": "workspace:*",
     "@cipibot/config-client": "workspace:*",
     "@cipibot/embeds": "workspace:*",
+    "@cipibot/logger": "workspace:*",
+    "@cipibot/redis": "workspace:*",
     "@discordjs/core": "^2.4.0",
     "@discordjs/rest": "^2.6.0",
     "@discordjs/ws": "^2.0.4",

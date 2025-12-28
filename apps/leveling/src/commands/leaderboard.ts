@@ -1,10 +1,10 @@
 import { Command } from '@cipibot/commands';
 import { LevelingService } from '../service';
 import { ApplicationCommandType } from 'discord-api-types/v10';
-import { sendEvent } from '@cipibot/kafka';
+import { KafkaClient } from '@cipibot/kafka';
 import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
 import { t } from '@cipibot/i18n';
-import { getGuildConfig } from '@cipibot/config-client';
+import { ConfigClient } from '@cipibot/config-client';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import {
   LeaderboardEntryVariables,
@@ -13,8 +13,9 @@ import {
 import { renderDiscordMessage } from '@cipibot/embeds/discord';
 import { renderTemplate } from '@cipibot/templating';
 import { CommandInteraction } from '@cipibot/schemas/discord';
+import { Logger } from '@cipibot/logger';
 
-export function createLeaderboardCommand(service: LevelingService): Command {
+export function createLeaderboardCommand(service: LevelingService, kafka: KafkaClient, configClient: ConfigClient, logger: Logger): Command {
   return {
     definition: {
       name: 'leaderboard',
@@ -25,7 +26,7 @@ export function createLeaderboardCommand(service: LevelingService): Command {
       const guildId = interaction.guild_id;
       if (!guildId) return;
 
-      const config = await getGuildConfig(guildId);
+      const config = await configClient.getGuildConfig(guildId);
       const leaderboard = await service.getLeaderboard(guildId, 5);
 
       const eventData: DiscordInteractionReplyUpdateType = {
@@ -59,7 +60,7 @@ export function createLeaderboardCommand(service: LevelingService): Command {
         },
       );
 
-      await sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE, eventData);
+      await kafka.sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE, eventData);
     },
   };
 }

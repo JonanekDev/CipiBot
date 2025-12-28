@@ -1,26 +1,33 @@
-import { getCommandRoute, getServiceCommandTopic } from '@cipibot/commands';
-import { getGuildConfig } from '@cipibot/config-client';
+import { CommandRegistry } from '@cipibot/commands';
+import { ConfigClient } from '@cipibot/config-client';
 import { DiscordRestRouter } from '@cipibot/discord-rest/router';
-import { sendEvent } from '@cipibot/kafka';
 import { TRPCClient } from '@trpc/client';
 import { Interaction, isCommandInteraction } from '@cipibot/schemas/discord';
 import { COMMAND_META } from '@cipibot/commands/commandsMeta';
 import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
 import { createErrorEmbed } from '@cipibot/embeds';
+import { KafkaClient } from '@cipibot/kafka';
+import { Logger } from '@cipibot/logger';
 
 export async function handleInteractionCreate(
+  kafka: KafkaClient,
+  logger: Logger,
   interaction: Interaction,
   trpc: TRPCClient<DiscordRestRouter>,
+  commandRegistry: CommandRegistry,
+  configClient: ConfigClient,
 ) {
   if (isCommandInteraction(interaction)) {
-    const serviceName = await getCommandRoute(interaction.data.name);
-    const guildConfig = await getGuildConfig(interaction.guild_id!);
+    const serviceName = await commandRegistry.getCommandRoute(interaction.data.name);
+    if (!interaction.guild_id) return; // Only handle guild interactions for now
+    const guildConfig = await configClient.getGuildConfig(interaction.guild_id);
     if (serviceName) {
       const meta = COMMAND_META[interaction.data.name];
       let ephemeral = false;
       if (!meta) {
-        console.warn(
-          `No command meta found for command: ${interaction.data.name} - Create meta in @cipibot/commands/commandsMeta.ts`,
+        logger.warn(
+          { interactionName: interaction.data.name },
+          `No command meta found for command - Create meta in @cipibot/commands/commandsMeta.ts`,
         );
       } else {
         const moduleConfig = guildConfig[meta.module];
@@ -54,7 +61,7 @@ export async function handleInteractionCreate(
               ephemeral: true,
             })
             .catch((error) => {
-              console.error('Failed to send error reply:', error);
+              logger.error({ error, interactionName: interaction.data.name }, 'Failed to send disabled reply');
             });
           return;
         }
@@ -67,14 +74,14 @@ export async function handleInteractionCreate(
           ephemeral: ephemeral,
         })
         .catch((error) => {
-          console.error('Failed to defer interaction:', error);
+          logger.error({ error, interactionName: interaction.data.name }, 'Failed to send defer reply');
         });
-      await sendEvent(getServiceCommandTopic(serviceName), interaction, {
+      await kafka.sendEvent(commandRegistry.getServiceCommandTopic(serviceName), interaction, {
         key: interaction.guild_id,
       });
     } else {
       //TODO: Custom commands
-      console.warn(`No service route found for command: ${interaction.data.name}`);
+      logger.error(`No service route found for command: ${interaction.data.name}`);
       await trpc.sendReply
         .mutate({
           interactionId: interaction.id,
@@ -91,7 +98,7 @@ export async function handleInteractionCreate(
           ephemeral: true,
         })
         .catch((error) => {
-          console.error('Failed to send error reply:', error);
+          logger.error({ error, interactionName: interaction.data.name }, 'Failed to send error reply');
         });
     }
   }

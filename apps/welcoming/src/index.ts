@@ -1,17 +1,27 @@
 import { WelcomingService } from './service';
-import { registerConsumers, shutdownConsumers } from './consumers';
+import { registerConsumers } from './consumers';
+import { createLogger } from '@cipibot/logger';
+import { KafkaClient } from '@cipibot/kafka';
+import { ConfigClient } from '@cipibot/config-client';
+import { RedisClient } from '@cipibot/redis';
+
+const logger = createLogger('welcoming');
 
 async function main() {
-  const welcomingService = new WelcomingService();
+    const kafka = new KafkaClient(logger);
+    const redis = new RedisClient(logger);
+    const configClient = new ConfigClient(redis, logger);
 
-  registerConsumers(welcomingService).catch((error) => {
-    console.error('Failed to start consumers: ', error);
+      const welcomingService = new WelcomingService(kafka, configClient);
+      
+  registerConsumers(kafka, welcomingService).catch((error) => {
+    logger.error(error, 'Failed to start consumers: ');
     process.exit(1);
   });
 
   const shutdown = async () => {
-    console.log('Shutting down...');
-    await shutdownConsumers();
+    logger.info('Shutting down...');
+    await kafka.shutdown();
     process.exit(0);
   };
 
@@ -20,6 +30,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error('Fatal error:', error);
+  logger.error(error, 'Fatal error:');
   process.exit(1);
 });

@@ -7,15 +7,28 @@ import {
 import { CONFIG } from '../config';
 import axios from 'axios';
 import { PrismaClient } from '../generated/prisma/client';
-import { Redis } from '@cipibot/redis';
+import { RedisClient } from '@cipibot/redis';
 import { DashboardGuild, SessionDataType } from '@cipibot/schemas/api';
-import { getKnownGuilds } from '@cipibot/config-client';
+import { ConfigClient } from '@cipibot/config-client';
+import { Logger } from '@cipibot/logger';
 
 export class AuthService {
+  private readonly logger: Logger;
+  private readonly prisma: PrismaClient;
+  private readonly redis: RedisClient;
+  private readonly configClient: ConfigClient
+
   constructor(
-    private readonly prisma: PrismaClient,
-    private readonly redis: Redis,
-  ) {}
+    prisma: PrismaClient,
+   redis: RedisClient,
+   logger: Logger,
+   configClient: ConfigClient,
+  ) {
+    this.prisma = prisma;
+    this.redis = redis;
+    this.logger = logger.child({ module: 'AuthService' });
+    this.configClient = configClient;
+  }
 
   async login(code: string): Promise<SessionDataType> {
     const params = new URLSearchParams({
@@ -61,6 +74,7 @@ export class AuthService {
       where: { id: userId },
     });
     if (!user) {
+      this.logger.error({ userId }, `User not found`);
       throw new Error('User not found');
     }
 
@@ -87,7 +101,7 @@ export class AuthService {
 
     const guildIds = guilds.map((g) => g.id);
 
-    const knownGuilds = await getKnownGuilds(guildIds);
+    const knownGuilds = await this.configClient.getKnownGuilds(guildIds);
 
     const dashboardGuilds: DashboardGuild[] = guilds.map((guild) => ({
       id: guild.id,
@@ -104,7 +118,7 @@ export class AuthService {
     userId: string,
   ): Promise<RESTGetAPICurrentUserGuildsResult> {
     const redis_cache_key = `user:guilds:${userId}`;
-    const cache = await this.redis.getex(redis_cache_key, 'EX', 120);
+    const cache = await this.redis.get(redis_cache_key, 'EX', 120);
     if (cache) {
       return JSON.parse(cache) as RESTGetAPICurrentUserGuildsResult;
     }
@@ -127,7 +141,7 @@ export class AuthService {
 
       return hasAdmin || hasManageGuild;
     });
-    await this.redis.setex(redis_cache_key, 120, JSON.stringify(guilds));
+    await this.redis.set(redis_cache_key, JSON.stringify(guilds), 'EX', 120);
     return guilds;
   }
 }

@@ -21,6 +21,7 @@
     "@cipibot/kafka": "workspace:*",
     "@cipibot/redis": "workspace:*",
     "@cipibot/schemas": "workspace:*",
+    "@cipibot/logger": "workspace:*",
     "@discordjs/rest": "^2.6.0",
     "@trpc/server": "^11.8.1",
     "discord-api-types": "^0.38.37",

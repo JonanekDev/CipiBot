@@ -27,6 +27,7 @@
     "@cipibot/constants": "workspace:*",
     "@cipibot/redis": "workspace:*",
     "@cipibot/schemas": "workspace:*",
+    "@cipibot/logger": "workspace:*",
     "@fastify/cookie": "^11.0.2",
     "@fastify/jwt": "^10.0.0",
     "@prisma/adapter-pg": "^7.1.0",

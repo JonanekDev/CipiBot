@@ -1,13 +1,20 @@
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/rest/v10';
+import { Logger } from '@cipibot/logger';
+import { DiscordAPIError, REST } from '@discordjs/rest';
+import { RESTJSONErrorCodes, Routes } from 'discord-api-types/rest/v10';
 import { RESTPostAPIChannelMessageJSONBody } from 'discord-api-types/v9';
+import { safeDiscordRequest } from '../utils/discord';
 
 // 10062 (Unknown interaction) and 40060 (Already acknowledged)
 export class InteractionsService {
+  private readonly logger: Logger;
+
   constructor(
     private readonly rest: REST,
+    logger: Logger,
     private readonly applicationId: string,
-  ) {}
+  ) {
+    this.logger = logger.child({ module: 'InteractionsService' });
+  }
 
   async deferCommandResponse(
     interactionId: string,
@@ -23,10 +30,22 @@ export class InteractionsService {
           },
         },
       });
-    } catch (error: any) {
-      if (error.code !== 10062 && error.code !== 40060) {
-        console.warn(`Failed to defer interaction ${interactionId}:`, error);
+    } catch (error) {
+      if (error instanceof DiscordAPIError) {
+        switch (error.code) {
+          case RESTJSONErrorCodes.UnknownInteraction:
+            this.logger.warn(
+              `Interaction ${interactionId} is unknown (possibly timed out), cannot defer.`,
+            );
+            return;
+          case RESTJSONErrorCodes.InteractionHasAlreadyBeenAcknowledged:
+            this.logger.warn(
+              `Interaction ${interactionId} has already been acknowledged, cannot defer.`,
+            );
+            return;
+        }
       }
+      throw error;
     }
   }
 
@@ -37,8 +56,7 @@ export class InteractionsService {
     body: RESTPostAPIChannelMessageJSONBody,
     ephemeral: boolean,
   ): Promise<void> {
-    try {
-      await this.rest.post(Routes.interactionCallback(interactionId, interactionToken), {
+      await safeDiscordRequest(() => this.rest.post(Routes.interactionCallback(interactionId, interactionToken), {
         body: {
           type: 4,
           data: {
@@ -46,10 +64,7 @@ export class InteractionsService {
             flags: ephemeral ? 64 : undefined,
           },
         },
-      });
-    } catch (error: any) {
-      console.error(`Failed to send reply for interaction ${interactionId}:`, error);
-    }
+      }), this.logger, { interactionId, interactionToken });
   }
 
   //Reply after deferring
@@ -58,15 +73,11 @@ export class InteractionsService {
     interactionToken: string,
     body: RESTPostAPIChannelMessageJSONBody,
   ): Promise<void> {
-    try {
-      await this.rest.patch(
+      await safeDiscordRequest(() => this.rest.patch(
         Routes.webhookMessage(this.applicationId, interactionToken, '@original'),
         {
           body: body,
         },
-      );
-    } catch (error: any) {
-      console.error(`Failed to update reply for interaction ${interactionId}:`, error);
-    }
+      ), this.logger, { interactionId, interactionToken });
   }
 }

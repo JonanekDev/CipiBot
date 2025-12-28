@@ -15,6 +15,7 @@
     "@cipibot/constants": "workspace:*",
     "@cipibot/redis": "workspace:*",
     "@cipibot/schemas": "workspace:*",
+    "@cipibot/logger": "workspace:*",
     "@trpc/client": "^11.8.1"
   },
   "devDependencies": {

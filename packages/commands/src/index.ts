@@ -1,62 +1,96 @@
 import { CACHE_TTL, KAFKA_TOPICS, REDIS_KEYS } from '@cipibot/constants';
-import { getRedis } from '@cipibot/redis';
-import { sendEvent } from '@cipibot/kafka';
+import {  RedisClient } from '@cipibot/redis';
 import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction } from '@cipibot/schemas/discord';
 import { UpdateCommandPayloadType } from '@cipibot/schemas';
+import { Logger } from '@cipibot/logger';
+import { KafkaClient } from '@cipibot/kafka';
 
 export interface Command {
   definition: RESTPostAPIApplicationCommandsJSONBody;
   handler: (interaction: CommandInteraction) => Promise<void> | void;
 }
 
-// Commands routing
+export class CommandRegistry {
+  private readonly kafka: KafkaClient;
+  private readonly redis: RedisClient;
+  private readonly logger: Logger;
+  private readonly serviceName: string;
+  private heartbeatInterval: NodeJS.Timeout | null = null;
 
-async function setCommandRoute(command: string, serviceName: string): Promise<void> {
-  const redis = getRedis();
-  const key = `${REDIS_KEYS.COMMAND_ROUTE}${command}`;
-  await redis.set(key, serviceName, 'EX', CACHE_TTL.COMMAND_ROUTE);
-}
+  constructor(
+    serviceName: string,
+    kafka: KafkaClient,
+    redis: RedisClient,
+    logger: Logger,
+  ) {
+    this.serviceName = serviceName;
+    this.kafka = kafka;
+    this.redis = redis;
+    this.logger = logger.child({ package: 'CommandRegistry' });
+  }
 
-export async function getCommandRoute(command: string): Promise<string | null> {
-  const redis = getRedis();
-  const key = `${REDIS_KEYS.COMMAND_ROUTE}${command}`;
-  return redis.get(key);
-}
+  public getServiceCommandTopic(serviceName?: string): string {
+    const name = serviceName || this.serviceName;
+    return `service.${name}.commands`;
+  }
 
-export function getServiceCommandTopic(serviceName: string): string {
-  return `service.${serviceName}.commands`;
-}
-
-export function startCommandHeartbeat(serviceName: string, commands: string[]): () => void {
-  const register = async () => {
+  private async setCommandRoute(command: string): Promise<void> {
+    const redisKey = `${REDIS_KEYS.COMMAND_ROUTE}${command}`;
     try {
-      await Promise.all(commands.map((cmd) => setCommandRoute(cmd, serviceName)));
-    } catch (err) {
-      console.error(`[Redis] Failed to refresh command routes for ${serviceName}:`, err);
+      await this.redis.set(redisKey, this.serviceName, 'EX', CACHE_TTL.COMMAND_ROUTE);
+    } catch (error) {
+      this.logger.error({ command, error }, 'Failed to set command route in Redis');
     }
-  };
+  }
 
-  register();
+  public async getCommandRoute(command: string): Promise<string | null> {
+    const redisKey = `${REDIS_KEYS.COMMAND_ROUTE}${command}`;
+    return await this.redis.get(redisKey);
+  }
 
-  const interval = setInterval(register, (CACHE_TTL.COMMAND_ROUTE * 1000) / 2);
-  return () => clearInterval(interval);
-}
+  public startHeartbeat(commands: string[]): void {
+    if (this.heartbeatInterval) {
+      this.logger.warn('Heartbeat is already running');
+      return;
+    }
 
-// Command definitions publishing
-export async function publishCommandDefinitions(
-  serviceName: string,
-  definitions: RESTPostAPIApplicationCommandsJSONBody[],
-): Promise<void> {
-  const redis = getRedis();
+    const register = async () => {
+      await Promise.all(
+        commands.map(async (cmd) => await this.setCommandRoute(cmd)),
+      )
+    }
 
-  await redis.hset(REDIS_KEYS.COMMAND_DEFINITIONS, serviceName, JSON.stringify(definitions));
+    register();
+    this.heartbeatInterval = setInterval(register, (CACHE_TTL.COMMAND_ROUTE * 1000) / 2);
+    this.logger.info({ commands }, 'Command route heartbeat started');
+  }
 
-  const eventData: UpdateCommandPayloadType = {
-    serviceName: serviceName,
-  };
+  public stopHeartbeat(): void {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+      this.logger.info('Command route heartbeat stopped');
+    }
+  }
 
-  await sendEvent(KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE, eventData);
+  public async publishDefinitions(definitions: RESTPostAPIApplicationCommandsJSONBody[]): Promise<void> {
+    try {
+      await this.redis.hset(
+        REDIS_KEYS.COMMAND_DEFINITIONS,
+        this.serviceName,
+        JSON.stringify(definitions),
+      );
 
-  console.log(`[Commands] Published ${definitions.length} definitions for ${serviceName}`);
+      const eventData: UpdateCommandPayloadType = {
+        serviceName: this.serviceName,
+      }
+
+      await this.kafka.sendEvent(KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE, eventData);
+
+      this.logger.info( { count: definitions.length }, 'Published command definitions successfully');
+    } catch (error) {
+      this.logger.error({ error }, 'Failed to publish command definitions');
+    }
+  }
 }

@@ -1,17 +1,28 @@
 import { DiscordMessagePayloadType, GuildConfigType, RolePayloadType } from '@cipibot/schemas';
 import { UserLevel } from './generated/prisma/browser';
-import { getGuildConfig } from '@cipibot/config-client';
+import { ConfigClient } from '@cipibot/config-client';
 import { t } from '@cipibot/i18n';
 import { KAFKA_TOPICS } from '@cipibot/constants';
-import { sendEvent } from '@cipibot/kafka';
+import { KafkaClient } from '@cipibot/kafka';
 import { calculateXpForLevel, calculateXpFromMessage } from './calculator';
 import { LevelingRepository } from './repository';
 import { renderDiscordMessage } from '@cipibot/embeds/discord';
 import { createLevelUpVariables, LevelUpVariables } from '@cipibot/templating/modules/leveling';
 import { UserType } from '@cipibot/schemas/discord';
+import { Logger } from '@cipibot/logger';
 
 export class LevelingService {
-  constructor(private readonly levelingRepository: LevelingRepository) {}
+    private readonly logger: Logger;
+    private readonly levelingRepository: LevelingRepository;
+    private readonly kafka: KafkaClient;
+    private readonly configClient: ConfigClient;
+
+  constructor(kafka: KafkaClient, logger: Logger, levelingRepository: LevelingRepository, configClient: ConfigClient) {
+    this.kafka = kafka;
+    this.logger = logger.child({ service: 'LevelingService' });
+    this.levelingRepository = levelingRepository;
+    this.configClient = configClient;
+  }
 
   async syncMemberPresence(guildId: string, userId: string, left: boolean): Promise<void> {
     await this.levelingRepository.setUserLeftStatus(guildId, userId, left);
@@ -61,7 +72,7 @@ export class LevelingService {
         },
       );
 
-      sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
+      this.kafka.sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
 
       // Role reward
       const roleId = config.leveling.roleRewards[(currentLevel + 1).toString()];
@@ -71,7 +82,7 @@ export class LevelingService {
           userId: user.id,
           roleId,
         };
-        sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_ADD, eventData);
+        this.kafka.sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_ADD, eventData);
       }
     }
 
@@ -83,7 +94,7 @@ export class LevelingService {
   }
 
   async getWebLeaderboard(guildId: string): Promise<UserLevel[]> {
-    const config = await getGuildConfig(guildId);
+    const config = await this.configClient.getGuildConfig(guildId);
 
     if (!config.leveling.enabled) {
       throw new Error('Leveling is disabled for this guild');

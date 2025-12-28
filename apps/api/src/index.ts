@@ -1,4 +1,4 @@
-import { getRedis } from '@cipibot/redis';
+import { RedisClient } from '@cipibot/redis';
 import Fastify from 'fastify';
 import { AuthService } from './services/auth.service';
 import fastifyCookie from '@fastify/cookie';
@@ -9,17 +9,23 @@ import { CONFIG } from './config';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 import { createContext } from './context';
 import { createAppRouter } from './router';
+import { createLogger } from '@cipibot/logger';
+import { ConfigClient } from '@cipibot/config-client';
+
+const logger = createLogger('api');
 
 async function main() {
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL || '' });
 
   const prisma = new PrismaClient({ adapter });
 
-  const redis = getRedis();
-  const authService = new AuthService(prisma, redis);
+  const redis = new RedisClient(logger);
+  const configClient = new ConfigClient(redis, logger);  
+
+  const authService = new AuthService(prisma, redis, logger, configClient);
 
   const app = Fastify({
-    logger: true,
+    loggerInstance: logger,
   });
 
   app.register(fastifyCookie);
@@ -46,13 +52,13 @@ async function main() {
   const APP_PORT = parseInt(process.env.PORT || '3002', 10);
   await app.listen({ port: APP_PORT, host: '0.0.0.0' });
 
-  console.log(`API service listening on port ${APP_PORT}`);
+  logger.info(`API service listening on port ${APP_PORT}`);
 
   const shutdown = async () => {
-    console.log('Shutting down...');
+    logger.info('Shutting down...');
     await app.close();
     await prisma.$disconnect();
-    await redis.quit();
+    await redis.shutdown();
     process.exit(0);
   };
 
@@ -61,6 +67,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error('Fatal error:', error);
+  logger.error(error, 'Fatal error:');
   process.exit(1);
 });

@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "kafkajs": "^2.2.4",
-    "zod": "^4.1.13"
+    "zod": "^4.1.13",
+    "@cipibot/logger": "workspace:*"
   }
 }

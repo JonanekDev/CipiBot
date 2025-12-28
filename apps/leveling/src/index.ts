@@ -2,40 +2,51 @@ import Fastify from 'fastify';
 import { PrismaClient } from './generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { LevelingService } from './service';
-import { registerConsumers, shutdownConsumers } from './consumers';
+import { registerConsumers } from './consumers';
 import { createLevelingRouter } from './router';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
-import { startCommandHeartbeat, publishCommandDefinitions } from '@cipibot/commands';
+import { CommandRegistry } from '@cipibot/commands';
 import { createCommands } from './commands';
 import { LevelingRepository } from './repository';
+import { createLogger } from '@cipibot/logger';
+import { KafkaClient } from '@cipibot/kafka';
+import { RedisClient } from '@cipibot/redis';
+import { ConfigClient } from '@cipibot/config-client';
 
 const SERVICE_NAME = 'leveling';
+const logger = createLogger(SERVICE_NAME);
 
 async function main() {
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL || '' });
 
   const prisma = new PrismaClient({ adapter });
+  const kafka = new KafkaClient(logger);
+  const redis = new RedisClient(logger);
+  const configClient = new ConfigClient(redis, logger);
+
   const levelingRepository = new LevelingRepository(prisma);
-  const levelingService = new LevelingService(levelingRepository);
+  const levelingService = new LevelingService(kafka, logger, levelingRepository, configClient);
 
   // Register Commands
-  const commandsMap = createCommands(levelingService);
+  const commandsMap = createCommands(levelingService, kafka, configClient, logger);
   const commandNames = Array.from(commandsMap.keys());
   const commandDefinitions = Array.from(commandsMap.values()).map((c) => c.definition);
 
-  console.log(`Initialized ${commandNames.length} commands: ${commandNames.join(', ')}`);
+  logger.info({ commandNames }, `Initialized ${commandNames.length} commands`);
 
-  await publishCommandDefinitions(SERVICE_NAME, commandDefinitions);
+  const commandRegistry = new CommandRegistry(SERVICE_NAME, kafka, redis, logger);
 
-  const stopHeartbeat = startCommandHeartbeat(SERVICE_NAME, commandNames);
+  await commandRegistry.publishDefinitions(commandDefinitions);
 
-  registerConsumers(levelingService, commandsMap).catch((error) => {
-    console.error('Failed to start consumers: ', error);
+  commandRegistry.startHeartbeat(commandNames);
+
+  registerConsumers(kafka, commandRegistry, levelingService, configClient, logger, commandsMap).catch((error) => {
+    logger.error(error, 'Failed to start consumers');
     process.exit(1);
   });
 
   const app = Fastify({
-    logger: true,
+    loggerInstance: logger,
   });
 
   const levelingRouter = createLevelingRouter(levelingService);
@@ -51,14 +62,15 @@ async function main() {
   const APP_PORT = parseInt(process.env.PORT || '3001', 10);
   await app.listen({ port: APP_PORT });
 
-  console.log(`Leveling service listening on port ${APP_PORT}`);
+  logger.info(`Leveling service listening on port ${APP_PORT}`);
 
   const shutdown = async () => {
-    console.log('Shutting down...');
-    stopHeartbeat();
+    logger.info('Shutting down...');
+    commandRegistry.stopHeartbeat();
     await app.close();
     await prisma.$disconnect();
-    await shutdownConsumers();
+    await kafka.shutdown();
+    await redis.shutdown();
     process.exit(0);
   };
 
@@ -67,6 +79,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error('Fatal error:', error);
+  logger.error(error, 'Fatal error:');
   process.exit(1);
 });

@@ -1,28 +1,34 @@
 import Fastify from 'fastify';
 import { PrismaClient } from './generated/prisma/client';
-import { getRedis } from '@cipibot/redis';
+import { RedisClient } from '@cipibot/redis';
 import { ConfigService } from './service';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { registerConsumers, shutdownConsumers } from './consumers';
+import { registerConsumers } from './consumers';
 import { createConfigRouter } from './router';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 import { ConfigRepository } from './repository';
+import { KafkaClient } from '@cipibot/kafka';
+import { createLogger } from '@cipibot/logger';
+
+const logger = createLogger('config');
 
 async function main() {
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL || '' });
 
   const prisma = new PrismaClient({ adapter });
-  const redis = getRedis();
+  const redis = new RedisClient(logger);
+  const kafka = new KafkaClient(logger);
+
   const configRepository = new ConfigRepository(prisma);
   const configService = new ConfigService(redis, configRepository);
 
-  registerConsumers(configService).catch((error) => {
+  registerConsumers(configService, kafka).catch((error) => {
     console.error('Failed to start consumers: ', error);
     process.exit(1);
   });
 
   const app = Fastify({
-    logger: true,
+    loggerInstance: logger,
   });
 
   // Register routes
@@ -39,14 +45,14 @@ async function main() {
   const APP_PORT = parseInt(process.env.PORT || '3000', 10);
   await app.listen({ port: APP_PORT });
 
-  console.log(`Config service listening on port ${APP_PORT}`);
+  logger.info(`Config service listening on port ${APP_PORT}`);
 
   const shutdown = async () => {
-    console.log('Shutting down...');
+    logger.info('Shutting down...');
     await app.close();
     await prisma.$disconnect();
-    await redis.quit();
-    await shutdownConsumers();
+    await redis.shutdown();
+    await kafka.shutdown();
     process.exit(0);
   };
 
@@ -55,6 +61,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error('Fatal error:', error);
+  logger.error(error, 'Fatal error:');
   process.exit(1);
 });

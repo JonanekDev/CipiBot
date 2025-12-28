@@ -1,24 +1,31 @@
 import { REST } from '@discordjs/rest';
 import { Routes, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { getRedis } from '@cipibot/redis';
+import { RedisClient } from '@cipibot/redis';
 import { REDIS_KEYS } from '@cipibot/constants';
+import { Logger } from '@cipibot/logger';
 
 export class CommandsService {
   private debounceTimer: NodeJS.Timeout | null = null;
   private readonly DEBOUNCE_MS = 30000;
+  private readonly logger: Logger;
 
   constructor(
     private readonly rest: REST,
+    logger: Logger,
+    private readonly redis: RedisClient,
     private readonly clientId: string,
-  ) {}
+  ) {
+    this.logger = logger.child({ module: 'CommandsService' });
+  }
 
-  triggerSync(serviceName: string) {
+  triggerSync(serviceTriggerName: string) {
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
     }
 
-    console.log(
-      `[CommandsService] Sync triggered by ${serviceName}. Waiting for other services to publish their command definitions...`,
+    this.logger.info(
+      { serviceTriggerName },
+      `Sync triggered. Waiting for other services to publish their command definitions...`,
     );
 
     this.debounceTimer = setTimeout(() => {
@@ -29,14 +36,13 @@ export class CommandsService {
   }
 
   private async syncCommands() {
-    console.log('[CommandsService] Starting global command synchronization...');
-    const redis = getRedis();
+    this.logger.info('Starting command sync with Discord API...');
 
     try {
-      const data = await redis.hgetall(REDIS_KEYS.COMMAND_DEFINITIONS);
+      const data = await this.redis.hgetall(REDIS_KEYS.COMMAND_DEFINITIONS);
 
       if (!data) {
-        console.error('[CommandsService] No command definitions found in Redis.');
+        this.logger.error('No command definitions found in Redis.');
         return;
       }
 
@@ -45,23 +51,23 @@ export class CommandsService {
           try {
             return JSON.parse(jsonString);
           } catch (e) {
-            console.error('[CommandsService] Failed to parse definition chunk:', e);
+            this.logger.error(e, 'Failed to parse command definition JSON from Redis.');
             return [];
           }
         },
       );
 
-      console.log(
-        `[CommandsService] Aggregated ${allCommands.length} commands from ${Object.keys(data).length} services.`,
+      this.logger.info(
+        `Aggregated ${allCommands.length} commands from ${Object.keys(data).length} services.`,
       );
 
       await this.rest.put(Routes.applicationCommands(this.clientId), {
         body: allCommands,
       });
 
-      console.log('[CommandsService] Discord API sync complete.');
+      this.logger.info('Successfully synced commands with Discord API.');
     } catch (error) {
-      console.error('[CommandsService] Fatal error during command sync:', error);
+      this.logger.error(error, 'Fatal error during command sync');
       throw error;
     } finally {
       this.debounceTimer = null;

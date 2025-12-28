@@ -25,6 +25,7 @@
     "@cipibot/commands": "workspace:*",
     "@cipibot/embeds": "workspace:*",
     "@cipibot/templating": "workspace:*",
+    "@cipibot/logger": "workspace:*",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
     "@trpc/server": "^11.8.1",
