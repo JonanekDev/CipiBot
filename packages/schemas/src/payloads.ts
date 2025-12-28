@@ -16,6 +16,13 @@ export const DiscordMessagePayloadSchema = z.object({
 
 export type DiscordMessagePayloadType = z.infer<typeof DiscordMessagePayloadSchema>;
 
+export const DiscordDMPayloadSchema = z.object({
+  userId: z.string(),
+  body: z.custom<RESTPostAPIChannelMessageJSONBody>(),
+});
+
+export type DiscordDMPayloadType = z.infer<typeof DiscordDMPayloadSchema>;
+
 export const DiscordInteractionReplyUpdateSchema = z.object({
   interactionId: z.string(),
   interactionToken: z.string(),
@@ -24,7 +31,9 @@ export const DiscordInteractionReplyUpdateSchema = z.object({
 
 export type DiscordInteractionReplyUpdateType = z.infer<typeof DiscordInteractionReplyUpdateSchema>;
 
-export const UpdateCommandPayloadSchema = z.object({
+export const UpdateCommandPayloadSchema = z
+  .object({
     serviceName: z.string(),
-}).strict();
+  })
+  .strict();
 export type UpdateCommandPayloadType = z.infer<typeof UpdateCommandPayloadSchema>;

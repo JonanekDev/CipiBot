@@ -20,12 +20,17 @@ export const MessageSchema = z.object({
 
 export type MessageType = z.infer<typeof MessageSchema>;
 
-export const GuildMemberSchema = z.object({
-  user: UserSchema,
+export const InteractionGuildMemberSchema = z.object({
   roles: z.array(z.string()),
   joined_at: z.string().nullable(),
   flags: z.number().int(),
   permissions: z.string().optional(),
+});
+
+export type InteractionGuildMemberType = z.infer<typeof InteractionGuildMemberSchema>;
+
+export const GuildMemberSchema = InteractionGuildMemberSchema.extend({
+  user: UserSchema,
 });
 
 export type GuildMemberType = z.infer<typeof GuildMemberSchema>;

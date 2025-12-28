@@ -1,10 +1,7 @@
 import { Command } from '@cipibot/commands';
 import { getUserOption } from '@cipibot/commands/options';
 import { LevelingService } from '../service';
-import {
-  ApplicationCommandOptionType,
-  ApplicationCommandType,
-} from 'discord-api-types/v10';
+import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord-api-types/v10';
 import { sendEvent } from '@cipibot/kafka';
 import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
 import { t } from '@cipibot/i18n';
@@ -66,15 +63,15 @@ export function createLevelCommand(service: LevelingService): Command {
       const levelUpVariables = createLevelVariables(
         {
           userId: targetUser.id,
-          username: targetUser.global_name || targetUser.username,
-          avatar: targetUser.avatar || undefined,
+          username: targetUser.global_name ?? targetUser.username,
+          avatar: targetUser.avatar,
         },
         {
-          level: user?.level || 0,
-          currentXP: user?.xp || 0,
-          messageCount: user ? user.messageCount : 0,
+          level: user?.level ?? 0,
+          currentXP: user?.xp ?? 0,
+          messageCount: user?.messageCount ?? 0,
         },
-        calculateXpForLevel((user?.level || 0) + 1),
+        calculateXpForLevel((user?.level ?? 0) + 1),
       );
 
       eventData.body = renderDiscordMessage<LevelVariables>(

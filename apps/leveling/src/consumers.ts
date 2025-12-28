@@ -1,6 +1,15 @@
 import { disconnectConsumers, registerTopicHandler, startConsumer } from '@cipibot/kafka';
 import { LevelingService } from './service';
-import { CommandInteraction, CommandInteractionSchema, GuildMemberPayloadSchema, GuildMemberPayloadType, GuildMemberRemovePayloadSchema, GuildMemberRemovePayloadType, MessageSchema, MessageType } from '@cipibot/schemas/discord';
+import {
+  CommandInteraction,
+  CommandInteractionSchema,
+  GuildMemberPayloadSchema,
+  GuildMemberPayloadType,
+  GuildMemberRemovePayloadSchema,
+  GuildMemberRemovePayloadType,
+  MessageSchema,
+  MessageType,
+} from '@cipibot/schemas/discord';
 import { getServiceCommandTopic } from '@cipibot/commands';
 import { Command } from '@cipibot/commands';
 import { KAFKA_TOPICS } from '@cipibot/constants';

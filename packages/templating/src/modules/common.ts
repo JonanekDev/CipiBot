@@ -10,7 +10,7 @@ export interface UserVariables {
 export function createUserVariables(user: {
   userId: string;
   username: string;
-  avatar?: string;
+  avatar?: string | null;
 }): UserVariables {
   return {
     userId: user.userId,

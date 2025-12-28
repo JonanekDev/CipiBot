@@ -2,10 +2,11 @@ import Fastify from 'fastify';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 import { registerConsumers, shutdownConsumers } from './consumers';
 import { createDiscordRestRouter } from './router';
-import { DiscordRestService } from './service';
 import { CommandsService } from './services/commands.service';
 import { REST } from '@discordjs/rest';
 import { InteractionsService } from './services/interactions.service';
+import { RolesService } from './services/roles.service';
+import { MessagesService } from './services/messages.service';
 
 async function main() {
   const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
@@ -19,13 +20,15 @@ async function main() {
   const rest = new REST({ version: '10' }).setToken(DISCORD_BOT_TOKEN);
   const commandsService = new CommandsService(rest, DISCORD_CLIENT_ID);
   const interactionsService = new InteractionsService(rest, DISCORD_CLIENT_ID);
+  const messagesService = new MessagesService(rest);
+  const rolesService = new RolesService(rest);
 
-  const discordRestService = new DiscordRestService(DISCORD_BOT_TOKEN);
-
-  registerConsumers(discordRestService, commandsService, interactionsService).catch((error) => {
-    console.error('Failed to start consumers: ', error);
-    process.exit(1);
-  });
+  registerConsumers(commandsService, interactionsService, messagesService, rolesService).catch(
+    (error) => {
+      console.error('Failed to start consumers: ', error);
+      process.exit(1);
+    },
+  );
 
   const app = Fastify({
     logger: true,

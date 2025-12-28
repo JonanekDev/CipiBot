@@ -9,6 +9,12 @@
     "leaderboardEntry": "{{position}}. {{userMention}} - Level {{level}} ({{currentXP}} XP)",
     "noData": "No level data found."
   },
+  "welcoming": {
+    "welcomeTitle": "👋 Welcome! 👋",
+    "welcomeDescription": "Welcome to the server, {{userMention}}! 🎉",
+    "leaveTitle": "👋 Goodbye! 👋",
+    "leaveDescription": "Goodbye, **{{username}}**! We look forward to your return. 👋"
+  },
   "errors": {
     "errorTitle": "❌ Error ❌",
     "MODULE_DISABLED": "Module {{module}} is disabled on this server.",

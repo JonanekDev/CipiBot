@@ -1,6 +1,5 @@
 import type { Redis } from '@cipibot/redis';
 import { DeepPartial, type GuildConfigType } from '@cipibot/schemas';
-import { APIGuild } from 'discord-api-types/v10';
 import { defu } from 'defu';
 import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
 import { ConfigRepository } from './repository';

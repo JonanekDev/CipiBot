@@ -1,8 +1,4 @@
-import {
-  DiscordMessagePayloadType,
-  GuildConfigType,
-  RolePayloadType,
-} from '@cipibot/schemas';
+import { DiscordMessagePayloadType, GuildConfigType, RolePayloadType } from '@cipibot/schemas';
 import { UserLevel } from './generated/prisma/browser';
 import { getGuildConfig } from '@cipibot/config-client';
 import { t } from '@cipibot/i18n';

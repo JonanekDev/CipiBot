@@ -1,6 +1,7 @@
 import { disconnectConsumers, registerTopicHandler, startConsumer } from '@cipibot/kafka';
-import { DiscordRestService } from './service';
 import {
+  DiscordDMPayloadSchema,
+  DiscordDMPayloadType,
   DiscordInteractionReplyUpdateSchema,
   DiscordInteractionReplyUpdateType,
   DiscordMessagePayloadSchema,
@@ -13,20 +14,32 @@ import {
 import { CommandsService } from './services/commands.service';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import { InteractionsService } from './services/interactions.service';
+import { MessagesService } from './services/messages.service';
+import { RolesService } from './services/roles.service';
 
 const CONSUMER_GROUP = 'discord-rest-service-group';
 
 export async function registerConsumers(
-  discordRestService: DiscordRestService,
   commandsService: CommandsService,
   interactionsService: InteractionsService,
+  messagesService: MessagesService,
+  rolesService: RolesService,
 ) {
   await registerTopicHandler<DiscordMessagePayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE,
     DiscordMessagePayloadSchema,
     async (payload) => {
-      await discordRestService.handleMessageCreate(payload);
+      await messagesService.sendMessage(payload.channelId, payload.body);
+    },
+  );
+
+  await registerTopicHandler<DiscordDMPayloadType>(
+    CONSUMER_GROUP,
+    KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_DM,
+    DiscordDMPayloadSchema,
+    async (payload) => {
+      await messagesService.sendDirectMessage(payload.userId, payload.body);
     },
   );
 
@@ -35,7 +48,16 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_ADD,
     RolePayloadSchema,
     async (payload) => {
-      await discordRestService.handleMemberRoleAdd(payload);
+      await rolesService.addRoleToMember(payload.guildId, payload.userId, payload.roleId);
+    },
+  );
+
+  await registerTopicHandler<RolePayloadType>(
+    CONSUMER_GROUP,
+    KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_REMOVE,
+    RolePayloadSchema,
+    async (payload) => {
+      await rolesService.removeRoleFromMember(payload.guildId, payload.userId, payload.roleId);
     },
   );
 
@@ -44,7 +66,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE,
     UpdateCommandPayloadSchema,
     async (payload) => {
-      commandsService.triggerSync();
+      commandsService.triggerSync(payload.serviceName);
     },
   );
 

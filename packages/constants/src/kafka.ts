@@ -10,7 +10,9 @@ export const KAFKA_TOPICS = {
 
   DISCORD_OUTBOUND: {
     MEMBER_ROLE_ADD: 'discord.outbound.member.role.add',
+    MEMBER_ROLE_REMOVE: 'discord.outbound.member.role.remove',
     SEND_MESSAGE: 'discord.outbound.send.message',
+    SEND_DM: 'discord.outbound.send.dm',
     INTERACTION_REPLY_UPDATE: 'discord.outbound.interaction.reply.update',
   },
   SYSTEM: {

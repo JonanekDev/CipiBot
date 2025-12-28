@@ -1,5 +1,5 @@
-import z from "zod";
-import { GuildMemberSchema, UserSchema } from "./common";
+import z from 'zod';
+import { GuildMemberSchema, UserSchema } from './common';
 
 const BaseGuildSchema = z.object({
   id: z.string(),

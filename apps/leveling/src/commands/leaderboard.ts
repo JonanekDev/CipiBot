@@ -1,8 +1,6 @@
 import { Command } from '@cipibot/commands';
 import { LevelingService } from '../service';
-import {
-  ApplicationCommandType,
-} from 'discord-api-types/v10';
+import { ApplicationCommandType } from 'discord-api-types/v10';
 import { sendEvent } from '@cipibot/kafka';
 import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
 import { t } from '@cipibot/i18n';

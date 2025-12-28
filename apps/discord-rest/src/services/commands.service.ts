@@ -12,13 +12,13 @@ export class CommandsService {
     private readonly clientId: string,
   ) {}
 
-  public triggerSync() {
+  triggerSync(serviceName: string) {
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
     }
 
     console.log(
-      '[CommandsService] Sync triggered. Waiting for other services to publish their command definitions...',
+      `[CommandsService] Sync triggered by ${serviceName}. Waiting for other services to publish their command definitions...`,
     );
 
     this.debounceTimer = setTimeout(() => {

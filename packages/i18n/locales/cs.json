@@ -9,6 +9,12 @@
     "leaderboardEntry": "{{position}}. {{userMention}} - Level {{level}} ({{currentXP}} XP)",
     "noData": "Žádná level data nebyla nalezena."
   },
+  "welcoming": {
+    "welcomeTitle": "👋 Vítej! 👋",
+    "welcomeDescription": "Vítej na serveru, {{userMention}}! 🎉",
+    "leaveTitle": "👋 Sbohem! 👋",
+    "leaveDescription": "Sbohem, **{{username}}**! Budeme se těšit na tvůj návrat. 👋"
+  },
   "errors": {
     "errorTitle": "❌ Chyba ❌",
     "MODULE_DISABLED": "Modul {{modul}} je na tomto serveru vypnut.",

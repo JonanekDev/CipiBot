@@ -1,6 +1,11 @@
 import { InteractionType } from 'discord-api-types/v10';
 import z from 'zod';
-import { GuildMemberSchema, MessageSchema, UserSchema } from './common';
+import {
+  GuildMemberSchema,
+  InteractionGuildMemberSchema,
+  MessageSchema,
+  UserSchema,
+} from './common';
 
 export const BaseInteractionSchema = z.object({
   id: z.string(),
@@ -28,10 +33,13 @@ export const CommandInteractionDataSchema = z.object({
       }),
     )
     .optional(),
-    resolved: z.object({
+  resolved: z
+    .object({
       users: z.record(z.string(), UserSchema).optional(),
-      members: z.record(z.string(), GuildMemberSchema).optional(),
-    }).optional(),
+      members: z.record(z.string(), InteractionGuildMemberSchema).optional(),
+      messages: z.record(z.string(), MessageSchema).optional(),
+    })
+    .optional(),
   guild_id: z.string().optional(),
   target_id: z.string().optional(),
 });
@@ -68,32 +76,30 @@ export const PingInteractionSchema = BaseInteractionSchema.extend({
 export type PingInteraction = z.infer<typeof PingInteractionSchema>;
 
 export const CommandAutocompleteInteractionSchema = BaseInteractionSchema.extend({
-    type: z.literal(InteractionType.ApplicationCommandAutocomplete),
-    //TODO
-})
+  type: z.literal(InteractionType.ApplicationCommandAutocomplete),
+  //TODO
+});
 
 export type CommandAutocompleteInteraction = z.infer<typeof CommandAutocompleteInteractionSchema>;
 
 export const ModalSubmitInteractionSchema = BaseInteractionSchema.extend({
-    type: z.literal(InteractionType.ModalSubmit),
-    //TODO
-})
+  type: z.literal(InteractionType.ModalSubmit),
+  //TODO
+});
 
 export type ModalSubmitInteraction = z.infer<typeof ModalSubmitInteractionSchema>;
 
 export const InteractionSchema = z.discriminatedUnion('type', [
-    CommandInteractionSchema,
-    MessageComponentInteractionSchema,
-    PingInteractionSchema,
-    CommandAutocompleteInteractionSchema,
-    ModalSubmitInteractionSchema,
+  CommandInteractionSchema,
+  MessageComponentInteractionSchema,
+  PingInteractionSchema,
+  CommandAutocompleteInteractionSchema,
+  ModalSubmitInteractionSchema,
 ]);
 
 export type Interaction = z.infer<typeof InteractionSchema>;
 
-export function isCommandInteraction(
-  interaction: Interaction,
-): interaction is CommandInteraction {
+export function isCommandInteraction(interaction: Interaction): interaction is CommandInteraction {
   return interaction.type === InteractionType.ApplicationCommand;
 }
 
@@ -102,4 +108,3 @@ export function isMessageComponentInteraction(
 ): interaction is z.infer<typeof MessageComponentInteractionSchema> {
   return interaction.type === InteractionType.MessageComponent;
 }
-

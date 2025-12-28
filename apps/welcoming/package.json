@@ -1,0 +1,30 @@
+{
+  "name": "@cipibot/welcoming",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx -r dotenv/config src/index.ts",
+    "build": "tsc",
+    "format": "prettier --write src/"
+  },
+  "keywords": [],
+  "author": "JonanekDev",
+  "license": "ISC",
+  "packageManager": "pnpm@10.25.0",
+  "dependencies": {
+    "@cipibot/constants": "workspace:*",
+    "@cipibot/kafka": "workspace:*",
+    "@cipibot/schemas": "workspace:*",
+    "@cipibot/discord-rest": "workspace:*",
+    "@cipibot/config-client": "workspace:*",
+    "@cipibot/templating": "workspace:*",
+    "@cipibot/embeds": "workspace:*",
+    "@cipibot/i18n": "workspace:*"
+  },
+  "devDependencies": {
+    "@cipibot/tsconfig": "workspace:*",
+    "@types/node": "^25.0.1"
+  }
+}

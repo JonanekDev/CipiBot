@@ -1,9 +1,7 @@
 import { CACHE_TTL, KAFKA_TOPICS, REDIS_KEYS } from '@cipibot/constants';
 import { getRedis } from '@cipibot/redis';
 import { sendEvent } from '@cipibot/kafka';
-import {
-  RESTPostAPIApplicationCommandsJSONBody,
-} from 'discord-api-types/v10';
+import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction } from '@cipibot/schemas/discord';
 import { UpdateCommandPayloadType } from '@cipibot/schemas';
 
@@ -56,7 +54,7 @@ export async function publishCommandDefinitions(
 
   const eventData: UpdateCommandPayloadType = {
     serviceName: serviceName,
-  }
+  };
 
   await sendEvent(KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE, eventData);
 

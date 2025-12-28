@@ -3,20 +3,12 @@ import { EmbedSchema } from './discord/embeds';
 import { SUPPORTED_LANGUAGES } from '@cipibot/i18n';
 import { LevelingConfigSchema } from './modules/leveling';
 import { withDefaults } from './defaults';
-
-export const WelcomeConfigSchema = z.object({
-  enabled: z.boolean().default(true),
-  welcomeEnabled: z.boolean().default(true),
-  leaveEnabled: z.boolean().default(true),
-  welcomeMessage: z.union([z.string(), EmbedSchema]).nullable().default(null),
-  leaveMessage: z.union([z.string(), EmbedSchema]).nullable().default(null),
-  channelId: z.union([z.string(), EmbedSchema]).nullable().default(null),
-});
+import { WelcomingConfigSchema } from './modules/welcoming';
 
 export const GuildConfigSchema = z.object({
   language: z.enum(SUPPORTED_LANGUAGES).default('en'),
   leveling: withDefaults(LevelingConfigSchema),
-  welcome: withDefaults(WelcomeConfigSchema),
+  welcoming: withDefaults(WelcomingConfigSchema),
 });
 export type GuildConfigType = z.infer<typeof GuildConfigSchema>;
 
@@ -24,7 +16,7 @@ export type GuildConfigType = z.infer<typeof GuildConfigSchema>;
 export const GuildConfigPatchSchema = z.object({
   language: z.enum(SUPPORTED_LANGUAGES).optional(),
   leveling: LevelingConfigSchema.partial().optional(),
-  welcome: WelcomeConfigSchema.partial().optional(),
+  welcoming: WelcomingConfigSchema.partial().optional(),
 });
 export type GuildConfigPatchType = z.infer<typeof GuildConfigPatchSchema>;
 

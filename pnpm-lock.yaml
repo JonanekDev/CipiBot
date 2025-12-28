@@ -293,6 +293,40 @@ importers:
         specifier: ^8.16.0
         version: 8.16.0
 
+  apps/welcoming:
+    dependencies:
+      '@cipibot/config-client':
+        specifier: workspace:*
+        version: link:../../packages/config-client
+      '@cipibot/constants':
+        specifier: workspace:*
+        version: link:../../packages/constants
+      '@cipibot/discord-rest':
+        specifier: workspace:*
+        version: link:../discord-rest
+      '@cipibot/embeds':
+        specifier: workspace:*
+        version: link:../../packages/embeds
+      '@cipibot/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@cipibot/kafka':
+        specifier: workspace:*
+        version: link:../../packages/kafka
+      '@cipibot/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
+      '@cipibot/templating':
+        specifier: workspace:*
+        version: link:../../packages/templating
+    devDependencies:
+      '@cipibot/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@types/node':
+        specifier: ^25.0.1
+        version: 25.0.1
+
   packages/commands:
     dependencies:
       '@cipibot/constants':
