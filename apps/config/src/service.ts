@@ -4,6 +4,7 @@ import { APIGuild } from 'discord-api-types/v10';
 import { defu } from 'defu';
 import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
 import { ConfigRepository } from './repository';
+import { GuildUpdatePayload } from '@cipibot/schemas/discord';
 
 export class ConfigService {
   constructor(
@@ -57,7 +58,7 @@ export class ConfigService {
     return cleanConfig;
   }
 
-  async upsertGuild(guild: APIGuild): Promise<void> {
+  async upsertGuild(guild: GuildUpdatePayload): Promise<void> {
     const guildRecord = await this.configRepository.upsertGuildWithoutConfig(
       guild.id,
       guild.name,

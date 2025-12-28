@@ -1,9 +1,14 @@
 import { disconnectConsumers, registerTopicHandler, startConsumer } from '@cipibot/kafka';
 import { DiscordRestService } from './service';
 import {
+  DiscordInteractionReplyUpdateSchema,
   DiscordInteractionReplyUpdateType,
+  DiscordMessagePayloadSchema,
   DiscordMessagePayloadType,
+  RolePayloadSchema,
   RolePayloadType,
+  UpdateCommandPayloadSchema,
+  UpdateCommandPayloadType,
 } from '@cipibot/schemas';
 import { CommandsService } from './services/commands.service';
 import { KAFKA_TOPICS } from '@cipibot/constants';
@@ -19,6 +24,7 @@ export async function registerConsumers(
   await registerTopicHandler<DiscordMessagePayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE,
+    DiscordMessagePayloadSchema,
     async (payload) => {
       await discordRestService.handleMessageCreate(payload);
     },
@@ -27,14 +33,16 @@ export async function registerConsumers(
   await registerTopicHandler<RolePayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_ADD,
+    RolePayloadSchema,
     async (payload) => {
       await discordRestService.handleMemberRoleAdd(payload);
     },
   );
 
-  await registerTopicHandler<any>(
+  await registerTopicHandler<UpdateCommandPayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE,
+    UpdateCommandPayloadSchema,
     async (payload) => {
       commandsService.triggerSync();
     },
@@ -43,6 +51,7 @@ export async function registerConsumers(
   await registerTopicHandler<DiscordInteractionReplyUpdateType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE,
+    DiscordInteractionReplyUpdateSchema,
     async (payload) => {
       await interactionsService.updateReply(
         payload.interactionId,

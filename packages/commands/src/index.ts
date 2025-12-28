@@ -3,12 +3,13 @@ import { getRedis } from '@cipibot/redis';
 import { sendEvent } from '@cipibot/kafka';
 import {
   RESTPostAPIApplicationCommandsJSONBody,
-  APIChatInputApplicationCommandInteraction,
 } from 'discord-api-types/v10';
+import { CommandInteraction } from '@cipibot/schemas/discord';
+import { UpdateCommandPayloadType } from '@cipibot/schemas';
 
 export interface Command {
   definition: RESTPostAPIApplicationCommandsJSONBody;
-  handler: (interaction: APIChatInputApplicationCommandInteraction) => Promise<void> | void;
+  handler: (interaction: CommandInteraction) => Promise<void> | void;
 }
 
 // Commands routing
@@ -53,10 +54,11 @@ export async function publishCommandDefinitions(
 
   await redis.hset(REDIS_KEYS.COMMAND_DEFINITIONS, serviceName, JSON.stringify(definitions));
 
-  await sendEvent(KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE, {
-    service: serviceName,
-    timestamp: Date.now(),
-  });
+  const eventData: UpdateCommandPayloadType = {
+    serviceName: serviceName,
+  }
+
+  await sendEvent(KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE, eventData);
 
   console.log(`[Commands] Published ${definitions.length} definitions for ${serviceName}`);
 }

@@ -4,7 +4,6 @@ import { LevelingService } from '../service';
 import {
   ApplicationCommandOptionType,
   ApplicationCommandType,
-  APIChatInputApplicationCommandInteraction,
 } from 'discord-api-types/v10';
 import { sendEvent } from '@cipibot/kafka';
 import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
@@ -15,6 +14,7 @@ import { calculateXpForLevel } from '../calculator';
 import { createErrorEmbed } from '@cipibot/embeds';
 import { createLevelVariables, LevelVariables } from '@cipibot/templating/modules/leveling';
 import { renderDiscordMessage } from '@cipibot/embeds/discord';
+import { CommandInteraction, Interaction } from '@cipibot/schemas/discord';
 
 export function createLevelCommand(service: LevelingService): Command {
   return {
@@ -31,7 +31,7 @@ export function createLevelCommand(service: LevelingService): Command {
         },
       ],
     },
-    handler: async (interaction: APIChatInputApplicationCommandInteraction) => {
+    handler: async (interaction: CommandInteraction) => {
       const guildId = interaction.guild_id;
 
       if (!guildId) return;

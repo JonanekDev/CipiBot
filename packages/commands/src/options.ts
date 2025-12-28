@@ -1,14 +1,13 @@
+import { CommandInteraction, UserType } from '@cipibot/schemas/discord';
 import {
   APIApplicationCommandInteractionDataUserOption,
-  APIChatInputApplicationCommandInteraction,
-  APIUser,
   ApplicationCommandOptionType,
 } from 'discord-api-types/v10';
 
 export function getUserOption(
-  interaction: APIChatInputApplicationCommandInteraction,
+  interaction: CommandInteraction,
   optionName: string,
-): { userId: string; user: APIUser | null } | null {
+): { userId: string; user: UserType | null } | null {
   const options = interaction.data.options;
   if (!options) return null;
 

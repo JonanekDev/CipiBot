@@ -1,5 +1,5 @@
 import z from 'zod';
-import { EmbedSchema } from './discord';
+import { EmbedSchema } from './discord/embeds';
 
 export const CommandSchema = z.object({
   enabled: z.boolean().default(true),

@@ -1,13 +1,10 @@
 import {
   DiscordMessagePayloadType,
-  EmbedType,
   GuildConfigType,
   RolePayloadType,
 } from '@cipibot/schemas';
 import { UserLevel } from './generated/prisma/browser';
-import { PrismaClient } from './generated/prisma/client';
 import { getGuildConfig } from '@cipibot/config-client';
-import { APIUser } from 'discord-api-types/v10';
 import { t } from '@cipibot/i18n';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import { sendEvent } from '@cipibot/kafka';
@@ -15,6 +12,7 @@ import { calculateXpForLevel, calculateXpFromMessage } from './calculator';
 import { LevelingRepository } from './repository';
 import { renderDiscordMessage } from '@cipibot/embeds/discord';
 import { createLevelUpVariables, LevelUpVariables } from '@cipibot/templating/modules/leveling';
+import { UserType } from '@cipibot/schemas/discord';
 
 export class LevelingService {
   constructor(private readonly levelingRepository: LevelingRepository) {}
@@ -26,7 +24,7 @@ export class LevelingService {
   async processMessage(
     guildId: string,
     config: GuildConfigType,
-    user: APIUser,
+    user: UserType,
     message: string,
     channelId: string,
   ): Promise<void> {

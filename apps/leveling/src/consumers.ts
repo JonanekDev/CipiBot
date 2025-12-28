@@ -1,14 +1,8 @@
 import { disconnectConsumers, registerTopicHandler, startConsumer } from '@cipibot/kafka';
 import { LevelingService } from './service';
-import { GuildMessage } from '@cipibot/schemas/dist/discord';
+import { CommandInteraction, CommandInteractionSchema, GuildMemberPayloadSchema, GuildMemberPayloadType, GuildMemberRemovePayloadSchema, GuildMemberRemovePayloadType, MessageSchema, MessageType } from '@cipibot/schemas/discord';
 import { getServiceCommandTopic } from '@cipibot/commands';
 import { Command } from '@cipibot/commands';
-import {
-  GatewayGuildMemberAddDispatchData,
-  GatewayGuildMemberRemoveDispatchData,
-  InteractionType,
-  APIChatInputApplicationCommandInteraction,
-} from 'discord-api-types/v10';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import { getGuildConfig } from '@cipibot/config-client';
 
@@ -18,9 +12,10 @@ export async function registerConsumers(
   levelingService: LevelingService,
   commands: Map<string, Command>,
 ) {
-  await registerTopicHandler<GuildMessage>(
+  await registerTopicHandler<MessageType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.MESSAGE_CREATE,
+    MessageSchema,
     async (message) => {
       if (message.author.bot) return;
       const guildId = message.guild_id;
@@ -40,28 +35,29 @@ export async function registerConsumers(
     },
   );
 
-  await registerTopicHandler<GatewayGuildMemberAddDispatchData>(
+  await registerTopicHandler<GuildMemberPayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_MEMBER_ADD,
+    GuildMemberPayloadSchema,
     async (data) => {
       await levelingService.syncMemberPresence(data.guild_id, data.user.id, false);
     },
   );
 
-  await registerTopicHandler<GatewayGuildMemberRemoveDispatchData>(
+  await registerTopicHandler<GuildMemberRemovePayloadType>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_MEMBER_REMOVE,
+    GuildMemberRemovePayloadSchema,
     async (data) => {
       await levelingService.syncMemberPresence(data.guild_id, data.user.id, true);
     },
   );
 
-  await registerTopicHandler<APIChatInputApplicationCommandInteraction>(
+  await registerTopicHandler<CommandInteraction>(
     CONSUMER_GROUP,
     getServiceCommandTopic('leveling'),
+    CommandInteractionSchema,
     async (interaction) => {
-      if (interaction.type !== InteractionType.ApplicationCommand) return;
-
       const commandName = interaction.data.name;
       const command = commands.get(commandName);
 

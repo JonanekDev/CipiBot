@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { EmbedSchema } from './discord';
+import { EmbedSchema } from './discord/embeds';
 import { SUPPORTED_LANGUAGES } from '@cipibot/i18n';
 import { LevelingConfigSchema } from './modules/leveling';
 import { withDefaults } from './defaults';

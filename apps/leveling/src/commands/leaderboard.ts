@@ -1,22 +1,20 @@
 import { Command } from '@cipibot/commands';
-import { getUserOption } from '@cipibot/commands/options';
 import { LevelingService } from '../service';
 import {
   ApplicationCommandType,
-  APIChatInputApplicationCommandInteraction,
 } from 'discord-api-types/v10';
 import { sendEvent } from '@cipibot/kafka';
 import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
 import { t } from '@cipibot/i18n';
 import { getGuildConfig } from '@cipibot/config-client';
 import { KAFKA_TOPICS } from '@cipibot/constants';
-import { createErrorEmbed } from '@cipibot/embeds';
 import {
   LeaderboardEntryVariables,
   LeaderboardVariables,
 } from '@cipibot/templating/modules/leveling';
 import { renderDiscordMessage } from '@cipibot/embeds/discord';
 import { renderTemplate } from '@cipibot/templating';
+import { CommandInteraction } from '@cipibot/schemas/discord';
 
 export function createLeaderboardCommand(service: LevelingService): Command {
   return {
@@ -25,7 +23,7 @@ export function createLeaderboardCommand(service: LevelingService): Command {
       description: 'Shows the leaderboard of the server',
       type: ApplicationCommandType.ChatInput,
     },
-    handler: async (interaction: APIChatInputApplicationCommandInteraction) => {
+    handler: async (interaction: CommandInteraction) => {
       const guildId = interaction.guild_id;
       if (!guildId) return;
 

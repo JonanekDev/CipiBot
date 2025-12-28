@@ -1,5 +1,5 @@
 import z from 'zod';
-import { EmbedSchema } from '../discord';
+import { EmbedSchema } from '../discord/embeds';
 import { CommandSchema } from '../commands';
 import { withDefaults } from '../defaults';
 import { BaseModuleSchema } from '.';

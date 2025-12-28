@@ -1,5 +1,4 @@
 import {
-  APIGuild,
   PermissionFlagsBits,
   RESTGetAPICurrentUserGuildsResult,
   RESTGetAPICurrentUserResult,
@@ -9,7 +8,7 @@ import { CONFIG } from '../config';
 import axios from 'axios';
 import { PrismaClient } from '../generated/prisma/client';
 import { Redis } from '@cipibot/redis';
-import { DashboardGuild, SessionDataType } from '@cipibot/schemas/dist/api/auth';
+import { DashboardGuild, SessionDataType } from '@cipibot/schemas/api';
 import { getKnownGuilds } from '@cipibot/config-client';
 
 export class AuthService {

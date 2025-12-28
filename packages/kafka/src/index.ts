@@ -7,6 +7,7 @@ import {
   type KafkaConfig,
   type EachMessagePayload,
 } from 'kafkajs';
+import z from 'zod';
 
 type SendEventOptions = {
   key?: string;
@@ -21,6 +22,7 @@ type SubscribeOptions = {
 
 type TopicHandler<T = unknown> = {
   handler: (data: T, key: string | null) => Promise<void>;
+  schema: z.ZodSchema<T>;
   options: SubscribeOptions;
 };
 
@@ -165,8 +167,9 @@ export async function sendEvent(
   }
 }
 
-function safeParseJson<T>(value: Buffer): T {
-  return JSON.parse(value.toString()) as T;
+function safeParseJson<T>(value: Buffer, schema: z.ZodSchema<T>): T {
+  const parsed = JSON.parse(value.toString());
+  return schema.parse(parsed);
 }
 
 /**
@@ -176,6 +179,7 @@ function safeParseJson<T>(value: Buffer): T {
 export async function registerTopicHandler<T>(
   groupId: string,
   topic: string,
+  schema: z.ZodSchema<T>,
   handler: (data: T, key: string | null) => Promise<void>,
   options: SubscribeOptions = {},
 ): Promise<void> {
@@ -193,6 +197,7 @@ export async function registerTopicHandler<T>(
   // Store the handler
   group.handlers.set(topic, {
     handler: handler as TopicHandler['handler'],
+    schema,
     options,
   });
 
@@ -236,7 +241,7 @@ export async function startConsumer(groupId: string): Promise<void> {
 
       try {
         const key = message.key ? message.key.toString() : null;
-        const data = safeParseJson(message.value);
+        const data = safeParseJson(message.value, topicHandler.schema);
         await topicHandler.handler(data, key);
       } catch (err) {
         const prefix = `${topic}[${partition} | ${message.offset}]`;

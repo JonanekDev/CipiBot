@@ -3,16 +3,16 @@ import { getGuildConfig } from '@cipibot/config-client';
 import { DiscordRestRouter } from '@cipibot/discord-rest/router';
 import { sendEvent } from '@cipibot/kafka';
 import { TRPCClient } from '@trpc/client';
-import { APIInteraction, InteractionType } from 'discord-api-types/v10';
+import { Interaction, isCommandInteraction } from '@cipibot/schemas/discord';
 import { COMMAND_META } from '@cipibot/commands/commandsMeta';
 import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
 import { createErrorEmbed } from '@cipibot/embeds';
 
 export async function handleInteractionCreate(
-  interaction: APIInteraction,
+  interaction: Interaction,
   trpc: TRPCClient<DiscordRestRouter>,
 ) {
-  if (interaction.type == InteractionType.ApplicationCommand) {
+  if (isCommandInteraction(interaction)) {
     const serviceName = await getCommandRoute(interaction.data.name);
     const guildConfig = await getGuildConfig(interaction.guild_id!);
     if (serviceName) {
@@ -20,7 +20,7 @@ export async function handleInteractionCreate(
       let ephemeral = false;
       if (!meta) {
         console.warn(
-          `No command meta found for command: ${interaction.data.name} - Create meta in @cipibot/schemas`,
+          `No command meta found for command: ${interaction.data.name} - Create meta in @cipibot/commands/commandsMeta.ts`,
         );
       } else {
         const moduleConfig = guildConfig[meta.module];
