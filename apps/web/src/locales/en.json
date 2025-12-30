@@ -1,0 +1,68 @@
+{
+  "common": {
+    "addToDiscord": "Add to Discord",
+    "logout": "Log out"
+  },
+  "mainlayout": {
+    "nav": {
+      "features": "Features",
+      "support": "Support",
+      "enterDashboard": "Enter Dashboard"
+    },
+    "footer": {
+      "slogan": "One bot. Infinite possibilities."
+    }
+  },
+  "landing": {
+    "hero": {
+      "title": "The Only Discord Bot <br> <span class=\"text-primary\">You'll Ever Need</span>",
+      "subtitle": "A modern, modular Discord bot that combines moderation, engagement, and automation — fully customizable for every server.",
+      "cta_explore": "Explore Features"
+    },
+    "features": {
+      "title": "Powerful Modules",
+      "subtitle": "Enable only what your server actually needs.",
+      "leveling": {
+        "title": "Leveling System",
+        "description": "Engage your community with XP progression, ranks, and leaderboards."
+      },
+      "welcome": {
+        "title": "Welcome Messages",
+        "description": "Greet new members with customizable embeds and messages."
+      },
+      "verification": {
+        "title": "User Verification",
+        "description": "Protect your server with a one-click verification and CAPTCHA flow."
+      },
+      "custom_commands": {
+        "title": "Custom Commands",
+        "description": "Build custom commands that fit your server — from simple replies to advanced actions."
+      },
+      "ticketing": {
+        "title": "Ticketing System",
+        "description": "Handle support requests privately and efficiently — without clutter."
+      },
+      "social_alerts": {
+        "title": "Social Alerts",
+        "description": "Get notified when your favorite content creators go live."
+      }
+    },
+    "cta": {
+      "title": "Everything your server needs. One bot.",
+      "subtitle": "Moderation, engagement, and automation — enabled only what you need them.",
+      "inviteButton": "Invite CipiBot",
+      "exploreButton": "Explore Dashboard"
+    }
+  },
+  "dashboard": {
+    "guildSelect": {
+      "selectGuildTitle": "Select a Server",
+      "selectGuildDescription": "Choose the server you want to manage.",
+      "noGuilds": "You don't own or admin any Discord servers.",
+      "activeGuilds": "Active Servers",
+      "inactiveGuilds": "Add CipiBot to server ",
+      "manage": "Manage",
+      "addBot": "Add Bot"
+    }
+  }
+}

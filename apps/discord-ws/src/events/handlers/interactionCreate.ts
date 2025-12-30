@@ -61,7 +61,10 @@ export async function handleInteractionCreate(
               ephemeral: true,
             })
             .catch((error) => {
-              logger.error({ error, interactionName: interaction.data.name }, 'Failed to send disabled reply');
+              logger.error(
+                { error, interactionName: interaction.data.name },
+                'Failed to send disabled reply',
+              );
             });
           return;
         }
@@ -74,7 +77,10 @@ export async function handleInteractionCreate(
           ephemeral: ephemeral,
         })
         .catch((error) => {
-          logger.error({ error, interactionName: interaction.data.name }, 'Failed to send defer reply');
+          logger.error(
+            { error, interactionName: interaction.data.name },
+            'Failed to send defer reply',
+          );
         });
       await kafka.sendEvent(commandRegistry.getServiceCommandTopic(serviceName), interaction, {
         key: interaction.guild_id,
@@ -98,7 +104,10 @@ export async function handleInteractionCreate(
           ephemeral: true,
         })
         .catch((error) => {
-          logger.error({ error, interactionName: interaction.data.name }, 'Failed to send error reply');
+          logger.error(
+            { error, interactionName: interaction.data.name },
+            'Failed to send error reply',
+          );
         });
     }
   }

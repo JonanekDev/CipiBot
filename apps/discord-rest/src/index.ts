@@ -31,12 +31,16 @@ async function main() {
   const messagesService = new MessagesService(rest, logger);
   const rolesService = new RolesService(rest, logger);
 
-  registerConsumers(kafka, commandsService, interactionsService, messagesService, rolesService).catch(
-    (error) => {
-      logger.error(error, 'Failed to start consumers: ');
-      process.exit(1);
-    },
-  );
+  registerConsumers(
+    kafka,
+    commandsService,
+    interactionsService,
+    messagesService,
+    rolesService,
+  ).catch((error) => {
+    logger.error(error, 'Failed to start consumers: ');
+    process.exit(1);
+  });
 
   const app = Fastify({
     loggerInstance: logger,

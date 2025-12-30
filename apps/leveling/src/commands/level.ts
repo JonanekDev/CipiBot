@@ -14,7 +14,12 @@ import { CommandInteraction } from '@cipibot/schemas/discord';
 import { Logger } from '@cipibot/logger';
 import { KafkaClient } from '@cipibot/kafka';
 
-export function createLevelCommand(service: LevelingService, kafka: KafkaClient, configClient: ConfigClient, logger: Logger): Command {
+export function createLevelCommand(
+  service: LevelingService,
+  kafka: KafkaClient,
+  configClient: ConfigClient,
+  logger: Logger,
+): Command {
   return {
     definition: {
       name: 'level',

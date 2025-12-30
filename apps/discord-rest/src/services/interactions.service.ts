@@ -56,15 +56,20 @@ export class InteractionsService {
     body: RESTPostAPIChannelMessageJSONBody,
     ephemeral: boolean,
   ): Promise<void> {
-      await safeDiscordRequest(() => this.rest.post(Routes.interactionCallback(interactionId, interactionToken), {
-        body: {
-          type: 4,
-          data: {
-            ...body,
-            flags: ephemeral ? 64 : undefined,
+    await safeDiscordRequest(
+      () =>
+        this.rest.post(Routes.interactionCallback(interactionId, interactionToken), {
+          body: {
+            type: 4,
+            data: {
+              ...body,
+              flags: ephemeral ? 64 : undefined,
+            },
           },
-        },
-      }), this.logger, { interactionId, interactionToken });
+        }),
+      this.logger,
+      { interactionId, interactionToken },
+    );
   }
 
   //Reply after deferring
@@ -73,11 +78,13 @@ export class InteractionsService {
     interactionToken: string,
     body: RESTPostAPIChannelMessageJSONBody,
   ): Promise<void> {
-      await safeDiscordRequest(() => this.rest.patch(
-        Routes.webhookMessage(this.applicationId, interactionToken, '@original'),
-        {
+    await safeDiscordRequest(
+      () =>
+        this.rest.patch(Routes.webhookMessage(this.applicationId, interactionToken, '@original'), {
           body: body,
-        },
-      ), this.logger, { interactionId, interactionToken });
+        }),
+      this.logger,
+      { interactionId, interactionToken },
+    );
   }
 }

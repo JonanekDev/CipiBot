@@ -76,18 +76,26 @@ export async function registerConsumers(
 
       if (command) {
         try {
-          logger.info({ commandName, guildId: interaction.guild_id }, `Executing command: ${commandName}`);
+          logger.info(
+            { commandName, guildId: interaction.guild_id },
+            `Executing command: ${commandName}`,
+          );
           await command.handler(interaction);
         } catch (error) {
-          logger.error({ commandName, error, guildId: interaction.guild_id }, `Error executing command: ${commandName}`);
+          logger.error(
+            { commandName, error, guildId: interaction.guild_id },
+            `Error executing command: ${commandName}`,
+          );
           // TODO: Send error response to user
         }
       } else {
-        logger.warn({ commandName, guildId: interaction.guild_id }, `Received command '${commandName}' but no handler found.`);
+        logger.warn(
+          { commandName, guildId: interaction.guild_id },
+          `Received command '${commandName}' but no handler found.`,
+        );
       }
     },
   );
 
   await kafka.startConsumer(CONSUMER_GROUP);
 }
-

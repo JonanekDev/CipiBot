@@ -64,7 +64,12 @@ export class ConfigService {
       guild.icon,
     );
     const cacheKey = this.getGuildConfigCacheKey(guild.id);
-    await this.redis.set(cacheKey, JSON.stringify(guildRecord.config), 'EX', CACHE_TTL.GUILD_CONFIG);
+    await this.redis.set(
+      cacheKey,
+      JSON.stringify(guildRecord.config),
+      'EX',
+      CACHE_TTL.GUILD_CONFIG,
+    );
   }
 
   async filterKnownGuilds(guildIds: string[]): Promise<string[]> {

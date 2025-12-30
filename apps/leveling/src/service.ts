@@ -12,12 +12,17 @@ import { UserType } from '@cipibot/schemas/discord';
 import { Logger } from '@cipibot/logger';
 
 export class LevelingService {
-    private readonly logger: Logger;
-    private readonly levelingRepository: LevelingRepository;
-    private readonly kafka: KafkaClient;
-    private readonly configClient: ConfigClient;
+  private readonly logger: Logger;
+  private readonly levelingRepository: LevelingRepository;
+  private readonly kafka: KafkaClient;
+  private readonly configClient: ConfigClient;
 
-  constructor(kafka: KafkaClient, logger: Logger, levelingRepository: LevelingRepository, configClient: ConfigClient) {
+  constructor(
+    kafka: KafkaClient,
+    logger: Logger,
+    levelingRepository: LevelingRepository,
+    configClient: ConfigClient,
+  ) {
     this.kafka = kafka;
     this.logger = logger.child({ service: 'LevelingService' });
     this.levelingRepository = levelingRepository;

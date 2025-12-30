@@ -1,5 +1,5 @@
 import { CACHE_TTL, KAFKA_TOPICS, REDIS_KEYS } from '@cipibot/constants';
-import {  RedisClient } from '@cipibot/redis';
+import { RedisClient } from '@cipibot/redis';
 import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction } from '@cipibot/schemas/discord';
 import { UpdateCommandPayloadType } from '@cipibot/schemas';
@@ -18,12 +18,7 @@ export class CommandRegistry {
   private readonly serviceName: string;
   private heartbeatInterval: NodeJS.Timeout | null = null;
 
-  constructor(
-    serviceName: string,
-    kafka: KafkaClient,
-    redis: RedisClient,
-    logger: Logger,
-  ) {
+  constructor(serviceName: string, kafka: KafkaClient, redis: RedisClient, logger: Logger) {
     this.serviceName = serviceName;
     this.kafka = kafka;
     this.redis = redis;
@@ -56,10 +51,8 @@ export class CommandRegistry {
     }
 
     const register = async () => {
-      await Promise.all(
-        commands.map(async (cmd) => await this.setCommandRoute(cmd)),
-      )
-    }
+      await Promise.all(commands.map(async (cmd) => await this.setCommandRoute(cmd)));
+    };
 
     register();
     this.heartbeatInterval = setInterval(register, (CACHE_TTL.COMMAND_ROUTE * 1000) / 2);
@@ -74,7 +67,9 @@ export class CommandRegistry {
     }
   }
 
-  public async publishDefinitions(definitions: RESTPostAPIApplicationCommandsJSONBody[]): Promise<void> {
+  public async publishDefinitions(
+    definitions: RESTPostAPIApplicationCommandsJSONBody[],
+  ): Promise<void> {
     try {
       await this.redis.hset(
         REDIS_KEYS.COMMAND_DEFINITIONS,
@@ -84,11 +79,11 @@ export class CommandRegistry {
 
       const eventData: UpdateCommandPayloadType = {
         serviceName: this.serviceName,
-      }
+      };
 
       await this.kafka.sendEvent(KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE, eventData);
 
-      this.logger.info( { count: definitions.length }, 'Published command definitions successfully');
+      this.logger.info({ count: definitions.length }, 'Published command definitions successfully');
     } catch (error) {
       this.logger.error({ error }, 'Failed to publish command definitions');
     }

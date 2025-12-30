@@ -8,7 +8,7 @@ import {
 import { Logger } from '@cipibot/logger';
 
 export class MessagesService {
-    private readonly logger: Logger;
+  private readonly logger: Logger;
 
   constructor(
     private readonly rest: REST,
@@ -46,12 +46,11 @@ export class MessagesService {
   async sendDirectMessage(userId: string, body: RESTPostAPIChannelMessageJSONBody): Promise<void> {
     // Get DM channel
     try {
-    const dmChannel = await this.rest
-      .post(Routes.userChannels(), {
+      const dmChannel = (await this.rest.post(Routes.userChannels(), {
         body: {
           recipient_id: userId,
         },
-      }) as APIDMChannel;
+      })) as APIDMChannel;
       await this.sendMessage(dmChannel.id, body);
     } catch (error) {
       throw error;

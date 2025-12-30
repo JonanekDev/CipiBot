@@ -1,0 +1,140 @@
+@font-face {
+  font-family: 'Outfit';
+  src: url('../Outfit.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+:root {
+  --color-background: #09090b;
+  --color-background-soft: #121216; /* Lighter variant for cards */
+  --color-primary: #1caf87;
+  --color-primary-hover: #168f6e;
+  --color-secondary: #07518d;
+  --color-accent: #b6d848;
+  --color-text: #fdeed8;
+  --color-text-muted: #a19d96;
+  --color-danger: #e74c3c;
+  --color-border: #27272a;
+  --color-input-bg: #000000;
+  --color-navbar-bg: rgba(9, 9, 11, 0.8);
+  --hero-glow-start: rgba(28, 175, 135, 0.15);
+  --hero-glow-end: rgba(9, 9, 11, 0);
+
+  /* Spacing & Layout */
+  --container-width: 1200px;
+  --header-height: 80px;
+  --sidebar-width: 260px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color var(--transition-fast);
+}
+
+ul {
+  list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 3.5rem;
+  letter-spacing: -0.02em;
+}
+h2 {
+  font-size: 2.5rem;
+}
+h3 {
+  font-size: 1.75rem;
+}
+
+p {
+  margin-bottom: 1rem;
+  color: var(--color-text-muted);
+}
+
+p a {
+  color: var(--color-primary);
+}
+
+p a:hover {
+  color: var(--color-primary-hover);
+}
+
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.items-center {
+  align-items: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.justify-center {
+  justify-content: center;
+}
+.gap-1 {
+  gap: 0.5rem;
+}
+.gap-2 {
+  gap: 1rem;
+}
+.gap-4 {
+  gap: 2rem;
+}
+
+.grid {
+  display: grid;
+}
+.text-center {
+  text-align: center;
+}
+.text-primary {
+  color: var(--color-primary);
+}
+.text-accent {
+  color: var(--color-accent);
+}

@@ -51,7 +51,7 @@ export async function dispatchEvent(
         break;
 
       default:
-        logger.warn({ eventType: event.t },`Unhandled event type`);
+        logger.warn({ eventType: event.t }, `Unhandled event type`);
         break;
     }
   } catch (error) {

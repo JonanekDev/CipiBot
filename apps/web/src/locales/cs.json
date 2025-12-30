@@ -1,0 +1,68 @@
+{
+  "common": {
+    "addToDiscord": "Přidat na Discord",
+    "logout": "Odhlásit se"
+  },
+  "mainlayout": {
+    "nav": {
+      "features": "Funkce",
+      "support": "Podpora",
+      "enterDashboard": "Otevřít panel"
+    },
+    "footer": {
+      "slogan": "Jeden Bot, nekonečno možností."
+    }
+  },
+  "landing": {
+    "hero": {
+      "title": "Jediný Discord bot,<br><span class=\"text-primary\">který budeš kdy potřebovat</span>",
+      "subtitle": "Moderní, modulární Discord bot, který spojuje moderaci, zapojení komunity a automatizaci — plně přizpůsobitelný pro každý server.",
+      "cta_explore": "Prozkoumat funkce"
+    },
+    "features": {
+      "title": "Moduly",
+      "subtitle": "Zapni jen ty funkce, které potřebuješ.",
+      "leveling": {
+        "title": "Systém úrovní",
+        "description": "Zapojte komunitu pomocí XP progrese, hodností a žebříčků."
+      },
+      "welcome": {
+        "title": "Uvítací zprávy",
+        "description": "Přivítejte nové členy nastavitelnými zprávami a embedy."
+      },
+      "verification": {
+        "title": "Ověření uživatelů",
+        "description": "Chraňte svůj server pomocí ověření jedním kliknutím a CAPTCHA."
+      },
+      "custom_commands": {
+        "title": "Vlastní příkazy",
+        "description": "Vytvářejte příkazy na míru — od jednoduchých odpovědí po pokročilé akce."
+      },
+      "ticketing": {
+        "title": "Ticket systém",
+        "description": "Řešte požadavky na podporu soukromě a efektivně."
+      },
+      "social_alerts": {
+        "title": "Sociální upozornění",
+        "description": "Dostávejte upozornění, když vaši oblíbení tvůrci začnou vysílat."
+      }
+    },
+    "cta": {
+      "title": "Vše, co váš server potřebuje. Jeden bot.",
+      "subtitle": "Moderace, zapojení a automatizace — povoleno jen co to potřebujete.",
+      "inviteButton": "Pozvat CipiBota",
+      "exploreButton": "Prozkoumat panel"
+    }
+  },
+  "dashboard": {
+    "guildSelect": {
+      "selectGuildTitle": "Výběr serveru",
+      "selectGuildDescription": "Vyber server, který chceš spravovat.",
+      "noGuilds": "Nevlastníš žádný Discord server ani nejsi nikde adminem.",
+      "activeGuilds": "Aktivní servery",
+      "inactiveGuilds": "Přidat CipiBota na server ",
+      "manage": "Spravovat",
+      "addBot": "Přidat bota"
+    }
+  }
+}

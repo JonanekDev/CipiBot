@@ -16,7 +16,7 @@ datasource db {
 model Guild {
   id        String   @id
   
-  name      String?
+  name      String
   icon      String?
 
   config        Json     @default("{}")

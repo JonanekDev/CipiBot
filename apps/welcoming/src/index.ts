@@ -8,12 +8,12 @@ import { RedisClient } from '@cipibot/redis';
 const logger = createLogger('welcoming');
 
 async function main() {
-    const kafka = new KafkaClient(logger);
-    const redis = new RedisClient(logger);
-    const configClient = new ConfigClient(redis, logger);
+  const kafka = new KafkaClient(logger);
+  const redis = new RedisClient(logger);
+  const configClient = new ConfigClient(redis, logger);
 
-      const welcomingService = new WelcomingService(kafka, configClient);
-      
+  const welcomingService = new WelcomingService(kafka, configClient);
+
   registerConsumers(kafka, welcomingService).catch((error) => {
     logger.error(error, 'Failed to start consumers: ');
     process.exit(1);

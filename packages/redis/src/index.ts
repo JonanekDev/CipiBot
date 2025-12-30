@@ -17,7 +17,7 @@ export class RedisClient {
         return delay;
       },
       ...options,
-    }
+    };
 
     this.redis = new Redis(defaultOptions);
     this.registerEventListeners();

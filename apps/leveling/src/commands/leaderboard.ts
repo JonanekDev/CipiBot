@@ -15,7 +15,12 @@ import { renderTemplate } from '@cipibot/templating';
 import { CommandInteraction } from '@cipibot/schemas/discord';
 import { Logger } from '@cipibot/logger';
 
-export function createLeaderboardCommand(service: LevelingService, kafka: KafkaClient, configClient: ConfigClient, logger: Logger): Command {
+export function createLeaderboardCommand(
+  service: LevelingService,
+  kafka: KafkaClient,
+  configClient: ConfigClient,
+  logger: Logger,
+): Command {
   return {
     definition: {
       name: 'leaderboard',

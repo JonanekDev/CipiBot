@@ -2,7 +2,7 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { Context } from './context';
 import { AuthService } from './services/auth.service';
-import { LoginReqSchema } from '@cipibot/schemas/api';
+import { LoginReqSchema, LoginRes, UserGuildRes } from '@cipibot/schemas/api';
 import { GuildConfigPatchSchema } from '@cipibot/schemas';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import type { ConfigRouter } from '@cipibot/config/router';
@@ -39,11 +39,11 @@ export const protectedProcedure = t.procedure.use(isAuthed);
 export function createAppRouter(authService: AuthService) {
   const authRouter = t.router({
     login: t.procedure.input(LoginReqSchema).mutation(async ({ input, ctx }) => {
-      const sessionData = await authService.login(input.code);
+      const userData = await authService.login(input.code);
 
       const token = await ctx.res.jwtSign(
         {
-          userId: sessionData.user.id,
+          userId: userData.id,
         },
         {
           expiresIn: '7d',
@@ -56,19 +56,35 @@ export function createAppRouter(authService: AuthService) {
         maxAge: 60 * 60 * 24 * 7, // 1 week
       });
 
-      return {
+      const res: LoginRes = {
         status: 'ok',
-        data: sessionData,
+        data: userData,
       };
+
+      return res;
     }),
     me: protectedProcedure.query(async ({ ctx }) => {
-      const sessionData = await authService.getSessionData(ctx.user.userId);
-      return {
+      const userInfo = await authService.getSessionData(ctx.user.userId);
+
+      const res: LoginRes = {
         status: 'ok',
-        data: sessionData,
+        data: userInfo,
       };
+
+      return res;
     }),
-    logout: protectedProcedure.mutation(({ ctx }) => {
+    guilds: protectedProcedure.query(async ({ ctx }) => {
+      const guilds = await authService.getGuildsForUser(ctx.user.userId);
+
+      const res: UserGuildRes = {
+        status: 'ok',
+        data: guilds,
+      };
+
+      return res;
+    }),
+    logout: protectedProcedure.mutation(async ({ ctx }) => {
+      await authService.logout(ctx.user.userId);
       ctx.res.clearCookie('access_token');
       return { success: true };
     }),
@@ -107,4 +123,4 @@ export function createAppRouter(authService: AuthService) {
   });
 }
 
-export type AppRouter = ReturnType<typeof createAppRouter>;
+export type ApiRouter = ReturnType<typeof createAppRouter>;

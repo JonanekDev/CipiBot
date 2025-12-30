@@ -40,7 +40,14 @@ async function main() {
 
   commandRegistry.startHeartbeat(commandNames);
 
-  registerConsumers(kafka, commandRegistry, levelingService, configClient, logger, commandsMap).catch((error) => {
+  registerConsumers(
+    kafka,
+    commandRegistry,
+    levelingService,
+    configClient,
+    logger,
+    commandsMap,
+  ).catch((error) => {
     logger.error(error, 'Failed to start consumers');
     process.exit(1);
   });

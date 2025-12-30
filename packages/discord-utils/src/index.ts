@@ -10,3 +10,7 @@ export function getAvatarURL(userId: string, avatar?: string | null): string {
   }
   return avatarURL;
 }
+
+export function getGuildIconURL(guildId: string, icon: string): string {
+    return `https://cdn.discordapp.com/icons/${guildId}/${icon}.png`;
+}

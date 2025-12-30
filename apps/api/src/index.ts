@@ -1,5 +1,7 @@
 import { RedisClient } from '@cipibot/redis';
-import Fastify from 'fastify';
+import Fastify, { FastifyError } from 'fastify';
+import { ErrorRes } from '@cipibot/schemas/api';
+import { ZodError } from 'zod';
 import { AuthService } from './services/auth.service';
 import fastifyCookie from '@fastify/cookie';
 import fastifyJwt from '@fastify/jwt';
@@ -11,6 +13,7 @@ import { createContext } from './context';
 import { createAppRouter } from './router';
 import { createLogger } from '@cipibot/logger';
 import { ConfigClient } from '@cipibot/config-client';
+import cors from '@fastify/cors';
 
 const logger = createLogger('api');
 
@@ -20,7 +23,7 @@ async function main() {
   const prisma = new PrismaClient({ adapter });
 
   const redis = new RedisClient(logger);
-  const configClient = new ConfigClient(redis, logger);  
+  const configClient = new ConfigClient(redis, logger);
 
   const authService = new AuthService(prisma, redis, logger, configClient);
 
@@ -28,9 +31,15 @@ async function main() {
     loggerInstance: logger,
   });
 
-  app.register(fastifyCookie);
+  // CORS MUST be registered first!
+  await app.register(cors, {
+    origin: ['http://localhost:5174', 'https://cipibot.scipak.eu'],
+    credentials: true,
+  });
 
-  app.register(fastifyJwt, {
+  await app.register(fastifyCookie);
+
+  await app.register(fastifyJwt, {
     secret: CONFIG.JWT_SECRET,
     cookie: {
       cookieName: 'access_token',
@@ -40,7 +49,7 @@ async function main() {
 
   const appRouter = createAppRouter(authService);
 
-  app.register(fastifyTRPCPlugin, {
+  await app.register(fastifyTRPCPlugin, {
     prefix: '/trpc',
     trpcOptions: {
       router: appRouter,

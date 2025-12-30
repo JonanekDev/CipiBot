@@ -91,11 +91,7 @@ export class KafkaClient {
     return this.producer;
   }
 
-  async sendEvent(
-    topic: string,
-    message: object,
-    options: SendEventOptions = {},
-  ): Promise<void> {
+  async sendEvent(topic: string, message: object, options: SendEventOptions = {}): Promise<void> {
     const attemptSend = async (prod: Producer) =>
       prod.send({
         topic,
@@ -117,9 +113,9 @@ export class KafkaClient {
       if (err?.message?.includes('disconnected') || err?.name === 'KafkaJSError') {
         this.logger.warn('Kafka producer disconnected, attempting to reconnect...');
         try {
-            await currentProducer.disconnect();
+          await currentProducer.disconnect();
         } catch {
-            // Ignore disconnect error
+          // Ignore disconnect error
         }
         this.producer = null;
         const reconnected = await this.getProducer();
@@ -186,7 +182,7 @@ export class KafkaClient {
 
         const topicHandler = group.handlers.get(topic);
         if (!topicHandler) {
-            // Shouldn't happen
+          // Shouldn't happen
           return;
         }
 
@@ -195,7 +191,7 @@ export class KafkaClient {
         try {
           const key = message.key ? message.key.toString() : null;
           const data = this.safeParseJson(message.value, topicHandler.schema);
-          
+
           await topicHandler.handler(data, key);
         } catch (err) {
           this.logger.error({ ...logContext, err }, 'Error handling Kafka message');
@@ -203,15 +199,12 @@ export class KafkaClient {
       },
     });
 
-    this.logger.info(
-      { groupId, topicCount: group.handlers.size },
-      'Kafka consumer group started',
-    );
+    this.logger.info({ groupId, topicCount: group.handlers.size }, 'Kafka consumer group started');
   }
 
   async shutdown(): Promise<void> {
     this.logger.info('Shutting down Kafka client...');
-    
+
     // Disconnect all consumers
     await Promise.all(
       Array.from(this.consumerGroups.entries()).map(async ([groupId, group]) => {
@@ -242,7 +235,7 @@ export class KafkaClient {
       heartbeatInterval: 3000,
       maxWaitTimeInMs: 5000,
     });
-    
+
     await consumer.connect();
     this.logger.info({ groupId }, 'Kafka consumer connected');
 

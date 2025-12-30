@@ -55,7 +55,6 @@ export class WelcomingService {
     this.kafka.sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE, eventData);
   }
 
-
   async leaveMessage(
     guildId: string,
     userId: string,

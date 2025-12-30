@@ -36,7 +36,6 @@ export async function safeDiscordRequest<T>(
             `Cannot send messages to this user (Code: ${error.code}), skipping.`,
           );
           return null;
-
       }
       logger.error({ ...context, apiError: error }, 'Discord API Error');
     }
