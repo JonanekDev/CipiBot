@@ -21,6 +21,8 @@ model Guild {
 
   config        Json     @default("{}")
 
+  removed  Boolean  @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

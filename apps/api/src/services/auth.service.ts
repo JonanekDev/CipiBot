@@ -133,6 +133,11 @@ export class AuthService {
     };
   }
 
+  async hasGuildAccess(userId: string, guildId: string): Promise<boolean> {
+    const guilds = await this.getGuildsForUser(userId);
+    return guilds.some((g) => g.id === guildId);
+  }
+
   async getGuildsForUser(userId: string): Promise<UserGuild[]> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -168,7 +173,7 @@ export class AuthService {
 
   async requestDiscordGuilds(accessToken: string, userId: string): Promise<UserGuild[]> {
     const redis_cache_key = `user:guilds:${userId}`;
-    const cache = await this.redis.get(redis_cache_key, 'EX', 120);
+    const cache = await this.redis.get(redis_cache_key);
     if (cache) {
       return UserGuildSchema.array().parse(JSON.parse(cache));
     }
@@ -177,7 +182,6 @@ export class AuthService {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log(res.data);
     res.data[0].permissions;
 
     const guilds = res.data.filter((guild) => {
@@ -192,7 +196,7 @@ export class AuthService {
     });
 
     const parsedGuilds = UserGuildSchema.array().parse(guilds);
-    await this.redis.set(redis_cache_key, JSON.stringify(parsedGuilds), 'EX', 120);
+    await this.redis.set(redis_cache_key, JSON.stringify(parsedGuilds), 'EX', 600);
     return parsedGuilds;
   }
 

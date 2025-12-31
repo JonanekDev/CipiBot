@@ -12,6 +12,15 @@ export const GuildConfigSchema = z.object({
 });
 export type GuildConfigType = z.infer<typeof GuildConfigSchema>;
 
+export const GuildSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  icon: z.string().nullable(),
+  config: withDefaults(GuildConfigSchema),
+  removed: z.boolean().default(false),
+});
+export type Guild = z.infer<typeof GuildSchema>;
+
 // Partial schema for PATCH requests - all fields are optional
 export const GuildConfigPatchSchema = z.object({
   language: z.enum(SUPPORTED_LANGUAGES).optional(),

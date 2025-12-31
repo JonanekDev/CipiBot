@@ -32,3 +32,7 @@ type RecursiveKeyOf<TObj extends object> = {
 export function t(lang: SupportedLanguage, key: keyPath, variables?: Record<string, any>): string {
   return i18next.t(key, { lng: lang, ...variables });
 }
+
+export function isValidLanguage(language: unknown): language is SupportedLanguage {
+  return SUPPORTED_LANGUAGES.includes(language as SupportedLanguage);
+}

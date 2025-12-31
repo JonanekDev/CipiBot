@@ -81,6 +81,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
+ const hasAccessToGuild = (guildId: string): boolean => {
+    return guilds.value.some((g) => g.id === guildId);
+  }
+
   const clearError = () => {
     error.value = null;
   };
@@ -102,6 +106,7 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     fetchUser,
     fetchGuilds,
+    hasAccessToGuild,
     clearError,
   };
 });

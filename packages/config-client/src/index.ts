@@ -1,6 +1,6 @@
 import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
 import { RedisClient } from '@cipibot/redis';
-import { GuildConfigSchema, GuildConfigType } from '@cipibot/schemas';
+import { Guild, GuildConfigSchema, GuildConfigType, DeepPartial } from '@cipibot/schemas';
 import { createTRPCClient, httpBatchLink, TRPCClient } from '@trpc/client';
 import type { ConfigRouter } from '@cipibot/config/router';
 import { Logger } from '@cipibot/logger';
@@ -47,6 +47,17 @@ export class ConfigClient {
       return config.data;
     } catch (error) {
       this.logger.error({ error, guildId }, 'Failed to fetch guild config from Config service');
+      throw error;
+    }
+  }
+
+  async getGuild(guildId: string): Promise<DeepPartial<Guild>> {
+    try {
+      const guildWithoutDefault = await this.trpc.getGuild.query({ id: guildId });
+      
+      return (guildWithoutDefault || {}) as DeepPartial<Guild>;
+    } catch (error) {
+      this.logger.error({ error, guildId }, 'Failed to fetch guild from Config service');
       throw error;
     }
   }

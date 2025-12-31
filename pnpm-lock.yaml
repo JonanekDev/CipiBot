@@ -99,6 +99,9 @@ importers:
       '@cipibot/constants':
         specifier: workspace:*
         version: link:../../packages/constants
+      '@cipibot/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
       '@cipibot/kafka':
         specifier: workspace:*
         version: link:../../packages/kafka
@@ -344,6 +347,9 @@ importers:
       '@cipibot/api':
         specifier: workspace:*
         version: link:../api
+      '@cipibot/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
       '@cipibot/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig

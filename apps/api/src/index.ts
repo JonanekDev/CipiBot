@@ -31,7 +31,6 @@ async function main() {
     loggerInstance: logger,
   });
 
-  // CORS MUST be registered first!
   await app.register(cors, {
     origin: ['http://localhost:5174', 'https://cipibot.scipak.eu'],
     credentials: true,

@@ -9,6 +9,9 @@ export function createConfigRouter(service: ConfigService) {
     getGuildConfig: t.procedure.input(z.object({ id: z.string() })).query(async ({ input }) => {
       return await service.getGuildConfig(input.id);
     }),
+    getGuild: t.procedure.input(z.object({ id: z.string() })).query(async ({ input }) => {
+      return await service.getGuild(input.id);
+    }),
     updateGuildConfig: t.procedure
       .input(
         z.object({

@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 import { UserGuild } from '@cipibot/schemas/api';
 import { getGuildIconURL } from '@cipibot/discord-utils';
+import { generateGuildInviteURL } from '../../urls';
 
 const router = useRouter();
 
@@ -28,7 +29,7 @@ onMounted(async () => {
 });
 
 const navigateToGuild = (guildId: string) => {
-  router.push({ name: 'guild-detail', params: { guildId } });
+  router.push({ name: 'guild-general', params: { guildId } });
 };
 </script>
 
@@ -94,14 +95,17 @@ const navigateToGuild = (guildId: string) => {
                 :src="getGuildIconURL(guild.id, guild.icon)"
                 :alt="guild.name"
               />
-              <div v-else class="guild-icon-large">{{ guild.name.charAt(0) }}+</div>
+              <div v-else class="guild-icon-large">{{ guild.name.charAt(0).toUpperCase() }}</div>
               <div class="guild-details">
                 <h3>{{ guild.name }}</h3>
                 <span class="member-count" v-if="guild.approximate_member_count"
-                  >{{ guild.approximate_member_count }} members</span
+                  >{{ guild.approximate_member_count }}
+                  {{ $t('dashboard.guildSelect.members') }}</span
                 >
               </div>
-              <button class="btn btn-primary btn-sm">{{ $t('dashboard.guildSelect.manage') }}</button>
+              <button class="btn btn-primary btn-sm">
+                {{ $t('dashboard.guildSelect.manage') }}
+              </button>
             </div>
           </div>
         </section>
@@ -110,22 +114,33 @@ const navigateToGuild = (guildId: string) => {
         <section class="server-section" v-if="inviteGuilds.length > 0">
           <h2 class="section-title">{{ $t('dashboard.guildSelect.inactiveGuilds') }}</h2>
           <div class="guild-grid">
-            <div v-for="guild in inviteGuilds" :key="guild.id" class="card guild-card invite-card">
+            <a
+              target="_blank"
+              :href="generateGuildInviteURL(guild.id)"
+              v-for="guild in inviteGuilds"
+              :key="guild.id"
+              class="card guild-card invite-card"
+            >
               <img
                 v-if="guild.icon"
                 class="guild-icon-large grayscale"
                 :src="getGuildIconURL(guild.id, guild.icon)"
                 :alt="guild.name"
               />
-              <div v-else class="guild-icon-large grayscale">{{ guild.name.charAt(0) }}+</div>
+              <div v-else class="guild-icon-large grayscale">
+                {{ guild.name.charAt(0).toUpperCase() }}
+              </div>
               <div class="guild-details">
                 <h3>{{ guild.name }}</h3>
                 <span class="member-count" v-if="guild.approximate_member_count"
-                  >{{ guild.approximate_member_count }} members</span
+                  >{{ guild.approximate_member_count }}
+                  {{ $t('dashboard.guildSelect.members') }}</span
                 >
               </div>
-              <button class="btn btn-secondary btn-sm">{{ $t('dashboard.guildSelect.addBot') }}</button>
-            </div>
+              <button class="btn btn-secondary btn-sm">
+                {{ $t('dashboard.guildSelect.addBot') }}
+              </button>
+            </a>
           </div>
         </section>
       </div>

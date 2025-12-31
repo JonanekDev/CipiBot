@@ -54,6 +54,11 @@
       "exploreButton": "Prozkoumat panel"
     }
   },
+  "dashboardLayout": {
+    "dashboard": "Panel",
+    "modules": "Moduly",
+    "switchServer": "Přepnout server"
+  },
   "dashboard": {
     "guildSelect": {
       "selectGuildTitle": "Výběr serveru",
@@ -62,7 +67,26 @@
       "activeGuilds": "Aktivní servery",
       "inactiveGuilds": "Přidat CipiBota na server ",
       "manage": "Spravovat",
-      "addBot": "Přidat bota"
+      "addBot": "Přidat bota",
+      "members": "členů"
+    },
+    "modules": {
+      "generalSettings": {
+        "title": "Obecná nastavení",
+        "language": "Jazyk Bota"
+      },
+      "leveling": {
+        "title": "Systém úrovní"
+      },
+      "welcome": {
+        "title": "Uvítací zprávy"
+      },
+      "verification": {
+        "title": "Ověření uživatelů"
+      },
+      "ticketing": {
+        "title": "Ticket systém"
+      }
     }
   }
 }

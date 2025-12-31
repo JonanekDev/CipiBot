@@ -91,10 +91,14 @@ export function createAppRouter(authService: AuthService) {
   });
 
   const configRouter = t.router({
-    getGuildConfig: protectedProcedure
+    getGuild: protectedProcedure
       .input(z.object({ id: z.string() }))
-      .query(async ({ input }) => {
-        return await configClient.getGuildConfig.query(input);
+      .query(async ({ input, ctx }) => {
+        const hasAccess = await authService.hasGuildAccess(ctx.user.userId, input.id);
+        if (!hasAccess) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'No access to this guild' });
+        }
+        return await configClient.getGuild.query(input);
       }),
     updateGuildConfig: protectedProcedure
       .input(
@@ -103,13 +107,17 @@ export function createAppRouter(authService: AuthService) {
           patch: GuildConfigPatchSchema,
         }),
       )
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
+        const hasAccess = await authService.hasGuildAccess(ctx.user.userId, input.id);
+        if (!hasAccess) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'No access to this guild' });
+        }
         return await configClient.updateGuildConfig.mutate(input);
       }),
   });
 
   const levelingRouter = t.router({
-    getLeaderboard: t.procedure
+    getLeaderboard: t.procedure // Leaderboard is usually public, keeping it public or use protectedProcedure if needed
       .input(z.object({ guildId: z.string() }))
       .query(async ({ input }) => {
         return await levelingClient.getWebLeaderboard.query(input);

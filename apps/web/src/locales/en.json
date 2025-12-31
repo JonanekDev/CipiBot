@@ -54,6 +54,11 @@
       "exploreButton": "Explore Dashboard"
     }
   },
+  "dashboardLayout": {
+    "dashboard": "Dashboard",
+    "modules": "Modules",
+    "switchServer": "Switch Server"
+  },
   "dashboard": {
     "guildSelect": {
       "selectGuildTitle": "Select a Server",
@@ -62,7 +67,26 @@
       "activeGuilds": "Active Servers",
       "inactiveGuilds": "Add CipiBot to server ",
       "manage": "Manage",
-      "addBot": "Add Bot"
+      "addBot": "Add Bot",
+      "members": "members"
+    },
+    "modules": {
+      "generalSettings": {
+        "title": "General Settings",
+        "language": "Bot Language"
+      },
+      "leveling": {
+        "title": "Leveling System"
+      },
+      "welcome": {
+        "title": "Welcome Messages"
+      },
+      "verification": {
+        "title": "User Verification"
+      },
+      "ticketing": {
+        "title": "Ticketing System"
+      }
     }
   }
 }

@@ -1,35 +1,34 @@
-import { JsonValue } from '@prisma/client/runtime/client';
 import { Guild, PrismaClient } from './generated/prisma/client';
+import { type GuildConfigPatchType } from '@cipibot/schemas';
 
 export class ConfigRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async getGuildConfig(guildId: string): Promise<JsonValue | null> {
+  async getGuild(guildId: string): Promise<Guild | null> {
     const guild = await this.prisma.guild.findUnique({
       where: { id: guildId },
-      select: { config: true },
     });
     return guild;
   }
 
-  async upsertGuildConfig(guildId: string, config: object) {
-    const guild = await this.prisma.guild.upsert({
+  async updateGuildConfig(guildId: string, config: object) {
+    const guild = await this.prisma.guild.update({
       where: { id: guildId },
-      create: { id: guildId, config },
-      update: { config },
+      data: { config },
     });
     return guild.config;
   }
 
-  async upsertGuildWithoutConfig(
+  async upsertGuild(
     guildId: string,
     name: string,
     icon: string | null,
+    guildConfig: GuildConfigPatchType,
   ): Promise<Guild> {
     return await this.prisma.guild.upsert({
       where: { id: guildId },
-      create: { id: guildId, name, icon },
-      update: { name, icon },
+      create: { id: guildId, name, icon, config: guildConfig },
+      update: { name, icon, removed: false },
     });
   }
 
@@ -37,9 +36,17 @@ export class ConfigRepository {
     const knownGuilds = await this.prisma.guild.findMany({
       where: {
         id: { in: guildIds },
+        removed: false, 
       },
       select: { id: true },
     });
     return knownGuilds.map((guild) => guild.id);
+  }
+
+  async guildRemove(guildId: string): Promise<void> {
+    await this.prisma.guild.update({
+      where: { id: guildId },
+      data: { removed: true },
+    });
   }
 }

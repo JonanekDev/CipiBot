@@ -22,6 +22,7 @@
   "devDependencies": {
     "@cipibot/api": "workspace:*",
     "@cipibot/tsconfig": "workspace:*",
+    "@cipibot/i18n": "workspace:*",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.1",
     "typescript": "~5.9.3",

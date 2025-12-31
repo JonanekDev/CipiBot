@@ -20,3 +20,13 @@ botUrl.searchParams.append('redirect_uri', DISCORD.REDIRECT_URI);
 botUrl.searchParams.append('response_type', 'code');
 
 export const addBotURL = botUrl.toString();
+
+export function generateGuildInviteURL(guildId: string): string {
+  const url = new URL(BASE_URL);
+  url.searchParams.append('client_id', DISCORD.CLIENT_ID);
+  url.searchParams.append('permissions', '8');
+  url.searchParams.append('scope', 'bot applications.commands');
+  url.searchParams.append('guild_id', guildId);
+  url.searchParams.append('disable_guild_select', 'true');
+  return url.toString();
+}
