@@ -1,7 +1,12 @@
 import { ConfigService } from './service';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import { KafkaClient } from '@cipibot/kafka';
-import { GuildDeletePayload, GuildDeleteSchema, GuildUpdatePayload, GuildUpdateSchema } from '@cipibot/schemas/discord';
+import {
+  GuildDeletePayload,
+  GuildDeleteSchema,
+  GuildUpdatePayload,
+  GuildUpdateSchema,
+} from '@cipibot/schemas/discord';
 
 const CONSUMER_GROUP = 'config-service-group';
 

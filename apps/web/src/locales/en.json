@@ -1,7 +1,9 @@
 {
   "common": {
     "addToDiscord": "Add to Discord",
-    "logout": "Log out"
+    "logout": "Log out",
+    "loading": "Loading...",
+    "saveFailed": "Failed to save settings."
   },
   "mainlayout": {
     "nav": {
@@ -73,10 +75,65 @@
     "modules": {
       "generalSettings": {
         "title": "General Settings",
-        "language": "Bot Language"
+        "description": "Configure basic server settings and localization.",
+        "language": "Bot Language",
+        "localization": {
+          "title": "Localization",
+          "description": "Select the language for bot messages and commands.",
+          "serverLanguage": "Server Language"
+        }
       },
       "leveling": {
-        "title": "Leveling System"
+        "title": "Leveling System",
+        "description": "Manage XP rates, rewards, and announcements.",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "xpAlgorithm": {
+          "title": "XP Algorithm",
+          "xpMultiplier": "XP Multiplier",
+          "xpMultiplierHint": "Global multiplier. Base XP * {{ value }}",
+          "xpPerMessage": "XP Per Message",
+          "xpPerWord": "XP Per Word",
+          "maxXPPerMessage": "Max XP / Message",
+          "maxXPPerMessageHint": "Cap for spam prevention.",
+          "noXPChannels": "No-XP Channels",
+          "noXPChannelsHint": "Users won't gain XP here.",
+          "addChannel": "+ Add",
+          "selectChannel": "Select Channel"
+        },
+        "roleRewards": {
+          "title": "Role Rewards",
+          "description": "Automatically assign roles when users reach specific levels.",
+          "addReward": "Add Reward",
+          "selectRole": "Select Role",
+          "levelPlaceholder": "Level",
+          "alertExists": "Reward for this level already exists."
+        },
+        "levelUpAnnouncement": {
+          "title": "Level Up Announcement",
+          "description": "Sent when a user levels up.",
+          "channelLabel": "Announcement Channel",
+          "currentChannel": "Current Channel (Context)",
+          "editMessage": "Edit Message"
+        },
+        "commands": {
+          "title": "Commands",
+          "level": {
+            "description": "Check rank and XP.",
+            "edit": "Edit",
+            "ephemeral": "Only visible to user (ephemeral)"
+          },
+          "leaderboard": {
+            "description": "Show top users.",
+            "editHeader": "Edit Header",
+            "ephemeral": "Only visible to user (ephemeral)",
+            "entryFormat": "Leaderboard Entry Format"
+          }
+        },
+        "webLeaderboard": {
+          "title": "Public Web Leaderboard",
+          "description": "Allow users to view the leaderboard on the dashboard website."
+        }
       },
       "welcome": {
         "title": "Welcome Messages"
@@ -87,6 +144,46 @@
       "ticketing": {
         "title": "Ticketing System"
       }
+    },
+    "messageBuilder": {
+      "textMessage": "Text Message",
+      "embed": "Embed",
+      "embedTitle": "Embed Title",
+      "embedTitlePlaceholder": "e.g. Level Up!",
+      "color": "Color",
+      "contentLabel": "Message Content",
+      "descriptionLabel": "Description / Body",
+      "contentPlaceholder": "Enter your message here...",
+      "variables": "Variables:"
+    },
+    "messageEditorModal": {
+      "preview": "Preview",
+      "cancel": "Cancel",
+      "reset": "Reset to default",
+      "save": "Save Changes",
+      "errorEmpty": "Message content cannot be empty.",
+      "errorEmbed": "Embed must have a Title or Description."
+    },
+    "messagePreview": {
+      "mockTimestamp": "Today at 4:20 PM"
+    }
+  },
+  "validation": {
+    "required": "This field is required.",
+    "invalidType": "Invalid value type.",
+    "tooSmall": {
+      "string": "Must be at least {min} characters.",
+      "number": "Must be at least {min}.",
+      "array": "Must have at least {min} items."
+    },
+    "tooBig": {
+      "string": "Must be at most {max} characters.",
+      "number": "Must be at most {max}.",
+      "array": "Must have at most {max} items."
+    },
+    "invalidString": {
+      "email": "Invalid email address.",
+      "url": "Invalid URL."
     }
   }
 }

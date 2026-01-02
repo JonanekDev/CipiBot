@@ -7,6 +7,7 @@ import { GuildConfigPatchSchema } from '@cipibot/schemas';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import type { ConfigRouter } from '@cipibot/config/router';
 import type { LevelingRouter } from '@cipibot/leveling/router';
+import type { DiscordRestRouter } from '@cipibot/discord-rest/router';
 
 // Initialize tRPC Clients for Microservices
 const configClient = createTRPCClient<ConfigRouter>({
@@ -15,6 +16,12 @@ const configClient = createTRPCClient<ConfigRouter>({
 
 const levelingClient = createTRPCClient<LevelingRouter>({
   links: [httpBatchLink({ url: process.env.LEVELING_SERVICE_URL || 'http://localhost:3001/trpc' })],
+});
+
+const discordRestClient = createTRPCClient<DiscordRestRouter>({
+  links: [
+    httpBatchLink({ url: process.env.DISCORD_REST_SERVICE_URL || 'http://localhost:3003/trpc' }),
+  ],
 });
 
 export const t = initTRPC.context<Context>().create();
@@ -90,6 +97,35 @@ export function createAppRouter(authService: AuthService) {
     }),
   });
 
+  const guildRouter = t.router({
+    getGuildChannels: protectedProcedure
+      .input(
+        z.object({
+          guildId: z.string(),
+        }),
+      )
+      .query(async ({ input, ctx }) => {
+        const hasAccess = await authService.hasGuildAccess(ctx.user.userId, input.guildId);
+        if (!hasAccess) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'No access to this guild' });
+        }
+        return await discordRestClient.getGuildChannels.query(input);
+      }),
+    getGuildRoles: protectedProcedure
+      .input(
+        z.object({
+          guildId: z.string(),
+        }),
+      )
+      .query(async ({ input, ctx }) => {
+        const hasAccess = await authService.hasGuildAccess(ctx.user.userId, input.guildId);
+        if (!hasAccess) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'No access to this guild' });
+        }
+        return await discordRestClient.getGuildRoles.query(input);
+      }),
+  });
+
   const configRouter = t.router({
     getGuild: protectedProcedure
       .input(z.object({ id: z.string() }))
@@ -128,6 +164,7 @@ export function createAppRouter(authService: AuthService) {
     auth: authRouter,
     config: configRouter,
     leveling: levelingRouter,
+    guild: guildRouter,
   });
 }
 

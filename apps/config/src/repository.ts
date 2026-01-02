@@ -36,7 +36,7 @@ export class ConfigRepository {
     const knownGuilds = await this.prisma.guild.findMany({
       where: {
         id: { in: guildIds },
-        removed: false, 
+        removed: false,
       },
       select: { id: true },
     });

@@ -10,6 +10,7 @@ import { MessagesService } from './services/messages.service';
 import { createLogger } from '@cipibot/logger';
 import { KafkaClient } from '@cipibot/kafka';
 import { RedisClient } from '@cipibot/redis';
+import { ChannelsService } from './services/channels.service';
 
 const logger = createLogger('discord-rest');
 
@@ -30,6 +31,7 @@ async function main() {
   const interactionsService = new InteractionsService(rest, logger, DISCORD_CLIENT_ID);
   const messagesService = new MessagesService(rest, logger);
   const rolesService = new RolesService(rest, logger);
+  const channelsService = new ChannelsService(rest, logger);
 
   registerConsumers(
     kafka,
@@ -47,7 +49,11 @@ async function main() {
   });
 
   // Register routes
-  const discordRestRouter = createDiscordRestRouter(interactionsService);
+  const discordRestRouter = createDiscordRestRouter(
+    interactionsService,
+    channelsService,
+    rolesService,
+  );
 
   app.register(fastifyTRPCPlugin, {
     prefix: '/trpc',

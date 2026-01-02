@@ -1,4 +1,4 @@
-import { DISCORD } from "@cipibot/constants/src/discord";
+import { DISCORD } from '@cipibot/constants/src/discord';
 
 if (
   !process.env.DISCORD_CLIENT_ID ||

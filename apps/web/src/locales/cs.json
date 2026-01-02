@@ -1,7 +1,9 @@
 {
   "common": {
     "addToDiscord": "Přidat na Discord",
-    "logout": "Odhlásit se"
+    "logout": "Odhlásit se",
+    "loading": "Načítání...",
+    "saveFailed": "Nepodařilo se uložit nastavení."
   },
   "mainlayout": {
     "nav": {
@@ -73,10 +75,65 @@
     "modules": {
       "generalSettings": {
         "title": "Obecná nastavení",
-        "language": "Jazyk Bota"
+        "description": "Nastavení základních funkcí serveru a lokalizace.",
+        "language": "Jazyk Bota",
+        "localization": {
+          "title": "Lokalizace",
+          "description": "Vyber jazyk pro zprávy a příkazy bota.",
+          "serverLanguage": "Jazyk serveru"
+        }
       },
       "leveling": {
-        "title": "Systém úrovní"
+        "title": "Systém úrovní",
+        "description": "Správa XP, odměn a oznámení.",
+        "enabled": "Zapnuto",
+        "disabled": "Vypnuto",
+        "xpAlgorithm": {
+          "title": "Algoritmus XP",
+          "xpMultiplier": "Násobič XP",
+          "xpMultiplierHint": "Globální násobič. Základní XP * {{ value }}",
+          "xpPerMessage": "XP za zprávu",
+          "xpPerWord": "XP za slovo",
+          "maxXPPerMessage": "Max XP / Zprávu",
+          "maxXPPerMessageHint": "Limit proti spamu.",
+          "noXPChannels": "Kanály bez XP",
+          "noXPChannelsHint": "Uživatelé zde nezískávají XP.",
+          "addChannel": "+ Přidat",
+          "selectChannel": "Vybrat kanál"
+        },
+        "roleRewards": {
+          "title": "Role za odměnu",
+          "description": "Automaticky přidělí roli, když uživatel dosáhne určité úrovně.",
+          "addReward": "Přidat odměnu",
+          "selectRole": "Vybrat roli",
+          "levelPlaceholder": "Úroveň",
+          "alertExists": "Odměna pro tuto úroveň již existuje."
+        },
+        "levelUpAnnouncement": {
+          "title": "Oznámení o nové úrovni",
+          "description": "Odesláno, když uživatel postoupí na novou úroveň.",
+          "channelLabel": "Kanál pro oznámení",
+          "currentChannel": "Aktuální kanál (Kontext)",
+          "editMessage": "Upravit zprávu"
+        },
+        "commands": {
+          "title": "Příkazy",
+          "level": {
+            "description": "Zjistit úroveň a XP.",
+            "edit": "Upravit",
+            "ephemeral": "Viditelné pouze pro uživatele (ephemeral)"
+          },
+          "leaderboard": {
+            "description": "Zobrazit nejlepší uživatele.",
+            "editHeader": "Upravit záhlaví",
+            "ephemeral": "Viditelné pouze pro uživatele (ephemeral)",
+            "entryFormat": "Formát položky v žebříčku"
+          }
+        },
+        "webLeaderboard": {
+          "title": "Veřejný webový žebříček",
+          "description": "Povolit uživatelům zobrazit žebříček na webu."
+        }
       },
       "welcome": {
         "title": "Uvítací zprávy"
@@ -87,6 +144,46 @@
       "ticketing": {
         "title": "Ticket systém"
       }
+    },
+    "messageBuilder": {
+      "textMessage": "Textová zpráva",
+      "embed": "Embed",
+      "embedTitle": "Nadpis Embedu",
+      "embedTitlePlaceholder": "např. Nová úroveň!",
+      "color": "Barva",
+      "contentLabel": "Obsah zprávy",
+      "descriptionLabel": "Popis / Tělo",
+      "contentPlaceholder": "Zadejte text zprávy...",
+      "variables": "Proměnné:"
+    },
+    "messageEditorModal": {
+      "preview": "Náhled",
+      "cancel": "Zrušit",
+      "reset": "Obnovit výchozí",
+      "save": "Uložit změny",
+      "errorEmpty": "Obsah zprávy nesmí být prázdný.",
+      "errorEmbed": "Embed musí mít nadpis nebo popis."
+    },
+    "messagePreview": {
+      "mockTimestamp": "Dnes v 16:20"
+    }
+  },
+  "validation": {
+    "required": "Toto pole je povinné.",
+    "invalidType": "Neplatný typ hodnoty.",
+    "tooSmall": {
+      "string": "Musí mít alespoň {min} znaků.",
+      "number": "Musí být alespoň {min}.",
+      "array": "Musí obsahovat alespoň {min} položek."
+    },
+    "tooBig": {
+      "string": "Nesmí mít více než {max} znaků.",
+      "number": "Nesmí být více než {max}.",
+      "array": "Nesmí obsahovat více než {max} položek."
+    },
+    "invalidString": {
+      "email": "Neplatná e-mailová adresa.",
+      "url": "Neplatná URL adresa."
     }
   }
 }

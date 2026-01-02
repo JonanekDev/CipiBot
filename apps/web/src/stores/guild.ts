@@ -1,13 +1,22 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { trpc } from '../api';
-import { type GuildConfigType, type GuildConfigPatchType, type Guild, GuildSchema } from '@cipibot/schemas';
+import {
+  type GuildConfigPatchType,
+  type Guild,
+  GuildSchema,
+  GuildChannel,
+  GuildConfigSchema,
+  Role,
+} from '@cipibot/schemas';
 import { TRPCClientError } from '@trpc/client';
 import router from '../router';
 
 export const useGuildStore = defineStore('guild', () => {
   // State
   const guilds = ref<Record<string, Guild>>({});
+  const guildChannels = ref<Record<string, GuildChannel[]>>({});
+  const guildRoles = ref<Record<string, Role[]>>({});
   const activeGuildId = ref<string | null>(null);
   const isLoading = ref(false);
   const isSaving = ref(false);
@@ -17,6 +26,16 @@ export const useGuildStore = defineStore('guild', () => {
   const activeConfig = computed(() => {
     if (!activeGuildId.value) return null;
     return guilds.value[activeGuildId.value]?.config || null;
+  });
+
+  const activeGuildChannels = computed(() => {
+    if (!activeGuildId.value) return [];
+    return guildChannels.value[activeGuildId.value] || [];
+  });
+
+  const activeGuildRoles = computed(() => {
+    if (!activeGuildId.value) return [];
+    return guildRoles.value[activeGuildId.value] || [];
   });
 
   // Actions
@@ -32,10 +51,16 @@ export const useGuildStore = defineStore('guild', () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const guild = await trpc.config.getGuild.query({ id: guildId });
-      
-      guilds.value[guildId] = GuildSchema.parse(guild);
+      const [guild, channels, roles] = await Promise.all([
+        trpc.config.getGuild.query({ id: guildId }),
+        trpc.guild.getGuildChannels.query({ guildId }),
+        trpc.guild.getGuildRoles.query({ guildId }),
+      ]);
 
+      guilds.value[guildId] = GuildSchema.parse(guild);
+      console.log('Fetched guild:', guilds.value[guildId]);
+      guildChannels.value[guildId] = channels;
+      guildRoles.value[guildId] = roles;
       return guilds.value[guildId];
     } catch (err) {
       if (err instanceof TRPCClientError) {
@@ -46,7 +71,7 @@ export const useGuildStore = defineStore('guild', () => {
           return;
         }
       }
-      
+
       error.value = err instanceof Error ? err : new Error(String(err));
       throw err;
     } finally {
@@ -64,9 +89,9 @@ export const useGuildStore = defineStore('guild', () => {
       });
 
       if (updatedConfig) {
-         guilds.value[guildId].config = updatedConfig as GuildConfigType; 
+        guilds.value[guildId].config = GuildConfigSchema.parse(updatedConfig);
       }
-      
+
       return updatedConfig;
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err));
@@ -83,8 +108,12 @@ export const useGuildStore = defineStore('guild', () => {
   return {
     //Stete
     guilds,
+    guildChannels,
+    guildRoles,
     activeGuildId,
     activeConfig,
+    activeGuildChannels,
+    activeGuildRoles,
     isLoading,
     isSaving,
     error,
@@ -92,6 +121,6 @@ export const useGuildStore = defineStore('guild', () => {
     setActiveGuild,
     fetchGuild,
     updateConfig,
-    clearCache
+    clearCache,
   };
 });

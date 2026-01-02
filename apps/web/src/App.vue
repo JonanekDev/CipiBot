@@ -21,10 +21,10 @@ onMounted(async () => {
 </script>
 
 <template>
-    <Loading v-if="loading" key="loading" />
-    <component v-else :is="layout" :key="layout">
-      <transition name="fade" mode="out-in">
-        <router-view />
-      </transition>
-    </component>
+  <Loading v-if="loading" key="loading" />
+  <component v-else :is="layout" :key="layout">
+    <transition name="fade" mode="out-in">
+      <router-view />
+    </transition>
+  </component>
 </template>

@@ -50,6 +50,42 @@ const router = createRouter({
         layout: GuildLayout,
       },
     },
+    {
+      path: '/dashboard/guild/:guildId/leveling',
+      name: 'guild-leveling',
+      component: () => import('../views/dashboard/guild/Leveling.vue'),
+      meta: {
+        requiresAuth: true,
+        layout: GuildLayout,
+      },
+    },
+    {
+      path: '/dashboard/guild/:guildId/welcome',
+      name: 'guild-welcome',
+      component: () => import('../views/dashboard/guild/Welcome.vue'),
+      meta: {
+        requiresAuth: true,
+        layout: GuildLayout,
+      },
+    },
+    {
+      path: '/dashboard/guild/:guildId/verification',
+      name: 'guild-verification',
+      component: () => import('../views/dashboard/guild/Verification.vue'),
+      meta: {
+        requiresAuth: true,
+        layout: GuildLayout,
+      },
+    },
+    {
+      path: '/dashboard/guild/:guildId/ticketing',
+      name: 'guild-ticketing',
+      component: () => import('../views/dashboard/guild/Ticketing.vue'),
+      meta: {
+        requiresAuth: true,
+        layout: GuildLayout,
+      },
+    },
   ],
 });
 
@@ -74,14 +110,13 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  if (to.matched.some(record => record.path.includes('/dashboard/guild/'))) {
+  if (to.matched.some((record) => record.path.includes('/dashboard/guild/'))) {
     const guildId = to.params.guildId as string;
     const guildStore = useGuildStore();
-    
+
     await guildStore.fetchGuild(guildId);
     guildStore.setActiveGuild(guildId);
   }
-
 
   next();
 });

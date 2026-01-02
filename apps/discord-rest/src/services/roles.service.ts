@@ -1,7 +1,8 @@
 import { Logger } from '@cipibot/logger';
 import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v10';
+import { RESTGetAPIGuildRolesResult, Routes } from 'discord-api-types/v10';
 import { safeDiscordRequest } from '../utils/discord';
+import { Role } from '@cipibot/schemas/discord';
 
 export class RolesService {
   private readonly logger: Logger;
@@ -27,5 +28,14 @@ export class RolesService {
       this.logger,
       { guildId, userId, roleId },
     );
+  }
+
+  async getGuildRoles(guildId: string): Promise<Role[]> {
+    const roles = (await safeDiscordRequest(
+      () => this.rest.get(Routes.guildRoles(guildId)),
+      this.logger,
+      { guildId },
+    )) as Promise<RESTGetAPIGuildRolesResult>;
+    return roles;
   }
 }

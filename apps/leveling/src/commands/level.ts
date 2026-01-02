@@ -77,7 +77,7 @@ export function createLevelCommand(
           currentXP: user?.xp ?? 0,
           messageCount: user?.messageCount ?? 0,
         },
-        calculateXpForLevel((user?.level ?? 0) + 1),
+        calculateXpForLevel((user?.level ?? 0) + 1) - (user?.xp ?? 0),
       );
 
       eventData.body = renderDiscordMessage<LevelVariables>(

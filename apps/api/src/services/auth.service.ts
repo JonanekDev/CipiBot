@@ -177,11 +177,14 @@ export class AuthService {
     if (cache) {
       return UserGuildSchema.array().parse(JSON.parse(cache));
     }
-    const res = await axios.get<RESTGetAPICurrentUserGuildsResult>('https://discord.com/api/users/@me/guilds?with_counts=true', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
+    const res = await axios.get<RESTGetAPICurrentUserGuildsResult>(
+      'https://discord.com/api/users/@me/guilds?with_counts=true',
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       },
-    });
+    );
     res.data[0].permissions;
 
     const guilds = res.data.filter((guild) => {
@@ -211,7 +214,7 @@ export class AuthService {
 
     const accessToken = decrypt(user.discordAccessToken);
     const refreshToken = decrypt(user.discordRefreshToken);
-    
+
     try {
       // Revoke access token
       await axios.post(

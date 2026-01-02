@@ -54,7 +54,7 @@ export class ConfigClient {
   async getGuild(guildId: string): Promise<DeepPartial<Guild>> {
     try {
       const guildWithoutDefault = await this.trpc.getGuild.query({ id: guildId });
-      
+
       return (guildWithoutDefault || {}) as DeepPartial<Guild>;
     } catch (error) {
       this.logger.error({ error, guildId }, 'Failed to fetch guild from Config service');

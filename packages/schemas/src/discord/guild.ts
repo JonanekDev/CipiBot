@@ -31,3 +31,24 @@ export const GuildMemberRemovePayloadSchema = z.object({
 });
 
 export type GuildMemberRemovePayloadType = z.infer<typeof GuildMemberRemovePayloadSchema>;
+
+export const GuildChannelSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.number(),
+});
+
+export type GuildChannel = z.infer<typeof GuildChannelSchema>;
+
+export const RoleSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  color: z.number(),
+  hoist: z.boolean(),
+  position: z.number(),
+  permissions: z.string(),
+  managed: z.boolean(),
+  mentionable: z.boolean(),
+});
+
+export type Role = z.infer<typeof RoleSchema>;

@@ -1,11 +1,16 @@
-import { DeepPartial, Guild, type GuildConfigPatchType, type GuildConfigType } from '@cipibot/schemas';
-import { defu } from 'defu';
+import {
+  DeepPartial,
+  Guild,
+  type GuildConfigPatchType,
+  type GuildConfigType,
+} from '@cipibot/schemas';
 import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
 import { ConfigRepository } from './repository';
 import { GuildUpdatePayload } from '@cipibot/schemas/discord';
 import { RedisClient } from '@cipibot/redis';
 import { isValidLanguage, SupportedLanguage, t } from '@cipibot/i18n';
 import { TRPCError } from '@trpc/server';
+import { mergeConfig } from './utils/mergeConfig';
 
 export class ConfigService {
   constructor(
@@ -18,8 +23,7 @@ export class ConfigService {
   }
 
   async getGuild(guildId: string): Promise<DeepPartial<Guild>> {
-
-    const guildData = (await this.configRepository.getGuild(guildId));
+    const guildData = await this.configRepository.getGuild(guildId);
 
     if (!guildData) {
       throw new TRPCError({
@@ -31,9 +35,14 @@ export class ConfigService {
     let rawConfig = guildData.config;
 
     const config = (rawConfig ?? {}) as DeepPartial<GuildConfigType>;
-    
-    await this.redis.set(this.getGuildConfigCacheKey(guildId), JSON.stringify(config), 'EX', CACHE_TTL.GUILD_CONFIG);
-    
+
+    await this.redis.set(
+      this.getGuildConfigCacheKey(guildId),
+      JSON.stringify(config),
+      'EX',
+      CACHE_TTL.GUILD_CONFIG,
+    );
+
     const guild: DeepPartial<Guild> = {
       id: guildData.id,
       name: guildData.name,
@@ -51,9 +60,11 @@ export class ConfigService {
     const cached = await this.redis.get(cacheKey);
     if (cached) {
       const parsed = JSON.parse(cached) as DeepPartial<GuildConfigType>;
-       // Ensure ignoreChannelIds doesn't contain null values
+      // Ensure ignoreChannelIds doesn't contain null values
       if (parsed.leveling?.ignoreChannelIds) {
-        parsed.leveling.ignoreChannelIds = parsed.leveling.ignoreChannelIds.filter((id): id is string => id !== null && id !== undefined);
+        parsed.leveling.ignoreChannelIds = parsed.leveling.ignoreChannelIds.filter(
+          (id): id is string => id !== null && id !== undefined,
+        );
       }
       return parsed;
     }
@@ -71,16 +82,16 @@ export class ConfigService {
     patch: DeepPartial<GuildConfigType>,
   ): Promise<DeepPartial<GuildConfigType>> {
     const current = await this.getGuildConfig(guildId);
-    const merged = defu(patch, current) as DeepPartial<GuildConfigType>;
 
-    const cleanConfig = merged;
+    // Merge config with proper array handling
+    const merged = mergeConfig(current, patch) as DeepPartial<GuildConfigType>;
 
-    await this.configRepository.updateGuildConfig(guildId, cleanConfig);
+    await this.configRepository.updateGuildConfig(guildId, merged);
 
     const cacheKey = this.getGuildConfigCacheKey(guildId);
-    await this.redis.set(cacheKey, JSON.stringify(cleanConfig), 'EX', CACHE_TTL.GUILD_CONFIG);
+    await this.redis.set(cacheKey, JSON.stringify(merged), 'EX', CACHE_TTL.GUILD_CONFIG);
 
-    return cleanConfig;
+    return merged;
   }
 
   async upsertGuild(guild: GuildUpdatePayload): Promise<void> {
@@ -91,15 +102,15 @@ export class ConfigService {
       language = preferredLocale;
     }
 
-    const guildConfig:GuildConfigPatchType = {
-      language
-    }
-    
+    const guildConfig: GuildConfigPatchType = {
+      language,
+    };
+
     const guildRecord = await this.configRepository.upsertGuild(
       guild.id,
       guild.name,
       guild.icon,
-      guildConfig
+      guildConfig,
     );
     const cacheKey = this.getGuildConfigCacheKey(guild.id);
     await this.redis.set(

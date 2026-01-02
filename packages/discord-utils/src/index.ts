@@ -12,5 +12,5 @@ export function getAvatarURL(userId: string, avatar?: string | null): string {
 }
 
 export function getGuildIconURL(guildId: string, icon: string): string {
-    return `https://cdn.discordapp.com/icons/${guildId}/${icon}.png`;
+  return `https://cdn.discordapp.com/icons/${guildId}/${icon}.png`;
 }

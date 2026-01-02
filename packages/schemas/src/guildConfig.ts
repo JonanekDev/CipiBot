@@ -31,5 +31,9 @@ export type GuildConfigPatchType = z.infer<typeof GuildConfigPatchSchema>;
 
 // DeepPartial utility typ
 export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+  [P in keyof T]?: T[P] extends (infer U)[]
+    ? U[] // Array items cannot be undefined, but array can be empty
+    : T[P] extends object
+      ? DeepPartial<T[P]>
+      : T[P];
 };
