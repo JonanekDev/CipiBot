@@ -13,7 +13,9 @@
     "welcomeTitle": "👋 Welcome! 👋",
     "welcomeDescription": "Welcome to the server, {{userMention}}! 🎉",
     "leaveTitle": "👋 Goodbye! 👋",
-    "leaveDescription": "Goodbye, **{{username}}**! We look forward to your return. 👋"
+    "leaveDescription": "Goodbye, **{{username}}**! We look forward to your return. 👋",
+    "dmMessageTitle": "Welcome!",
+    "dmMessageDescription": "Hi {{userMention}}, we're glad you joined our server!"
   },
   "errors": {
     "errorTitle": "❌ Error ❌",

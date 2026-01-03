@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import enFlag from '../assets/flags/en.svg';
 import csFlag from '../assets/flags/cs.svg';
 import { useI18n } from 'vue-i18n';
+import { loadZodLocale } from '../utils/i18n';
 
 const { locale } = useI18n();
 
@@ -22,11 +23,13 @@ const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
 };
 
-const setLocale = (code: string) => {
+const setLocale = async (code: string) => {
   locale.value = code as 'en' | 'cs';
   isDropdownOpen.value = false;
   localStorage.setItem('user-locale', code);
+  await loadZodLocale(code);
 };
+
 
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as Node;

@@ -10,10 +10,15 @@ import { createI18n } from 'vue-i18n';
 import en from './locales/en.json';
 import cs from './locales/cs.json';
 
+import { loadZodLocale } from './utils/i18n';
+
 type MessageSchema = typeof en;
 
 const userLocale = localStorage.getItem('user-locale') || navigator.language.split('-')[0];
 const locale = userLocale === 'cs' ? 'cs' : 'en';
+
+await loadZodLocale(locale);
+
 
 const i18n = createI18n<[MessageSchema], 'en' | 'cs'>({
   legacy: false,

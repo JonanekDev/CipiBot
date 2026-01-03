@@ -65,7 +65,7 @@ export class RedisClient {
       }
       return await this.redis.set(key, value);
     } catch (error) {
-      this.logger.error({ key, value, error }, 'Redis SET failed');
+      this.logger.error({ key, error }, 'Redis SET failed');
       throw error;
     }
   }

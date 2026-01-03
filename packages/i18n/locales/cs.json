@@ -13,7 +13,9 @@
     "welcomeTitle": "👋 Vítej! 👋",
     "welcomeDescription": "Vítej na serveru, {{userMention}}! 🎉",
     "leaveTitle": "👋 Sbohem! 👋",
-    "leaveDescription": "Sbohem, **{{username}}**! Budeme se těšit na tvůj návrat. 👋"
+    "leaveDescription": "Sbohem, **{{username}}**! Budeme se těšit na tvůj návrat. 👋",
+    "dmMessageTitle": "Vítej!",
+    "dmMessageDescription": "Ahoj {{userMention}}, jsme rádi, že jsi se připojil k našemu serveru!"
   },
   "errors": {
     "errorTitle": "❌ Chyba ❌",

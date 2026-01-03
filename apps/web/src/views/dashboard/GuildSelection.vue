@@ -3,11 +3,11 @@ import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 import { UserGuild } from '@cipibot/schemas/api';
-import { getGuildIconURL } from '@cipibot/discord-utils';
 import { generateGuildInviteURL } from '../../urls';
+import GuildCard from '../../components/dashboard/GuildCard.vue';
+import Skeleton from '../../components/ui/Skeleton.vue';
 
 const router = useRouter();
-
 const authStore = useAuthStore();
 
 const skeletonLoading = ref(true);
@@ -41,36 +41,24 @@ const navigateToGuild = (guildId: string) => {
         <p>{{ $t('dashboard.guildSelect.selectGuildDescription') }}</p>
       </div>
 
-      <div v-if="skeletonLoading" class="loading-skeleton">
-        <section class="server-section">
-          <div class="skeleton-title-bar"></div>
+      <!-- SKELETON STATE -->
+      <div v-if="skeletonLoading">
+        <section class="server-section" v-for="s in 2" :key="s">
+          <Skeleton width="200px" height="2rem" class="mb-4" />
           <div class="guild-grid">
-            <div v-for="i in 3" :key="i" class="card guild-card skeleton-card">
-              <div class="skeleton-icon skeleton-shimmer"></div>
-              <div class="skeleton-details">
-                <div class="skeleton-text title skeleton-shimmer"></div>
-                <div class="skeleton-text subtitle skeleton-shimmer"></div>
+            <div v-for="i in 3" :key="i" class="card guild-card-skeleton">
+              <Skeleton shape="circle" width="80px" height="80px" />
+              <div class="w-full flex flex-col items-center gap-2">
+                <Skeleton shape="text" width="70%" height="24px" />
+                <Skeleton shape="text" width="40%" height="16px" />
               </div>
-              <div class="skeleton-btn skeleton-shimmer"></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="server-section">
-          <div class="skeleton-title-bar"></div>
-          <div class="guild-grid">
-            <div v-for="i in 2" :key="i" class="card guild-card skeleton-card">
-              <div class="skeleton-icon skeleton-shimmer"></div>
-              <div class="skeleton-details">
-                <div class="skeleton-text title skeleton-shimmer"></div>
-                <div class="skeleton-text subtitle skeleton-shimmer"></div>
-              </div>
-              <div class="skeleton-btn skeleton-shimmer"></div>
+              <Skeleton width="100%" height="36px" border-radius="var(--radius-sm)" />
             </div>
           </div>
         </section>
       </div>
 
+      <!-- LOADED STATE -->
       <div v-else>
         <section
           v-if="botGuilds.length === 0 && inviteGuilds.length === 0"
@@ -83,30 +71,12 @@ const navigateToGuild = (guildId: string) => {
         <section class="server-section" v-if="botGuilds.length > 0">
           <h2 class="section-title">{{ $t('dashboard.guildSelect.activeGuilds') }}</h2>
           <div class="guild-grid">
-            <div
+            <GuildCard
               v-for="guild in botGuilds"
               :key="guild.id"
-              class="card guild-card"
+              :guild="guild"
               @click="navigateToGuild(guild.id)"
-            >
-              <img
-                v-if="guild.icon"
-                class="guild-icon-large"
-                :src="getGuildIconURL(guild.id, guild.icon)"
-                :alt="guild.name"
-              />
-              <div v-else class="guild-icon-large">{{ guild.name.charAt(0).toUpperCase() }}</div>
-              <div class="guild-details">
-                <h3>{{ guild.name }}</h3>
-                <span class="member-count" v-if="guild.approximate_member_count"
-                  >{{ guild.approximate_member_count }}
-                  {{ $t('dashboard.guildSelect.members') }}</span
-                >
-              </div>
-              <button class="btn btn-primary btn-sm">
-                {{ $t('dashboard.guildSelect.manage') }}
-              </button>
-            </div>
+            />
           </div>
         </section>
 
@@ -114,33 +84,14 @@ const navigateToGuild = (guildId: string) => {
         <section class="server-section" v-if="inviteGuilds.length > 0">
           <h2 class="section-title">{{ $t('dashboard.guildSelect.inactiveGuilds') }}</h2>
           <div class="guild-grid">
-            <a
-              target="_blank"
-              :href="generateGuildInviteURL(guild.id)"
+            <GuildCard
               v-for="guild in inviteGuilds"
               :key="guild.id"
-              class="card guild-card invite-card"
-            >
-              <img
-                v-if="guild.icon"
-                class="guild-icon-large grayscale"
-                :src="getGuildIconURL(guild.id, guild.icon)"
-                :alt="guild.name"
-              />
-              <div v-else class="guild-icon-large grayscale">
-                {{ guild.name.charAt(0).toUpperCase() }}
-              </div>
-              <div class="guild-details">
-                <h3>{{ guild.name }}</h3>
-                <span class="member-count" v-if="guild.approximate_member_count"
-                  >{{ guild.approximate_member_count }}
-                  {{ $t('dashboard.guildSelect.members') }}</span
-                >
-              </div>
-              <button class="btn btn-secondary btn-sm">
-                {{ $t('dashboard.guildSelect.addBot') }}
-              </button>
-            </a>
+              :guild="guild"
+              is-invite
+              :href="generateGuildInviteURL(guild.id)"
+              target="_blank"
+            />
           </div>
         </section>
       </div>
@@ -175,133 +126,27 @@ const navigateToGuild = (guildId: string) => {
   gap: 1.5rem;
 }
 
-.guild-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 2rem;
-  cursor: pointer;
-  gap: 1rem;
-}
-
-.guild-icon-large {
-  width: 80px;
-  height: 80px;
-  background-color: var(--color-secondary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  font-weight: bold;
-  color: #fff;
-  border: 2px solid transparent;
-  transition: all var(--transition-fast);
-}
-
-.grayscale {
-  background-color: var(--color-border);
+.empty-state {
+  padding: 4rem;
   color: var(--color-text-muted);
+  font-size: 1.2rem;
 }
 
-.guild-card:hover .guild-icon-large {
-  border-color: var(--color-primary);
-  transform: scale(1.05);
-}
-
-.guild-details h3 {
-  font-size: 1.25rem;
-  margin-bottom: 0.25rem;
-}
-
-.member-count {
-  font-size: 0.9rem;
-  color: var(--color-text-muted);
-}
-
-.btn-sm {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  width: 100%;
-}
-
-/* Skeleton Loading */
-.skeleton-card {
-  pointer-events: none;
-  justify-content: space-between;
-}
-
-.skeleton-shimmer {
-  background: var(--color-border);
-  position: relative;
-  overflow: hidden;
-}
-
-.skeleton-shimmer::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  transform: translateX(-100%);
-  background-image: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0,
-    rgba(255, 255, 255, 0.05) 20%,
-    rgba(255, 255, 255, 0.1) 60%,
-    rgba(255, 255, 255, 0)
-  );
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.skeleton-title-bar {
-  height: 2rem;
-  width: 200px;
-  background: var(--color-border);
+.mb-4 {
   margin-bottom: 1.5rem;
-  border-radius: 4px;
 }
 
-.skeleton-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.skeleton-details {
+.w-full {
   width: 100%;
+}
+
+.guild-card-skeleton {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-}
-
-.skeleton-text {
-  border-radius: 4px;
-}
-
-.skeleton-text.title {
-  height: 24px;
-  width: 70%;
-}
-
-.skeleton-text.subtitle {
-  height: 16px;
-  width: 40%;
-}
-
-.skeleton-btn {
-  height: 36px;
-  width: 100%;
-  border-radius: var(--radius-sm);
+  padding: 2rem;
+  gap: 1rem;
+  height: 280px; /* Approximate height of loaded card */
+  justify-content: space-between;
 }
 </style>

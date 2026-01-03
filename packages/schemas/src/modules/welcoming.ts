@@ -1,6 +1,6 @@
 import z from 'zod';
 import { EmbedSchema } from '../discord/embeds';
-import { BaseModuleSchema } from '.';
+import { BaseModuleSchema } from './base';
 
 export const WelcomingConfigSchema = BaseModuleSchema.extend({
   enabled: z.boolean().default(false),
@@ -11,3 +11,5 @@ export const WelcomingConfigSchema = BaseModuleSchema.extend({
   channelId: z.string().nullable().default(null),
   dmWelcomeMessage: z.union([z.string(), EmbedSchema]).nullable().default(null),
 });
+
+export type WelcomingConfigType = z.infer<typeof WelcomingConfigSchema>;

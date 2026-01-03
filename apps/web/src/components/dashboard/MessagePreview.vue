@@ -5,6 +5,7 @@ import { renderTemplate, renderTemplateEmbed } from '@cipibot/templating';
 import { computed } from 'vue';
 import { intToHex } from '@/utils/common';
 import { useI18n } from 'vue-i18n';
+import { BRANDING } from '@cipibot/constants';
 
 const { t } = useI18n();
 
@@ -23,84 +24,109 @@ const processedMessage = computed(() => {
     return renderTemplateEmbed<T>(props.message, exampleData.value);
   }
 });
+
+const formatTextContent = (text: string) => {
+  if (!text) return '';
+return text.replace(/(@[\p{L}\p{N}_-]+)/gu, '<span class="mention">$1</span>');
+};
 </script>
 
 <template>
-  <div class="discord-mockup">
-    <div class="discord-message">
-      <div class="discord-avatar">
-        <img src="@/assets/avatar.png" class="avatar-img" />
+  <div class="discord-preview-wrapper">
+    
+    <div class="discord-message group">
+      
+      <div class="discord-avatar-col">
+        <div class="avatar-wrapper">
+            <img src="@/assets/avatar.png" alt="Bot Avatar" class="avatar-img" />
+        </div>
       </div>
 
-      <div class="discord-content">
+      <div class="discord-content-col">
+        
         <div class="discord-header">
-          <span class="discord-username">CipiBot</span>
-          <span class="discord-bot-tag">APP</span>
-          <span class="discord-timestamp">{{ t('dashboard.messagePreview.mockTimestamp') }}</span>
+          <span class="username">CipiBot</span>
+          <span class="bot-tag"><span class="bot-tag-text">APP</span></span>
+          <span class="timestamp">{{ t('dashboard.messagePreview.mockTimestamp') }}</span>
         </div>
 
-        <!-- PLAIN TEXT MODE -->
         <div
           v-if="typeof processedMessage === 'string'"
-          class="discord-text"
-          v-html="processedMessage"
-        ></div>
+          class="discord-message-body"
+        >
+            <span v-html="formatTextContent(processedMessage)"></span>
+        </div>
 
-        <!-- EMBED MODE -->
         <div
           v-else
           class="discord-embed"
-          :style="{ borderLeftColor: intToHex(processedMessage.color || 0) }"
+          :style="{ borderLeftColor: intToHex(processedMessage.color || 0) || '#1e1f22' }"
         >
-          <div class="embed-grid">
-            <div class="embed-main">
-              <div
-                v-if="processedMessage.title"
-                class="embed-title"
-                v-html="processedMessage.title"
-              ></div>
-              <div class="embed-description" v-html="processedMessage.description"></div>
-            </div>
-            <div v-if="processedMessage.thumbnail?.url" class="embed-thumbnail">
-              <div class="user-avatar-placeholder">
+          <div class="embed-inner">
+            
+            <div class="embed-content-grid">
+              
+              <div class="embed-text-col">
+                <div
+                  v-if="processedMessage.title"
+                  class="embed-title"
+                  v-html="processedMessage.title"
+                ></div>
+                
+                <div 
+                  v-if="processedMessage.description"
+                  class="embed-description" 
+                  v-html="formatTextContent(processedMessage.description)"
+                ></div>
+              </div>
+
+              <div v-if="processedMessage.thumbnail?.url" class="embed-thumbnail-col">
                 <img
-                  v-if="processedMessage.thumbnail?.url"
                   :src="processedMessage.thumbnail.url"
-                  alt="Avatar"
+                  alt="Thumbnail"
+                  class="embed-thumb-img"
                 />
               </div>
             </div>
+
+            <div class="embed-footer">
+               <span class="footer-text">
+                 {{ BRANDING.DEFAULT_FOOTER_TEXT }}
+                 <span> • {{ t('dashboard.messagePreview.mockTimestamp') }}</span>
+               </span>
+            </div>
+
           </div>
         </div>
+
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.discord-mockup {
-  background-color: #313338;
-  color: #dbdee1;
-  border: 1px solid #1e1f22;
-  border-radius: 8px;
-  padding: 1rem;
-  font-family: 'gg sans', 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  user-select: text;
-}
 
-.discord-mockup :deep(*) {
-  box-sizing: border-box;
+.discord-preview-wrapper {
+  background-color: #313338; /* Discord Dark Theme BG */
+  font-family: sans-serif;
+  color: #dbdee1;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #1e1f22; 
 }
 
 .discord-message {
   display: flex;
+  position: relative;
+  width: 100%;
   margin-top: 0.5rem;
+  padding: 2px 0;
 }
 
-.discord-avatar {
+.discord-avatar-col {
+  margin-top: 0px; 
+  width: 40px;
   margin-right: 16px;
-  margin-top: 2px;
   flex-shrink: 0;
 }
 
@@ -108,23 +134,14 @@ const processedMessage = computed(() => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: var(--color-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 14px;
-  color: white;
-  overflow: hidden;
+  cursor: pointer;
+  transition: opacity 0.1s;
+}
+.avatar-img:hover {
+  opacity: 0.8;
 }
 
-.avatar-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.discord-content {
+.discord-content-col {
   flex: 1;
   min-width: 0;
 }
@@ -132,37 +149,49 @@ const processedMessage = computed(() => {
 .discord-header {
   display: flex;
   align-items: center;
-  margin-bottom: 4px;
+  min-height: 1.375rem;
 }
 
-.discord-username {
+.username {
+  font-size: 16px;
   font-weight: 500;
   color: #f2f3f5;
   margin-right: 0.25rem;
-  font-size: 1rem;
+  line-height: 1.375rem;
+  cursor: pointer;
+}
+.username:hover {
+  text-decoration: underline;
 }
 
-.discord-bot-tag {
-  background-color: #5865f2;
-  color: #fff;
-  font-size: 0.625rem;
+.bot-tag {
+  background-color: #5865f2; /* Blurple */
+  border-radius: 3px;
   padding: 0 0.275rem;
-  border-radius: 0.1875rem;
-  line-height: 0.9375rem;
-  height: 0.9375rem;
-  text-transform: uppercase;
-  font-weight: 500;
-  margin-right: 0.5rem;
+  margin-right: 0.25rem;
   margin-top: 1px;
+  height: 0.9375rem;
+  display: flex;
+  align-items: center;
 }
 
-.discord-timestamp {
+.bot-tag-text {
+  font-size: 0.625rem; 
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.timestamp {
   font-size: 0.75rem;
   color: #949ba4;
   margin-left: 0.25rem;
+  line-height: 1.375rem;
+  cursor: default;
 }
 
-.discord-text {
+.discord-message-body {
   font-size: 1rem;
   line-height: 1.375rem;
   color: #dbdee1;
@@ -170,82 +199,102 @@ const processedMessage = computed(() => {
   word-wrap: break-word;
 }
 
-/* Embed Styles */
 .discord-embed {
-  margin-top: 0.5rem;
-  background-color: #2b2d31;
-  border-left: 4px solid;
-  border-radius: 4px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
   max-width: 520px;
-  display: grid;
-  grid-template-columns: auto;
+  background-color: #2b2d31; /* Embed BG */
+  border-radius: 4px;
+  border-left-width: 4px;
+  border-left-style: solid;
 }
 
-.embed-grid {
-  padding: 0.75rem 1rem;
+.embed-inner {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.embed-content-grid {
   display: flex;
   gap: 16px;
 }
 
-.embed-main {
+.embed-text-col {
   flex: 1;
   min-width: 0;
 }
 
 .embed-title {
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 600;
   color: #f2f3f5;
   margin-bottom: 8px;
-  margin-top: 0;
+  cursor: pointer;
 }
 
 .embed-description {
-  font-size: 0.875rem;
-  line-height: 1.125rem;
+  font-size: 14px;
+  line-height: 1.25rem;
   color: #dbdee1;
   white-space: pre-wrap;
-  word-wrap: break-word;
+  font-weight: 400;
 }
 
-.embed-thumbnail {
+
+.embed-thumbnail-col {
   flex-shrink: 0;
-  width: 60px;
-  height: 60px;
+  margin-top: 4px;
 }
 
-.user-avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  border-radius: 5px;
-  background-color: #000;
-  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.user-avatar-placeholder img {
-  width: 100%;
-  height: 100%;
+.embed-thumb-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 4px;
   object-fit: cover;
 }
 
+/* Footer */
+.embed-footer {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  line-height: 16px;
+  color: #949ba4;
+  font-weight: 500;
+}
+
+.footer-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+
 :deep(.mention) {
-  background-color: rgba(88, 101, 242, 0.3);
+  background-color: #3c4270;
   color: #c9cdfb;
   border-radius: 3px;
   padding: 0 2px;
   font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.1s, color 0.1s;
 }
+
+:deep(.mention):hover {
+    background-color: #5865f2;
+    color: #ffffff;
+}
+
 :deep(strong) {
   font-weight: 700;
   color: #f2f3f5;
 }
-:deep(em) {
-  font-style: italic;
-}
+
 :deep(code) {
   background: #1e1f22;
   padding: 2px 4px;

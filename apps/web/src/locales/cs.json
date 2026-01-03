@@ -73,6 +73,9 @@
       "members": "členů"
     },
     "modules": {
+    "enabled": "Zapnuto",
+    "disabled": "Vypnuto",
+    "editMessage": "Upravit zprávu",
       "generalSettings": {
         "title": "Obecná nastavení",
         "description": "Nastavení základních funkcí serveru a lokalizace.",
@@ -86,8 +89,6 @@
       "leveling": {
         "title": "Systém úrovní",
         "description": "Správa XP, odměn a oznámení.",
-        "enabled": "Zapnuto",
-        "disabled": "Vypnuto",
         "xpAlgorithm": {
           "title": "Algoritmus XP",
           "xpMultiplier": "Násobič XP",
@@ -113,8 +114,7 @@
           "title": "Oznámení o nové úrovni",
           "description": "Odesláno, když uživatel postoupí na novou úroveň.",
           "channelLabel": "Kanál pro oznámení",
-          "currentChannel": "Aktuální kanál (Kontext)",
-          "editMessage": "Upravit zprávu"
+          "currentChannel": "Aktuální kanál (Kontext)"
         },
         "commands": {
           "title": "Příkazy",
@@ -136,7 +136,26 @@
         }
       },
       "welcome": {
-        "title": "Uvítací zprávy"
+        "title": "Uvítací zprávy",
+        "description": "Přizpůsobte uvítací zprávy pro nové členy.",
+        "general": {
+          "title": "Obecná nastavení",
+          "channelLabel": "Kanál pro uvítací/odchodové zprávy",
+          "selectChannel": "Vybrat kanál",
+          "channelHint": "Vyber kanál, kam budou odesílány uvítací a odchodové zprávy."
+        },
+        "welcomeMessage": {
+          "title": "Uvítací zpráva",
+          "description": "Odesílá se, když se nový člen připojí na server."
+        },
+        "leaveMessage": {
+          "title": "Odchodová zpráva",
+          "description": "Odesílá se, když člen opustí server."
+        },
+        "dmMessage": {
+          "title": "Přímá uvítací zpráva",
+          "description": "Odesílá se jako přímá zpráva novým členům."
+        }
       },
       "verification": {
         "title": "Ověření uživatelů"

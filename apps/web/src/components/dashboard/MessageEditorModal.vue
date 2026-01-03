@@ -17,6 +17,7 @@ const props = defineProps<{
   mockUser?: any;
   previewVariables?: any;
   defaultConfig?: string | EmbedType;
+  adapterOptions?: { supportsAvatarThumbnail: boolean };
 }>();
 
 const emit = defineEmits<{

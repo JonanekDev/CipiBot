@@ -4,6 +4,7 @@ import { VariableDef } from '@/types/variables';
 import { EmbedType } from '@cipibot/schemas';
 import { intToHex, hexToInt } from '@/utils/common';
 import { useI18n } from 'vue-i18n';
+import { COLORS } from '@cipibot/constants';
 
 const { t } = useI18n();
 
@@ -25,7 +26,7 @@ const config = computed({
 
 const colorHex = computed({
   get: () => {
-    if (typeof config.value === 'string') return '#000000';
+    if (typeof config.value === 'string') return COLORS.PRIMARY;
     return intToHex(config.value.color || 0);
   },
   set: (val: string) => {
@@ -49,7 +50,7 @@ const setType = (type: 'text' | 'embed') => {
       config.value = {
         title: '',
         description: currentVal,
-        color: 0,
+        color: COLORS.PRIMARY,
       };
     }
   }

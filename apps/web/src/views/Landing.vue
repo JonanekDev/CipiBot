@@ -1,35 +1,13 @@
 <script setup lang="ts">
+import Button from '../components/ui/Button.vue';
+
 const features = [
-  {
-    id: 'leveling',
-    icon: '📊',
-    color: 'primary',
-  },
-  {
-    id: 'welcome',
-    icon: '👋',
-    color: 'secondary',
-  },
-  {
-    id: 'verification',
-    icon: '🛡️',
-    color: 'accent',
-  },
-  {
-    id: 'custom_commands',
-    icon: '🤖',
-    color: 'primary',
-  },
-  {
-    id: 'ticketing',
-    icon: '🎫',
-    color: 'secondary',
-  },
-  {
-    id: 'social_alerts',
-    icon: '📢',
-    color: 'accent',
-  },
+  { id: 'leveling', icon: '📊', color: 'primary' },
+  { id: 'welcome', icon: '👋', color: 'secondary' },
+  { id: 'verification', icon: '🛡️', color: 'accent' },
+  { id: 'custom_commands', icon: '🤖', color: 'primary' },
+  { id: 'ticketing', icon: '🎫', color: 'secondary' },
+  { id: 'social_alerts', icon: '📢', color: 'accent' },
 ];
 </script>
 
@@ -43,10 +21,14 @@ const features = [
           {{ $t('landing.hero.subtitle') }}
         </p>
         <div class="hero-actions">
-          <a href="#" class="btn btn-primary btn-lg">{{ $t('common.addToDiscord') }}</a>
-          <a href="https://github.com/cipibot" target="_blank" class="btn btn-secondary btn-lg">{{
-            $t('landing.hero.cta_explore')
-          }}</a>
+          <Button href="#" variant="primary" size="lg">{{ $t('common.addToDiscord') }}</Button>
+          <Button
+            href="https://github.com/cipibot"
+            target="_blank"
+            variant="secondary"
+            size="lg"
+            >{{ $t('landing.hero.cta_explore') }}</Button
+          >
         </div>
       </div>
       <div class="hero-image animate-float">
@@ -96,10 +78,10 @@ const features = [
         <h2>{{ $t('mainlayout.footer.slogan') }}</h2>
         <p>{{ $t('landing.cta.subtitle') }}</p>
         <div class="cta-actions">
-          <a href="#" class="btn btn-primary">{{ $t('landing.cta.inviteButton') }}</a>
-          <RouterLink to="/dashboard" class="btn btn-secondary">{{
+          <Button href="#" variant="primary">{{ $t('landing.cta.inviteButton') }}</Button>
+          <Button to="/dashboard" variant="secondary">{{
             $t('landing.cta.exploreButton')
-          }}</RouterLink>
+          }}</Button>
         </div>
       </div>
     </div>
@@ -126,29 +108,6 @@ const features = [
   z-index: -1;
   filter: blur(60px);
   animation: wandering-glow 20s ease-in-out infinite alternate;
-}
-
-@keyframes wandering-glow {
-  0% {
-    transform: translate(-50%, 0) scale(1);
-    opacity: 0.8;
-  }
-  25% {
-    transform: translate(-20%, 10%) scale(1.1);
-    opacity: 1;
-  }
-  50% {
-    transform: translate(-50%, 20%) scale(0.9);
-    opacity: 0.8;
-  }
-  75% {
-    transform: translate(-80%, 5%) scale(1.2);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, 0) scale(1);
-    opacity: 0.8;
-  }
 }
 
 .hero-content {
@@ -186,7 +145,7 @@ const features = [
 
 /* Code Window CSS Art */
 .code-window {
-  background: #1e1e24;
+  background: #1e1e24; /* TODO: Add var */
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   width: 100%;
@@ -196,7 +155,7 @@ const features = [
 }
 
 .window-header {
-  background: #27272a;
+  background: var(--color-border);
   padding: 1rem;
   display: flex;
   gap: 0.5rem;
@@ -225,7 +184,7 @@ const features = [
 .code-response {
   display: flex;
   gap: 1rem;
-  background: #2f3136;
+  background: #2f3136; /* Discord dark bg */
   padding: 1rem;
   border-radius: 8px;
   align-items: flex-start;
@@ -346,6 +305,6 @@ const features = [
   }
   .code-window {
     display: none;
-  } /* Hide complex graphic on mobile */
+  }
 }
 </style>

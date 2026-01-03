@@ -306,8 +306,8 @@ const resetSettings = () => {
         </label>
         <span class="status-text">{{
           draft.enabled
-            ? t('dashboard.modules.leveling.enabled')
-            : t('dashboard.modules.leveling.disabled')
+            ? t('dashboard.modules.enabled')
+            : t('dashboard.modules.disabled')
         }}</span>
       </div>
     </div>
@@ -448,7 +448,7 @@ const resetSettings = () => {
             v-model.number="newRewardLevel"
             :placeholder="t('dashboard.modules.leveling.roleRewards.levelPlaceholder')"
             class="input"
-            style="width: 85px"
+            style="width: 100px"
           />
           <select v-model="newRewardRoleId" class="input" style="flex: 1">
             <option value="" disabled selected>
@@ -498,7 +498,7 @@ const resetSettings = () => {
           </div>
           <div class="feature-actions">
             <button class="btn-edit" @click="activeModal = 'levelup'">
-              {{ t('dashboard.modules.leveling.levelUpAnnouncement.editMessage') }}
+              {{ t('dashboard.modules.editMessage') }}
             </button>
           </div>
         </div>
@@ -537,7 +537,7 @@ const resetSettings = () => {
                 @click="activeModal = 'command_level'"
                 :disabled="!draft.commands.level.enabled"
               >
-                {{ t('dashboard.modules.leveling.commands.level.edit') }}
+                {{ t('dashboard.modules.editMessage') }}
               </button>
 
               <label class="checkbox-label small-muted mt-4">

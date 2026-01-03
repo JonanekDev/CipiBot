@@ -73,6 +73,9 @@
       "members": "members"
     },
     "modules": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "editMessage": "Edit Message",
       "generalSettings": {
         "title": "General Settings",
         "description": "Configure basic server settings and localization.",
@@ -86,8 +89,6 @@
       "leveling": {
         "title": "Leveling System",
         "description": "Manage XP rates, rewards, and announcements.",
-        "enabled": "Enabled",
-        "disabled": "Disabled",
         "xpAlgorithm": {
           "title": "XP Algorithm",
           "xpMultiplier": "XP Multiplier",
@@ -113,8 +114,7 @@
           "title": "Level Up Announcement",
           "description": "Sent when a user levels up.",
           "channelLabel": "Announcement Channel",
-          "currentChannel": "Current Channel (Context)",
-          "editMessage": "Edit Message"
+          "currentChannel": "Current Channel (Context)"
         },
         "commands": {
           "title": "Commands",
@@ -136,7 +136,26 @@
         }
       },
       "welcome": {
-        "title": "Welcome Messages"
+        "title": "Welcome Messages",
+        "description": "Customize greetings for new members.",
+        "general": {
+          "title": "General Settings",
+          "channelLabel": "Welcome/Leave Message Channel",
+          "selectChannel": "Select Channel",
+          "channelHint": "Choose the channel where welcome and leave messages will be sent."
+        },
+        "welcomeMessage": {
+          "title": "Welcome Message",
+          "description": "Sent when a new member joins the server."
+        },
+        "leaveMessage": {
+          "title": "Leave Message",
+          "description": "Sent when a member leaves the server."
+        },
+        "dmMessage": {
+          "title": "Direct Welcome Message",
+          "description": "Sent as a direct message to new members."
+        }
       },
       "verification": {
         "title": "User Verification"
