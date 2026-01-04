@@ -3,7 +3,7 @@ import { ref, watch } from 'vue';
 import MessageBuilder from './MessageBuilder.vue';
 import MessagePreview from './MessagePreview.vue';
 import { VariableDef } from '@/types/variables';
-import { EmbedType } from '@cipibot/schemas';
+import { Embed } from '@cipibot/schemas';
 import { deepEqual } from '@/utils/guildConfig';
 import { useI18n } from 'vue-i18n';
 
@@ -12,23 +12,23 @@ const { t } = useI18n();
 const props = defineProps<{
   isOpen: boolean;
   title: string;
-  initialConfig: string | EmbedType | undefined;
+  initialConfig: string | Embed | undefined;
   variables: VariableDef<T>[];
   mockUser?: any;
   previewVariables?: any;
-  defaultConfig?: string | EmbedType;
+  defaultConfig?: string | Embed;
   adapterOptions?: { supportsAvatarThumbnail: boolean };
 }>();
 
 const emit = defineEmits<{
   (e: 'close'): void;
-  (e: 'save', config: string | EmbedType | undefined): void;
+  (e: 'save', config: string | Embed | undefined): void;
 }>();
 
 const error = ref<string | null>(null);
 
 // Local state for editing (so we don't mutate parent state until save)
-const localConfig = ref<string | EmbedType>(props.initialConfig ?? '');
+const localConfig = ref<string | Embed>(props.initialConfig ?? '');
 
 // Validation Logic
 const checkValidation = () => {

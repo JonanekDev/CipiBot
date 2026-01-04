@@ -1,4 +1,4 @@
-import { EmbedType } from '@cipibot/schemas';
+import { Embed } from '@cipibot/schemas';
 
 export function renderTemplate<T extends object>(template: string, data: T): string {
   let result = template;
@@ -13,8 +13,8 @@ export function renderTemplate<T extends object>(template: string, data: T): str
   return result;
 }
 
-export function renderTemplateEmbed<T extends object>(template: EmbedType, data: T): EmbedType {
-  const renderedEmbed: EmbedType = { ...template };
+export function renderTemplateEmbed<T extends object>(template: Embed, data: T): Embed {
+  const renderedEmbed: Embed = { ...template };
   if (renderedEmbed.title) {
     renderedEmbed.title = renderTemplate(renderedEmbed.title, data);
   }

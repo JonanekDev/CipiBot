@@ -4,11 +4,11 @@ import {
   CommandInteraction,
   CommandInteractionSchema,
   GuildMemberPayloadSchema,
-  GuildMemberPayloadType,
+  GuildMemberPayload,
   GuildMemberRemovePayloadSchema,
-  GuildMemberRemovePayloadType,
+  GuildMemberRemovePayload,
   MessageSchema,
-  MessageType,
+  Message,
 } from '@cipibot/schemas/discord';
 import { Command, CommandRegistry } from '@cipibot/commands';
 import { KAFKA_TOPICS } from '@cipibot/constants';
@@ -25,7 +25,7 @@ export async function registerConsumers(
   logger: Logger,
   commands: Map<string, Command>,
 ) {
-  await kafka.registerHandler<MessageType>(
+  await kafka.registerHandler<Message>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.MESSAGE_CREATE,
     MessageSchema,
@@ -48,7 +48,7 @@ export async function registerConsumers(
     },
   );
 
-  await kafka.registerHandler<GuildMemberPayloadType>(
+  await kafka.registerHandler<GuildMemberPayload>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_MEMBER_ADD,
     GuildMemberPayloadSchema,
@@ -57,7 +57,7 @@ export async function registerConsumers(
     },
   );
 
-  await kafka.registerHandler<GuildMemberRemovePayloadType>(
+  await kafka.registerHandler<GuildMemberRemovePayload>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_MEMBER_REMOVE,
     GuildMemberRemovePayloadSchema,

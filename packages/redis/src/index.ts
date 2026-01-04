@@ -93,4 +93,13 @@ export class RedisClient {
       throw error;
     }
   }
+
+  async del(...keys: string[]): Promise<number> {
+    try {
+      return await this.redis.del(...keys);
+    } catch (error) {
+      this.logger.error({ keys, error }, 'Redis DEL failed');
+      throw error;
+    }
+  }
 }

@@ -2,7 +2,7 @@ import { Command } from '@cipibot/commands';
 import { getUserOption } from '@cipibot/commands/options';
 import { LevelingService } from '../service';
 import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord-api-types/v10';
-import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
+import { DiscordInteractionReplyUpdate } from '@cipibot/schemas';
 import { t } from '@cipibot/i18n';
 import { ConfigClient } from '@cipibot/config-client';
 import { KAFKA_TOPICS } from '@cipibot/constants';
@@ -45,7 +45,7 @@ export function createLevelCommand(
       const targetUser = userOptionResult || interaction.member?.user || interaction.user;
       if (!targetUser) return; //TODO: ERROR
       if (targetUser.bot) {
-        const eventData: DiscordInteractionReplyUpdateType = {
+        const eventData: DiscordInteractionReplyUpdate = {
           interactionId: interaction.id,
           interactionToken: interaction.token,
           body: {
@@ -60,7 +60,7 @@ export function createLevelCommand(
 
       const user = await service.getUser(guildId, targetUser.id);
 
-      const eventData: DiscordInteractionReplyUpdateType = {
+      const eventData: DiscordInteractionReplyUpdate = {
         interactionId: interaction.id,
         interactionToken: interaction.token,
         body: {},

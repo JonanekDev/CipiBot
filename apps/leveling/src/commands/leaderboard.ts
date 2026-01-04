@@ -2,7 +2,7 @@ import { Command } from '@cipibot/commands';
 import { LevelingService } from '../service';
 import { ApplicationCommandType } from 'discord-api-types/v10';
 import { KafkaClient } from '@cipibot/kafka';
-import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
+import { DiscordInteractionReplyUpdate } from '@cipibot/schemas';
 import { t } from '@cipibot/i18n';
 import { ConfigClient } from '@cipibot/config-client';
 import { KAFKA_TOPICS } from '@cipibot/constants';
@@ -34,7 +34,7 @@ export function createLeaderboardCommand(
       const config = await configClient.getGuildConfig(guildId);
       const leaderboard = await service.getLeaderboard(guildId, 5);
 
-      const eventData: DiscordInteractionReplyUpdateType = {
+      const eventData: DiscordInteractionReplyUpdate = {
         interactionId: interaction.id,
         interactionToken: interaction.token,
         body: {},

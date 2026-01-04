@@ -1,12 +1,12 @@
-import { EmbedType } from '@cipibot/schemas';
+import { Embed } from '@cipibot/schemas';
 import { createEmbed } from '.';
 import { APIEmbed, RESTPostAPIChannelMessageJSONBody } from 'discord-api-types/v10';
 import { renderTemplate, renderTemplateEmbed } from '@cipibot/templating';
 
 export function renderDiscordMessage<T extends object>(
-  template: string | EmbedType | null | undefined,
+  template: string | Embed | null | undefined,
   variables: T,
-  defaultEmbed?: EmbedType,
+  defaultEmbed?: Embed,
 ): RESTPostAPIChannelMessageJSONBody {
   if (typeof template === 'string') {
     // String message

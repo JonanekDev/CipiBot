@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
 import { ref, computed } from 'vue';
 import { VariableDef } from '@/types/variables';
-import { EmbedType } from '@cipibot/schemas';
+import { Embed } from '@cipibot/schemas';
 import { intToHex, hexToInt } from '@/utils/common';
 import { useI18n } from 'vue-i18n';
 import { COLORS } from '@cipibot/constants';
@@ -9,13 +9,13 @@ import { COLORS } from '@cipibot/constants';
 const { t } = useI18n();
 
 const props = defineProps<{
-  modelValue: string | EmbedType;
+  modelValue: string | Embed;
   label?: string;
   variables?: VariableDef<T>[];
 }>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string | EmbedType): void;
+  (e: 'update:modelValue', value: string | Embed): void;
 }>();
 
 // Proxy object to avoid mutating props directly

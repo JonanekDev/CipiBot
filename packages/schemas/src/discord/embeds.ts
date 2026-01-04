@@ -39,4 +39,4 @@ export const EmbedSchema = z.object({
     .optional(),
 });
 
-export type EmbedType = z.infer<typeof EmbedSchema>;
+export type Embed = z.infer<typeof EmbedSchema>;

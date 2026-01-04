@@ -8,6 +8,7 @@ import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import type { ConfigRouter } from '@cipibot/config/router';
 import type { LevelingRouter } from '@cipibot/leveling/router';
 import type { DiscordRestRouter } from '@cipibot/discord-rest/router';
+import { ConfigValidator } from './utils/configValidation';
 
 // Initialize tRPC Clients for Microservices
 const configClient = createTRPCClient<ConfigRouter>({
@@ -44,6 +45,8 @@ const isAuthed = t.middleware(async ({ ctx, next }) => {
 export const protectedProcedure = t.procedure.use(isAuthed);
 
 export function createAppRouter(authService: AuthService) {
+  const configValidator = new ConfigValidator(discordRestClient);
+
   const authRouter = t.router({
     login: t.procedure.input(LoginReqSchema).mutation(async ({ input, ctx }) => {
       const userData = await authService.login(input.code);
@@ -148,6 +151,9 @@ export function createAppRouter(authService: AuthService) {
         if (!hasAccess) {
           throw new TRPCError({ code: 'FORBIDDEN', message: 'No access to this guild' });
         }
+
+        await configValidator.validateGuildConfigPatch(input.id, input.patch);
+
         return await configClient.updateGuildConfig.mutate(input);
       }),
   });

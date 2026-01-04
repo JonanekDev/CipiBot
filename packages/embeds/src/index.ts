@@ -1,11 +1,11 @@
 import { APIEmbed } from 'discord-api-types/v10';
 import { COLORS, BRANDING } from '@cipibot/constants';
-import { EmbedType } from '@cipibot/schemas';
+import { Embed } from '@cipibot/schemas';
 import { ErrorType, ErrorVariables } from './types/errors';
 import { SupportedLanguage, t } from '@cipibot/i18n';
 import { renderTemplate } from '@cipibot/templating';
 
-export function createEmbed(embed: EmbedType): APIEmbed {
+export function createEmbed(embed: Embed): APIEmbed {
   return {
     color: COLORS.PRIMARY,
     ...embed,

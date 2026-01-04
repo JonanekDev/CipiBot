@@ -4,7 +4,7 @@ import { DiscordRestRouter } from '@cipibot/discord-rest/router';
 import { TRPCClient } from '@trpc/client';
 import { Interaction, isCommandInteraction } from '@cipibot/schemas/discord';
 import { COMMAND_META } from '@cipibot/commands/commandsMeta';
-import { DiscordInteractionReplyUpdateType } from '@cipibot/schemas';
+import { DiscordInteractionReplyUpdate } from '@cipibot/schemas';
 import { createErrorEmbed } from '@cipibot/embeds';
 import { KafkaClient } from '@cipibot/kafka';
 import { Logger } from '@cipibot/logger';
@@ -33,7 +33,7 @@ export async function handleInteractionCreate(
         const moduleConfig = guildConfig[meta.module];
         const commandConfig = meta.get(guildConfig);
         if (!moduleConfig.enabled || !commandConfig.enabled) {
-          const eventData: DiscordInteractionReplyUpdateType = {
+          const eventData: DiscordInteractionReplyUpdate = {
             interactionId: interaction.id,
             interactionToken: interaction.token,
             body: {

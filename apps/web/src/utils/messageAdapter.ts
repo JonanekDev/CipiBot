@@ -1,12 +1,12 @@
 import { COLORS } from '@cipibot/constants';
 import { keyPath, SupportedLanguage, t } from '@cipibot/i18n';
-import { EmbedType } from '@cipibot/schemas';
+import { Embed } from '@cipibot/schemas';
 import { computed, WritableComputedRef } from 'vue';
 
 export interface MessageAdapterResult {
-  adapter: WritableComputedRef<string | EmbedType | undefined>;
+  adapter: WritableComputedRef<string | Embed | undefined>;
   reset: () => void;
-  getDefault: () => string | EmbedType;
+  getDefault: () => string | Embed;
 }
 
 export const createMessageAdapter = (
@@ -26,7 +26,7 @@ export const createMessageAdapter = (
   });
 
   // Convert stored source shape -> adapter value
-  const toAdapter = (src?: string | EmbedType): string | EmbedType => {
+  const toAdapter = (src?: string | Embed): string | Embed => {
     if (!src) return getDefault();
     if (typeof src === 'string') return src;
 
@@ -39,7 +39,7 @@ export const createMessageAdapter = (
   };
 
   // Convert adapter value -> stored source shape
-  const toSource = (val: string | EmbedType | undefined) => {
+  const toSource = (val: string | Embed | undefined) => {
     if (!val) return undefined;
     // If val is default we will return undefined (which means default for not storing defaults in database)
     if (typeof val !== 'string') {
@@ -59,7 +59,7 @@ export const createMessageAdapter = (
     };
   };
 
-  const adapter = computed<string | EmbedType | undefined>({
+  const adapter = computed<string | Embed | undefined>({
     get: () => toAdapter(getSource()),
     set: (val) => setSource(toSource(val)),
   });

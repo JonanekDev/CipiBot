@@ -1,5 +1,5 @@
 import { ConfigClient } from '@cipibot/config-client';
-import { DiscordDMPayloadType, DiscordMessagePayloadType } from '@cipibot/schemas';
+import { DiscordDMPayload, DiscordMessagePayload } from '@cipibot/schemas';
 import { createUserVariables } from '@cipibot/templating/modules/common';
 import { renderDiscordMessage } from '@cipibot/embeds/discord';
 import { KafkaClient } from '@cipibot/kafka';
@@ -31,18 +31,21 @@ export class WelcomingService {
       avatar: avatar,
     });
 
-    if (config.welcoming.dmWelcomeMessage) {
-      let dmEventData: DiscordDMPayloadType = {
+    if (config.welcoming.dmEnabled) {
+      let dmEventData: DiscordDMPayload = {
         userId: userId,
         body: {},
       };
-      dmEventData.body = renderDiscordMessage(config.welcoming.dmWelcomeMessage, usersVariables);
+      dmEventData.body = renderDiscordMessage(config.welcoming.dmWelcomeMessage, usersVariables, {
+        title: t(config.language, 'welcoming.dmMessageTitle'),
+        description: t(config.language, 'welcoming.dmMessageDescription'),
+      });
       this.kafka.sendEvent(KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_DM, dmEventData);
     }
 
     if (!config.welcoming.channelId) return; //TODO: Something?
 
-    let eventData: DiscordMessagePayloadType = {
+    let eventData: DiscordMessagePayload = {
       channelId: config.welcoming.channelId,
       body: {},
     };
@@ -71,7 +74,7 @@ export class WelcomingService {
       avatar: avatar,
     });
 
-    let eventData: DiscordMessagePayloadType = {
+    let eventData: DiscordMessagePayload = {
       channelId: config.welcoming.channelId,
       body: {},
     };

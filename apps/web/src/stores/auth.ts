@@ -2,12 +2,12 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { trpc } from '../api';
 import type { UserGuild } from '@cipibot/schemas/api';
-import type { UserType } from '@cipibot/schemas/discord';
+import type { User } from '@cipibot/schemas/discord';
 import { getAvatarURL } from '@cipibot/discord-utils';
 
 export const useAuthStore = defineStore('auth', () => {
   // State
-  const user = ref<UserType | null>(null);
+  const user = ref<User | null>(null);
   const guilds = ref<UserGuild[]>([]);
   const isLoading = ref(true);
   const error = ref<Error | null>(null);

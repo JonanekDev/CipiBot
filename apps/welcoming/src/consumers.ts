@@ -3,15 +3,15 @@ import { WelcomingService } from './service';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import {
   GuildMemberPayloadSchema,
-  GuildMemberPayloadType,
+  GuildMemberPayload,
   GuildMemberRemovePayloadSchema,
-  GuildMemberRemovePayloadType,
+  GuildMemberRemovePayload,
 } from '@cipibot/schemas/discord';
 
 const CONSUMER_GROUP = 'welcoming-service-group';
 
 export async function registerConsumers(kafka: KafkaClient, welcomingService: WelcomingService) {
-  await kafka.registerHandler<GuildMemberPayloadType>(
+  await kafka.registerHandler<GuildMemberPayload>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_MEMBER_ADD,
     GuildMemberPayloadSchema,
@@ -26,7 +26,7 @@ export async function registerConsumers(kafka: KafkaClient, welcomingService: We
     },
   );
 
-  await kafka.registerHandler<GuildMemberRemovePayloadType>(
+  await kafka.registerHandler<GuildMemberRemovePayload>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_MEMBER_REMOVE,
     GuildMemberRemovePayloadSchema,

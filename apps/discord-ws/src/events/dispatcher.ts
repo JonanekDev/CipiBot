@@ -1,10 +1,10 @@
 import { GatewayDispatchEvents, GatewayDispatchPayload } from 'discord-api-types/gateway/v10';
 import { handleMessageCreate } from './handlers/messageCreate';
-import { handleGuildEvent } from './handlers/guild';
-import { handleMemberAdd } from './handlers/memberAdd';
-import { handleMemberRemove } from './handlers/memberRemove';
-import { handleGuildDelete } from './handlers/guildDelete';
+import { handleGuildEvent, handleGuildDelete } from './handlers/guildEvents';
+import { handleMemberAdd, handleMemberRemove } from './handlers/membersEvent';
 import { handleInteractionCreate } from './handlers/interactionCreate';
+import { handleChannelCreate, handleChannelUpdate, handleChannelDelete } from './handlers/channelEvents';
+import { handleRoleCreate, handleRoleUpdate, handleRoleDelete } from './handlers/roleEvents';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import { DiscordRestRouter } from '@cipibot/discord-rest/router';
 import { TRPCClient } from '@trpc/client';
@@ -48,6 +48,30 @@ export async function dispatchEvent(
         break;
       case GatewayDispatchEvents.InteractionCreate:
         await handleInteractionCreate(kafka, logger, event.d, trpc, commandRegistry, configClient);
+        break;
+
+      case GatewayDispatchEvents.ChannelCreate:
+        await handleChannelCreate(kafka, event.d);
+        break;
+
+      case GatewayDispatchEvents.ChannelUpdate:
+        await handleChannelUpdate(kafka, event.d);
+        break;
+
+      case GatewayDispatchEvents.ChannelDelete:
+        await handleChannelDelete(kafka, event.d);
+        break;
+
+      case GatewayDispatchEvents.GuildRoleCreate:
+        await handleRoleCreate(kafka, event.d);
+        break;
+
+      case GatewayDispatchEvents.GuildRoleUpdate:
+        await handleRoleUpdate(kafka, event.d);
+        break;
+
+      case GatewayDispatchEvents.GuildRoleDelete:
+        await handleRoleDelete(kafka, event.d);
         break;
 
       default:

@@ -23,19 +23,22 @@ export const GuildMemberPayloadSchema = GuildMemberSchema.extend({
   guild_id: z.string(),
 });
 
-export type GuildMemberPayloadType = z.infer<typeof GuildMemberPayloadSchema>;
+export type GuildMemberPayload = z.infer<typeof GuildMemberPayloadSchema>;
 
 export const GuildMemberRemovePayloadSchema = z.object({
   guild_id: z.string(),
   user: UserSchema,
 });
 
-export type GuildMemberRemovePayloadType = z.infer<typeof GuildMemberRemovePayloadSchema>;
+export type GuildMemberRemovePayload = z.infer<typeof GuildMemberRemovePayloadSchema>;
 
 export const GuildChannelSchema = z.object({
   id: z.string(),
   name: z.string(),
   type: z.number(),
+  position: z.number().optional(),
+  nsfw: z.boolean().optional(),
+  topic: z.string().nullable().optional(),
 });
 
 export type GuildChannel = z.infer<typeof GuildChannelSchema>;
@@ -52,3 +55,17 @@ export const RoleSchema = z.object({
 });
 
 export type Role = z.infer<typeof RoleSchema>;
+
+export const ChannelEventPayloadSchema = z.object({
+  guildId: z.string(),
+  channelId: z.string(),
+});
+
+export type ChannelEventPayload = z.infer<typeof ChannelEventPayloadSchema>;
+
+export const RoleEventPayloadSchema = z.object({
+  guildId: z.string(),
+  roleId: z.string(),
+});
+
+export type RoleEventPayload = z.infer<typeof RoleEventPayloadSchema>;

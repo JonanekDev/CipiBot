@@ -1,21 +1,28 @@
 import { KafkaClient } from '@cipibot/kafka';
 import {
   DiscordDMPayloadSchema,
-  DiscordDMPayloadType,
+  DiscordDMPayload,
   DiscordInteractionReplyUpdateSchema,
-  DiscordInteractionReplyUpdateType,
+  DiscordInteractionReplyUpdate,
   DiscordMessagePayloadSchema,
-  DiscordMessagePayloadType,
+  DiscordMessagePayload,
   RolePayloadSchema,
-  RolePayloadType,
+  RolePayload,
   UpdateCommandPayloadSchema,
-  UpdateCommandPayloadType,
+  UpdateCommandPayload,
 } from '@cipibot/schemas';
+import {
+  ChannelEventPayloadSchema,
+  ChannelEventPayload,
+  RoleEventPayloadSchema,
+  RoleEventPayload,
+} from '@cipibot/schemas/discord';
 import { CommandsService } from './services/commands.service';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import { InteractionsService } from './services/interactions.service';
 import { MessagesService } from './services/messages.service';
 import { RolesService } from './services/roles.service';
+import { ChannelsService } from './services/channels.service';
 
 const CONSUMER_GROUP = 'discord-rest-service-group';
 
@@ -25,8 +32,9 @@ export async function registerConsumers(
   interactionsService: InteractionsService,
   messagesService: MessagesService,
   rolesService: RolesService,
+  channelsService: ChannelsService,
 ) {
-  await kafka.registerHandler<DiscordMessagePayloadType>(
+  await kafka.registerHandler<DiscordMessagePayload>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE,
     DiscordMessagePayloadSchema,
@@ -35,7 +43,7 @@ export async function registerConsumers(
     },
   );
 
-  await kafka.registerHandler<DiscordDMPayloadType>(
+  await kafka.registerHandler<DiscordDMPayload>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_DM,
     DiscordDMPayloadSchema,
@@ -44,7 +52,7 @@ export async function registerConsumers(
     },
   );
 
-  await kafka.registerHandler<RolePayloadType>(
+  await kafka.registerHandler<RolePayload>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_ADD,
     RolePayloadSchema,
@@ -53,7 +61,7 @@ export async function registerConsumers(
     },
   );
 
-  await kafka.registerHandler<RolePayloadType>(
+  await kafka.registerHandler<RolePayload>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_REMOVE,
     RolePayloadSchema,
@@ -62,7 +70,7 @@ export async function registerConsumers(
     },
   );
 
-  await kafka.registerHandler<UpdateCommandPayloadType>(
+  await kafka.registerHandler<UpdateCommandPayload>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE,
     UpdateCommandPayloadSchema,
@@ -71,7 +79,7 @@ export async function registerConsumers(
     },
   );
 
-  await kafka.registerHandler<DiscordInteractionReplyUpdateType>(
+  await kafka.registerHandler<DiscordInteractionReplyUpdate>(
     CONSUMER_GROUP,
     KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE,
     DiscordInteractionReplyUpdateSchema,
@@ -81,6 +89,60 @@ export async function registerConsumers(
         payload.interactionToken,
         payload.body,
       );
+    },
+  );
+
+  await kafka.registerHandler<ChannelEventPayload>(
+    CONSUMER_GROUP,
+    KAFKA_TOPICS.DISCORD_INBOUND.CHANNEL_CREATE,
+    ChannelEventPayloadSchema,
+    async (payload) => {
+      await channelsService.invalidateCache(payload.guildId);
+    },
+  );
+
+  await kafka.registerHandler<ChannelEventPayload>(
+    CONSUMER_GROUP,
+    KAFKA_TOPICS.DISCORD_INBOUND.CHANNEL_UPDATE,
+    ChannelEventPayloadSchema,
+    async (payload) => {
+      await channelsService.invalidateCache(payload.guildId);
+    },
+  );
+
+  await kafka.registerHandler<ChannelEventPayload>(
+    CONSUMER_GROUP,
+    KAFKA_TOPICS.DISCORD_INBOUND.CHANNEL_DELETE,
+    ChannelEventPayloadSchema,
+    async (payload) => {
+      await channelsService.invalidateCache(payload.guildId);
+    },
+  );
+
+  await kafka.registerHandler<RoleEventPayload>(
+    CONSUMER_GROUP,
+    KAFKA_TOPICS.DISCORD_INBOUND.GUILD_ROLE_CREATE,
+    RoleEventPayloadSchema,
+    async (payload) => {
+      await rolesService.invalidateCache(payload.guildId);
+    },
+  );
+
+  await kafka.registerHandler<RoleEventPayload>(
+    CONSUMER_GROUP,
+    KAFKA_TOPICS.DISCORD_INBOUND.GUILD_ROLE_UPDATE,
+    RoleEventPayloadSchema,
+    async (payload) => {
+      await rolesService.invalidateCache(payload.guildId);
+    },
+  );
+
+  await kafka.registerHandler<RoleEventPayload>(
+    CONSUMER_GROUP,
+    KAFKA_TOPICS.DISCORD_INBOUND.GUILD_ROLE_DELETE,
+    RoleEventPayloadSchema,
+    async (payload) => {
+      await rolesService.invalidateCache(payload.guildId);
     },
   );
 

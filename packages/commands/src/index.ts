@@ -2,7 +2,7 @@ import { CACHE_TTL, KAFKA_TOPICS, REDIS_KEYS } from '@cipibot/constants';
 import { RedisClient } from '@cipibot/redis';
 import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction } from '@cipibot/schemas/discord';
-import { UpdateCommandPayloadType } from '@cipibot/schemas';
+import { UpdateCommandPayload } from '@cipibot/schemas';
 import { Logger } from '@cipibot/logger';
 import { KafkaClient } from '@cipibot/kafka';
 
@@ -77,7 +77,7 @@ export class CommandRegistry {
         JSON.stringify(definitions),
       );
 
-      const eventData: UpdateCommandPayloadType = {
+      const eventData: UpdateCommandPayload = {
         serviceName: this.serviceName,
       };
 

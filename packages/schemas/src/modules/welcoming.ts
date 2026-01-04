@@ -9,7 +9,8 @@ export const WelcomingConfigSchema = BaseModuleSchema.extend({
   welcomeMessage: z.union([z.string(), EmbedSchema]).nullable().default(null),
   leaveMessage: z.union([z.string(), EmbedSchema]).nullable().default(null),
   channelId: z.string().nullable().default(null),
+  dmEnabled: z.boolean().default(false),
   dmWelcomeMessage: z.union([z.string(), EmbedSchema]).nullable().default(null),
 });
 
-export type WelcomingConfigType = z.infer<typeof WelcomingConfigSchema>;
+export type WelcomingConfig = z.infer<typeof WelcomingConfigSchema>;

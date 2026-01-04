@@ -30,8 +30,8 @@ async function main() {
   const commandsService = new CommandsService(rest, logger, redis, DISCORD_CLIENT_ID);
   const interactionsService = new InteractionsService(rest, logger, DISCORD_CLIENT_ID);
   const messagesService = new MessagesService(rest, logger);
-  const rolesService = new RolesService(rest, logger);
-  const channelsService = new ChannelsService(rest, logger);
+  const rolesService = new RolesService(rest, redis, logger);
+  const channelsService = new ChannelsService(rest, redis, logger);
 
   registerConsumers(
     kafka,
@@ -39,6 +39,7 @@ async function main() {
     interactionsService,
     messagesService,
     rolesService,
+    channelsService,
   ).catch((error) => {
     logger.error(error, 'Failed to start consumers: ');
     process.exit(1);

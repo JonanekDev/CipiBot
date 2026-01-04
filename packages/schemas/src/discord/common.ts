@@ -8,7 +8,7 @@ export const UserSchema = z.object({
   bot: z.boolean().optional(),
 });
 
-export type UserType = z.infer<typeof UserSchema>;
+export type User = z.infer<typeof UserSchema>;
 
 export const MessageSchema = z.object({
   id: z.string(),
@@ -18,7 +18,7 @@ export const MessageSchema = z.object({
   author: UserSchema,
 });
 
-export type MessageType = z.infer<typeof MessageSchema>;
+export type Message = z.infer<typeof MessageSchema>;
 
 export const InteractionGuildMemberSchema = z.object({
   roles: z.array(z.string()),
@@ -27,10 +27,10 @@ export const InteractionGuildMemberSchema = z.object({
   permissions: z.string().optional(),
 });
 
-export type InteractionGuildMemberType = z.infer<typeof InteractionGuildMemberSchema>;
+export type InteractionGuildMember = z.infer<typeof InteractionGuildMemberSchema>;
 
 export const GuildMemberSchema = InteractionGuildMemberSchema.extend({
   user: UserSchema,
 });
 
-export type GuildMemberType = z.infer<typeof GuildMemberSchema>;
+export type GuildMember = z.infer<typeof GuildMemberSchema>;

@@ -6,6 +6,12 @@ export const KAFKA_TOPICS = {
     MESSAGE_CREATE: 'discord.message.create',
     GUILD_MEMBER_ADD: 'discord.guild.member.add',
     GUILD_MEMBER_REMOVE: 'discord.guild.member.remove',
+    CHANNEL_CREATE: 'discord.channel.create',
+    CHANNEL_UPDATE: 'discord.channel.update',
+    CHANNEL_DELETE: 'discord.channel.delete',
+    GUILD_ROLE_CREATE: 'discord.guild.role.create',
+    GUILD_ROLE_UPDATE: 'discord.guild.role.update',
+    GUILD_ROLE_DELETE: 'discord.guild.role.delete',
   },
 
   DISCORD_OUTBOUND: {

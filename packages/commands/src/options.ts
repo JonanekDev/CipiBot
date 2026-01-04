@@ -1,4 +1,4 @@
-import { CommandInteraction, UserType } from '@cipibot/schemas/discord';
+import { CommandInteraction, User } from '@cipibot/schemas/discord';
 import {
   APIApplicationCommandInteractionDataUserOption,
   ApplicationCommandOptionType,
@@ -7,7 +7,7 @@ import {
 export function getUserOption(
   interaction: CommandInteraction,
   optionName: string,
-): { userId: string; user: UserType | null } | null {
+): { userId: string; user: User | null } | null {
   const options = interaction.data.options;
   if (!options) return null;
 

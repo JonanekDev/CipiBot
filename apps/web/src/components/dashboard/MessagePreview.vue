@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
 import { VariableDef, exampleVariables } from '@/types/variables';
-import { EmbedType } from '@cipibot/schemas';
+import { Embed } from '@cipibot/schemas';
 import { renderTemplate, renderTemplateEmbed } from '@cipibot/templating';
 import { computed } from 'vue';
 import { intToHex } from '@/utils/common';
@@ -10,7 +10,7 @@ import { BRANDING } from '@cipibot/constants';
 const { t } = useI18n();
 
 const props = defineProps<{
-  message: string | EmbedType | undefined | null;
+  message: string | Embed | undefined | null;
   variables: VariableDef<T>[];
 }>();
 

@@ -9,7 +9,7 @@ import axios, { AxiosError } from 'axios';
 import { PrismaClient } from '../generated/prisma/client';
 import { RedisClient } from '@cipibot/redis';
 import { UserGuild, UserGuildSchema } from '@cipibot/schemas/api';
-import { UserType } from '@cipibot/schemas/discord';
+import { User } from '@cipibot/schemas/discord';
 import { ConfigClient } from '@cipibot/config-client';
 import { Logger } from '@cipibot/logger';
 import { encrypt, decrypt } from '../utils/encryption';
@@ -33,7 +33,7 @@ export class AuthService {
     this.configClient = configClient;
   }
 
-  async login(code: string): Promise<UserType> {
+  async login(code: string): Promise<User> {
     try {
       const params = new URLSearchParams({
         client_id: CONFIG.CLIENT_ID,
@@ -103,7 +103,7 @@ export class AuthService {
     }
   }
 
-  async getSessionData(userId: string): Promise<UserType> {
+  async getSessionData(userId: string): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -117,7 +117,7 @@ export class AuthService {
     return userInfo;
   }
 
-  async getUserInfo(accessToken: string): Promise<UserType> {
+  async getUserInfo(accessToken: string): Promise<User> {
     const res = await axios.get<RESTGetAPICurrentUserResult>('https://discord.com/api/users/@me', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -209,7 +209,7 @@ export class AuthService {
     });
     if (!user) {
       this.logger.error({ userId }, `User not found`);
-      throw new Error('User not found');
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found' });
     }
 
     const accessToken = decrypt(user.discordAccessToken);

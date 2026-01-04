@@ -1,4 +1,4 @@
-import { DiscordMessagePayloadType, GuildConfigType, RolePayloadType } from '@cipibot/schemas';
+import { DiscordMessagePayload, GuildConfigType, RolePayload } from '@cipibot/schemas';
 import { UserLevel } from './generated/prisma/browser';
 import { ConfigClient } from '@cipibot/config-client';
 import { t } from '@cipibot/i18n';
@@ -8,7 +8,7 @@ import { calculateXpForLevel, calculateXpFromMessage } from './calculator';
 import { LevelingRepository } from './repository';
 import { renderDiscordMessage } from '@cipibot/embeds/discord';
 import { createLevelUpVariables, LevelUpVariables } from '@cipibot/templating/modules/leveling';
-import { UserType } from '@cipibot/schemas/discord';
+import { User } from '@cipibot/schemas/discord';
 import { Logger } from '@cipibot/logger';
 
 export class LevelingService {
@@ -36,7 +36,7 @@ export class LevelingService {
   async processMessage(
     guildId: string,
     config: GuildConfigType,
-    user: UserType,
+    user: User,
     message: string,
     channelId: string,
   ): Promise<void> {
@@ -49,7 +49,7 @@ export class LevelingService {
     let levelUp = false;
     if (currentXp + xpAdded >= xpNeededForNextLevel) {
       levelUp = true;
-      let eventData: DiscordMessagePayloadType = {
+      let eventData: DiscordMessagePayload = {
         channelId: config.leveling.levelUpMessageChannelId ?? channelId,
         body: {},
       };
@@ -67,6 +67,10 @@ export class LevelingService {
         },
       );
 
+      eventData.body = {
+        
+      }
+
       eventData.body = renderDiscordMessage<LevelUpVariables>(
         config.leveling.levelUpMessage,
         levelUpVariables,
@@ -82,7 +86,7 @@ export class LevelingService {
       // Role reward
       const roleId = config.leveling.roleRewards[(currentLevel + 1).toString()];
       if (roleId) {
-        const eventData: RolePayloadType = {
+        const eventData: RolePayload = {
           guildId,
           userId: user.id,
           roleId,

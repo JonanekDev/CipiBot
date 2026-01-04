@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useI18n } from 'vue-i18n';
 import MessagePreview from '@/components/dashboard/MessagePreview.vue';
 import MessageEditorModal from '@/components/dashboard/MessageEditorModal.vue';
-import { GuildConfigSchema, WelcomingConfigType } from '@cipibot/schemas';
+import { GuildConfigSchema, WelcomingConfig } from '@cipibot/schemas';
 import router from '@/router';
 import { deepEqual } from '@/utils/guildConfig';
 import { getTextChannels } from '@/utils/channels';
@@ -28,8 +28,8 @@ onMounted(async () => {
   }
 });
 
-const draft = ref<WelcomingConfigType>(
-  JSON.parse(JSON.stringify(activeConfig.value?.welcoming)) as WelcomingConfigType,
+const draft = ref<WelcomingConfig>(
+  JSON.parse(JSON.stringify(activeConfig.value?.welcoming)) as WelcomingConfig,
 );
 
 // Validation
@@ -233,13 +233,15 @@ const resetSettings = () => {
             <h3>{{ t('dashboard.modules.welcome.dmMessage.title') }}</h3>
             <p>{{ t('dashboard.modules.welcome.dmMessage.description') }}</p>
           </div>
-           <!-- Note: DM doesn't have a separate toggle in the schema provided, implies it's enabled if set? 
-                Or maybe we use 'dmWelcomeMessage' nullability as toggle. 
-                For now, I'll assume it's always available to edit if module is enabled. 
-           -->
+          <div class="toggle-wrapper">
+             <label class="switch">
+              <input type="checkbox" v-model="draft.dmEnabled" />
+              <span class="slider round"></span>
+            </label>
+          </div>
         </div>
 
-        <div class="feature-content">
+        <div class="feature-content" :class="{ 'is-disabled': !draft.dmEnabled }">
            <div class="preview-mini-wrapper">
             <MessagePreview
               :message="dmWelcomeMsgAdapter"
