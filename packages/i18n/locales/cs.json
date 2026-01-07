@@ -17,6 +17,16 @@
     "dmMessageTitle": "Vítej!",
     "dmMessageDescription": "Ahoj {{userMention}}, jsme rádi, že jsi se připojil k našemu serveru!"
   },
+  "ticketing": {
+    "newTicketTitle": "🎫 Vytvořit nový tiket 🎫",
+    "newTicketDescription": "Vyber kategorii pro vytvoření podpůrného tiketu.",
+    "ticketCreatedTitle": "🎫 Tiket vytvořen 🎫",
+    "ticketCreatedDescription": "Tiket vytvořen uživatelem {{userMention}}\nKategorie: {{categoryName}}",
+    "ticketClosedTitle": "✅ Tiket uzavřen ✅",
+    "ticketClosedDescription": "Tiket uzavřen uživatelem {{userMention}}",
+    "ticketClosedDMTitle": "✅ Tvůj tiket byl uzavřen ✅",
+    "ticketClosedDMDescription": "Ahoj {{userMention}}, tvůj tiket byl uzavřen. Pokud máš další otázky, neváhej nás znovu kontaktovat!"
+  },
   "errors": {
     "errorTitle": "❌ Chyba ❌",
     "MODULE_DISABLED": "Modul {{modul}} je na tomto serveru vypnut.",

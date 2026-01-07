@@ -161,7 +161,8 @@
         "title": "User Verification"
       },
       "ticketing": {
-        "title": "Ticketing System"
+        "title": "Ticketing System",
+        "description": "Manage support tickets"
       }
     },
     "messageBuilder": {
@@ -185,24 +186,6 @@
     },
     "messagePreview": {
       "mockTimestamp": "Today at 4:20 PM"
-    }
-  },
-  "validation": {
-    "required": "This field is required.",
-    "invalidType": "Invalid value type.",
-    "tooSmall": {
-      "string": "Must be at least {min} characters.",
-      "number": "Must be at least {min}.",
-      "array": "Must have at least {min} items."
-    },
-    "tooBig": {
-      "string": "Must be at most {max} characters.",
-      "number": "Must be at most {max}.",
-      "array": "Must have at most {max} items."
-    },
-    "invalidString": {
-      "email": "Invalid email address.",
-      "url": "Invalid URL."
     }
   }
 }

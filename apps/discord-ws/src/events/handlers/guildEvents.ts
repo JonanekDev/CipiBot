@@ -28,10 +28,7 @@ export async function handleGuildEvent(
   await kafka.sendEvent(topic, payload, { key: payload.id });
 }
 
-export async function handleGuildDelete(
-  kafka: KafkaClient,
-  data: GatewayGuildDeleteDispatchData,
-) {
+export async function handleGuildDelete(kafka: KafkaClient, data: GatewayGuildDeleteDispatchData) {
   const payload: GuildDeletePayload = GuildDeleteSchema.parse({
     id: data.id,
   });

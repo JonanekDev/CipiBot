@@ -13,7 +13,7 @@ const props = defineProps<{
   isOpen: boolean;
   title: string;
   initialConfig: string | Embed | undefined;
-  variables: VariableDef<T>[];
+  variables?: VariableDef<T>[];
   mockUser?: any;
   previewVariables?: any;
   defaultConfig?: string | Embed;

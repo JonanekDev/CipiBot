@@ -11,10 +11,7 @@ import {
   GatewayGuildMemberRemoveDispatchData,
 } from 'discord-api-types/gateway/v10';
 
-export async function handleMemberAdd(
-  kafka: KafkaClient,
-  data: GatewayGuildMemberAddDispatchData,
-) {
+export async function handleMemberAdd(kafka: KafkaClient, data: GatewayGuildMemberAddDispatchData) {
   const payload: GuildMemberPayload = GuildMemberPayloadSchema.parse({
     guild_id: data.guild_id,
     user: data.user,

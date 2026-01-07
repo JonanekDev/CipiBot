@@ -20,11 +20,9 @@ export async function handleChannelCreate(
     channelId: data.id,
   });
 
-  await kafka.sendEvent(
-    KAFKA_TOPICS.DISCORD_INBOUND.CHANNEL_CREATE,
-    payload,
-    { key: payload.guildId },
-  );
+  await kafka.sendEvent(KAFKA_TOPICS.DISCORD_INBOUND.CHANNEL_CREATE, payload, {
+    key: payload.guildId,
+  });
 }
 
 export async function handleChannelUpdate(
@@ -40,11 +38,9 @@ export async function handleChannelUpdate(
     channelId: data.id,
   });
 
-  await kafka.sendEvent(
-    KAFKA_TOPICS.DISCORD_INBOUND.CHANNEL_UPDATE,
-    payload,
-    { key: payload.guildId },
-  );
+  await kafka.sendEvent(KAFKA_TOPICS.DISCORD_INBOUND.CHANNEL_UPDATE, payload, {
+    key: payload.guildId,
+  });
 }
 
 export async function handleChannelDelete(
@@ -60,9 +56,7 @@ export async function handleChannelDelete(
     channelId: data.id,
   });
 
-  await kafka.sendEvent(
-    KAFKA_TOPICS.DISCORD_INBOUND.CHANNEL_DELETE,
-    payload,
-    { key: payload.guildId },
-  );
+  await kafka.sendEvent(KAFKA_TOPICS.DISCORD_INBOUND.CHANNEL_DELETE, payload, {
+    key: payload.guildId,
+  });
 }

@@ -19,7 +19,6 @@ const locale = userLocale === 'cs' ? 'cs' : 'en';
 
 await loadZodLocale(locale);
 
-
 const i18n = createI18n<[MessageSchema], 'en' | 'cs'>({
   legacy: false,
   locale: locale,

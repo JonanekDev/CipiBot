@@ -10,6 +10,10 @@ export function getTextChannels(channels: GuildChannel[]): GuildChannel[] {
   );
 }
 
+export function getCategories(channels: GuildChannel[]): GuildChannel[] {
+  return channels.filter((channel) => channel.type === 4);
+}
+
 export function getNotUsedChannels(
   allChannels: GuildChannel[],
   usedChannelIds: string[],

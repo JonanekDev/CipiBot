@@ -30,7 +30,6 @@ const setLocale = async (code: string) => {
   await loadZodLocale(code);
 };
 
-
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as Node;
   if (dropdownRef.value && !dropdownRef.value.contains(target)) {

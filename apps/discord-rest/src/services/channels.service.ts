@@ -9,7 +9,7 @@ import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
 
 export class ChannelsService {
   private readonly logger: Logger;
-  
+
   constructor(
     private readonly rest: REST,
     private readonly redis: RedisClient,
@@ -25,7 +25,7 @@ export class ChannelsService {
   async getGuildChannels(guildId: string): Promise<GuildChannel[]> {
     const cacheKey = this.getCacheKey(guildId);
     const cached = await this.redis.get(cacheKey);
-    
+
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
@@ -33,7 +33,10 @@ export class ChannelsService {
         this.logger.debug({ guildId }, 'Returning cached guild channels');
         return validated;
       } catch (error) {
-        this.logger.warn({ guildId, error }, 'Failed to parse cached channels, fetching fresh data');
+        this.logger.warn(
+          { guildId, error },
+          'Failed to parse cached channels, fetching fresh data',
+        );
         await this.redis.del(cacheKey);
       }
     }
@@ -46,9 +49,14 @@ export class ChannelsService {
 
     const validated = z.array(GuildChannelSchema).parse(channels);
 
-    await this.redis.set(cacheKey, JSON.stringify(validated), 'EX', CACHE_TTL.DISCORD_GUILD_CHANNELS);
+    await this.redis.set(
+      cacheKey,
+      JSON.stringify(validated),
+      'EX',
+      CACHE_TTL.DISCORD_GUILD_CHANNELS,
+    );
     this.logger.debug({ guildId }, 'Cached guild channels');
-    
+
     return validated;
   }
 

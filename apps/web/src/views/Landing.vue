@@ -22,13 +22,9 @@ const features = [
         </p>
         <div class="hero-actions">
           <Button href="#" variant="primary" size="lg">{{ $t('common.addToDiscord') }}</Button>
-          <Button
-            href="https://github.com/cipibot"
-            target="_blank"
-            variant="secondary"
-            size="lg"
-            >{{ $t('landing.hero.cta_explore') }}</Button
-          >
+          <Button href="https://github.com/cipibot" target="_blank" variant="secondary" size="lg">{{
+            $t('landing.hero.cta_explore')
+          }}</Button>
         </div>
       </div>
       <div class="hero-image animate-float">
@@ -79,9 +75,7 @@ const features = [
         <p>{{ $t('landing.cta.subtitle') }}</p>
         <div class="cta-actions">
           <Button href="#" variant="primary">{{ $t('landing.cta.inviteButton') }}</Button>
-          <Button to="/dashboard" variant="secondary">{{
-            $t('landing.cta.exploreButton')
-          }}</Button>
+          <Button to="/dashboard" variant="secondary">{{ $t('landing.cta.exploreButton') }}</Button>
         </div>
       </div>
     </div>

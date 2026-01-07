@@ -16,11 +16,9 @@ export async function handleRoleCreate(
     roleId: data.role.id,
   });
 
-  await kafka.sendEvent(
-    KAFKA_TOPICS.DISCORD_INBOUND.GUILD_ROLE_CREATE,
-    payload,
-    { key: payload.guildId },
-  );
+  await kafka.sendEvent(KAFKA_TOPICS.DISCORD_INBOUND.GUILD_ROLE_CREATE, payload, {
+    key: payload.guildId,
+  });
 }
 
 export async function handleRoleUpdate(
@@ -32,11 +30,9 @@ export async function handleRoleUpdate(
     roleId: data.role.id,
   });
 
-  await kafka.sendEvent(
-    KAFKA_TOPICS.DISCORD_INBOUND.GUILD_ROLE_UPDATE,
-    payload,
-    { key: payload.guildId },
-  );
+  await kafka.sendEvent(KAFKA_TOPICS.DISCORD_INBOUND.GUILD_ROLE_UPDATE, payload, {
+    key: payload.guildId,
+  });
 }
 
 export async function handleRoleDelete(
@@ -48,9 +44,7 @@ export async function handleRoleDelete(
     roleId: data.role_id,
   });
 
-  await kafka.sendEvent(
-    KAFKA_TOPICS.DISCORD_INBOUND.GUILD_ROLE_DELETE,
-    payload,
-    { key: payload.guildId },
-  );
+  await kafka.sendEvent(KAFKA_TOPICS.DISCORD_INBOUND.GUILD_ROLE_DELETE, payload, {
+    key: payload.guildId,
+  });
 }

@@ -41,7 +41,7 @@ export class RolesService {
   async getGuildRoles(guildId: string): Promise<Role[]> {
     const cacheKey = this.getCacheKey(guildId);
     const cached = await this.redis.get(cacheKey);
-    
+
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
@@ -64,7 +64,7 @@ export class RolesService {
 
     await this.redis.set(cacheKey, JSON.stringify(validated), 'EX', CACHE_TTL.DISCORD_GUILD_ROLES);
     this.logger.debug({ guildId }, 'Cached guild roles');
-    
+
     return validated;
   }
 

@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/auth';
 import { t as tLib } from '@cipibot/i18n';
 import MessagePreview from '@/components/dashboard/MessagePreview.vue';
 import MessageEditorModal from '@/components/dashboard/MessageEditorModal.vue';
-import { LevelingConfigType, GuildConfigSchema } from '@cipibot/schemas';
+import { LevelingConfig, GuildConfigSchema } from '@cipibot/schemas';
 import router from '@/router';
 import { deepEqual } from '@/utils/guildConfig';
 import { renderTemplate } from '@cipibot/templating';
@@ -40,8 +40,8 @@ onMounted(async () => {
   }
 });
 
-const draft = ref<LevelingConfigType>(
-  JSON.parse(JSON.stringify(activeConfig.value?.leveling)) as LevelingConfigType,
+const draft = ref<LevelingConfig>(
+  JSON.parse(JSON.stringify(activeConfig.value?.leveling)) as LevelingConfig,
 );
 
 // Extract the specific schema for leveling
@@ -305,9 +305,7 @@ const resetSettings = () => {
           <span class="slider round"></span>
         </label>
         <span class="status-text">{{
-          draft.enabled
-            ? t('dashboard.modules.enabled')
-            : t('dashboard.modules.disabled')
+          draft.enabled ? t('dashboard.modules.enabled') : t('dashboard.modules.disabled')
         }}</span>
       </div>
     </div>

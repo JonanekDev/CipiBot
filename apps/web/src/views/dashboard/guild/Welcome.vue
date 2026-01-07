@@ -18,7 +18,7 @@ import { getCommonUserVars } from '@/utils/dashboardVariables';
 const { t } = useI18n();
 
 const guildStore = useGuildStore();
-const authStore = useAuthStore(); 
+const authStore = useAuthStore();
 const { activeConfig, activeGuildChannels, isSaving } = storeToRefs(guildStore);
 
 onMounted(async () => {
@@ -139,16 +139,13 @@ const resetSettings = () => {
           <span class="slider round"></span>
         </label>
         <span class="status-text">{{
-          draft.enabled
-            ? t('dashboard.modules.enabled')
-            : t('dashboard.modules.disabled')
+          draft.enabled ? t('dashboard.modules.enabled') : t('dashboard.modules.disabled')
         }}</span>
       </div>
     </div>
 
     <!-- MAIN SETTINGS -->
     <div class="settings-list" :class="{ disabled: !draft.enabled }">
-      
       <!-- GENERAL SETTINGS (Channel) -->
       <div class="setting-card">
         <h3>{{ t('dashboard.modules.welcome.general.title') }}</h3>
@@ -188,7 +185,11 @@ const resetSettings = () => {
             />
           </div>
           <div class="feature-actions">
-            <button class="btn-edit" @click="activeModal = 'welcome'" :disabled="!draft.welcomeEnabled">
+            <button
+              class="btn-edit"
+              @click="activeModal = 'welcome'"
+              :disabled="!draft.welcomeEnabled"
+            >
               {{ t('dashboard.modules.editMessage') }}
             </button>
           </div>
@@ -203,7 +204,7 @@ const resetSettings = () => {
             <p>{{ t('dashboard.modules.welcome.leaveMessage.description') }}</p>
           </div>
           <div class="toggle-wrapper">
-             <label class="switch">
+            <label class="switch">
               <input type="checkbox" v-model="draft.leaveEnabled" />
               <span class="slider round"></span>
             </label>
@@ -211,12 +212,8 @@ const resetSettings = () => {
         </div>
 
         <div class="feature-content" :class="{ 'is-disabled': !draft.leaveEnabled }">
-           <div class="preview-mini-wrapper">
-            <MessagePreview
-              :message="leaveMsgAdapter"
-              :variables="userVars"
-              class="mini-preview"
-            />
+          <div class="preview-mini-wrapper">
+            <MessagePreview :message="leaveMsgAdapter" :variables="userVars" class="mini-preview" />
           </div>
           <div class="feature-actions">
             <button class="btn-edit" @click="activeModal = 'leave'" :disabled="!draft.leaveEnabled">
@@ -234,7 +231,7 @@ const resetSettings = () => {
             <p>{{ t('dashboard.modules.welcome.dmMessage.description') }}</p>
           </div>
           <div class="toggle-wrapper">
-             <label class="switch">
+            <label class="switch">
               <input type="checkbox" v-model="draft.dmEnabled" />
               <span class="slider round"></span>
             </label>
@@ -242,7 +239,7 @@ const resetSettings = () => {
         </div>
 
         <div class="feature-content" :class="{ 'is-disabled': !draft.dmEnabled }">
-           <div class="preview-mini-wrapper">
+          <div class="preview-mini-wrapper">
             <MessagePreview
               :message="dmWelcomeMsgAdapter"
               :variables="userVars"
@@ -256,7 +253,6 @@ const resetSettings = () => {
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- STICKY SAVE BAR -->

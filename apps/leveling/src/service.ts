@@ -67,9 +67,7 @@ export class LevelingService {
         },
       );
 
-      eventData.body = {
-        
-      }
+      eventData.body = {};
 
       eventData.body = renderDiscordMessage<LevelUpVariables>(
         config.leveling.levelUpMessage,

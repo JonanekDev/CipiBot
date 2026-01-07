@@ -37,4 +37,4 @@ export const LevelingConfigSchema = BaseModuleSchema.extend({
   ),
 });
 
-export type LevelingConfigType = z.infer<typeof LevelingConfigSchema>;
+export type LevelingConfig = z.infer<typeof LevelingConfigSchema>;

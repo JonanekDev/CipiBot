@@ -17,6 +17,16 @@
     "dmMessageTitle": "Welcome!",
     "dmMessageDescription": "Hi {{userMention}}, we're glad you joined our server!"
   },
+  "ticketing": {
+    "newTicketTitle": "🎫 Create a New Ticket 🎫",
+    "newTicketDescription": "Select a category to create a support ticket.",
+    "ticketCreatedTitle": "🎫 Ticket Created 🎫",
+    "ticketCreatedDescription": "Ticket created by {{userMention}}\nCategory: {{categoryName}}",
+    "ticketClosedTitle": "✅ Ticket Closed ✅",
+    "ticketClosedDescription": "Ticket closed by {{userMention}}",
+    "ticketClosedDMTitle": "✅ Your Ticket has been Closed ✅",
+    "ticketClosedDMDescription": "Hello {{userMention}}, your ticket has been closed. If you have any further questions, feel free to reach out again!"
+  },
   "errors": {
     "errorTitle": "❌ Error ❌",
     "MODULE_DISABLED": "Module {{module}} is disabled on this server.",

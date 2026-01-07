@@ -4,11 +4,13 @@ import { SUPPORTED_LANGUAGES } from '@cipibot/i18n';
 import { LevelingConfigSchema } from './modules/leveling';
 import { withDefaults } from './defaults';
 import { WelcomingConfigSchema } from './modules/welcoming';
+import { TicketingConfigSchema } from './modules/ticketing';
 
 export const GuildConfigSchema = z.object({
   language: z.enum(SUPPORTED_LANGUAGES).default('en'),
   leveling: withDefaults(LevelingConfigSchema),
   welcoming: withDefaults(WelcomingConfigSchema),
+  ticketing: withDefaults(TicketingConfigSchema),
 });
 export type GuildConfigType = z.infer<typeof GuildConfigSchema>;
 
@@ -26,6 +28,7 @@ export const GuildConfigPatchSchema = z.object({
   language: z.enum(SUPPORTED_LANGUAGES).optional(),
   leveling: LevelingConfigSchema.partial().optional(),
   welcoming: WelcomingConfigSchema.partial().optional(),
+  ticketing: TicketingConfigSchema.partial().optional(),
 });
 export type GuildConfigPatchType = z.infer<typeof GuildConfigPatchSchema>;
 

@@ -73,9 +73,9 @@
       "members": "členů"
     },
     "modules": {
-    "enabled": "Zapnuto",
-    "disabled": "Vypnuto",
-    "editMessage": "Upravit zprávu",
+      "enabled": "Zapnuto",
+      "disabled": "Vypnuto",
+      "editMessage": "Upravit zprávu",
       "generalSettings": {
         "title": "Obecná nastavení",
         "description": "Nastavení základních funkcí serveru a lokalizace.",
@@ -161,7 +161,8 @@
         "title": "Ověření uživatelů"
       },
       "ticketing": {
-        "title": "Ticket systém"
+        "title": "Ticket systém",
+        "description": "Správa podpůrných ticketů"
       }
     },
     "messageBuilder": {
@@ -185,24 +186,6 @@
     },
     "messagePreview": {
       "mockTimestamp": "Dnes v 16:20"
-    }
-  },
-  "validation": {
-    "required": "Toto pole je povinné.",
-    "invalidType": "Neplatný typ hodnoty.",
-    "tooSmall": {
-      "string": "Musí mít alespoň {min} znaků.",
-      "number": "Musí být alespoň {min}.",
-      "array": "Musí obsahovat alespoň {min} položek."
-    },
-    "tooBig": {
-      "string": "Nesmí mít více než {max} znaků.",
-      "number": "Nesmí být více než {max}.",
-      "array": "Nesmí obsahovat více než {max} položek."
-    },
-    "invalidString": {
-      "email": "Neplatná e-mailová adresa.",
-      "url": "Neplatná URL adresa."
     }
   }
 }

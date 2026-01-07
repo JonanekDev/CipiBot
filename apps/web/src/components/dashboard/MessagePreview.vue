@@ -11,10 +11,12 @@ const { t } = useI18n();
 
 const props = defineProps<{
   message: string | Embed | undefined | null;
-  variables: VariableDef<T>[];
+  variables?: VariableDef<T>[];
 }>();
 
-const exampleData = computed(() => exampleVariables<T>(props.variables));
+const exampleData = computed(() =>
+  props.variables ? exampleVariables<T>(props.variables) : ({} as T),
+);
 
 const processedMessage = computed(() => {
   if (!props.message) return '';
@@ -27,34 +29,28 @@ const processedMessage = computed(() => {
 
 const formatTextContent = (text: string) => {
   if (!text) return '';
-return text.replace(/(@[\p{L}\p{N}_-]+)/gu, '<span class="mention">$1</span>');
+  return text.replace(/(@[\p{L}\p{N}_-]+)/gu, '<span class="mention">$1</span>');
 };
 </script>
 
 <template>
   <div class="discord-preview-wrapper">
-    
     <div class="discord-message group">
-      
       <div class="discord-avatar-col">
         <div class="avatar-wrapper">
-            <img src="@/assets/avatar.png" alt="Bot Avatar" class="avatar-img" />
+          <img src="@/assets/avatar.png" alt="Bot Avatar" class="avatar-img" />
         </div>
       </div>
 
       <div class="discord-content-col">
-        
         <div class="discord-header">
           <span class="username">CipiBot</span>
           <span class="bot-tag"><span class="bot-tag-text">APP</span></span>
           <span class="timestamp">{{ t('dashboard.messagePreview.mockTimestamp') }}</span>
         </div>
 
-        <div
-          v-if="typeof processedMessage === 'string'"
-          class="discord-message-body"
-        >
-            <span v-html="formatTextContent(processedMessage)"></span>
+        <div v-if="typeof processedMessage === 'string'" class="discord-message-body">
+          <span v-html="formatTextContent(processedMessage)"></span>
         </div>
 
         <div
@@ -63,19 +59,17 @@ return text.replace(/(@[\p{L}\p{N}_-]+)/gu, '<span class="mention">$1</span>');
           :style="{ borderLeftColor: intToHex(processedMessage.color || 0) || '#1e1f22' }"
         >
           <div class="embed-inner">
-            
             <div class="embed-content-grid">
-              
               <div class="embed-text-col">
                 <div
                   v-if="processedMessage.title"
                   class="embed-title"
                   v-html="processedMessage.title"
                 ></div>
-                
-                <div 
+
+                <div
                   v-if="processedMessage.description"
-                  class="embed-description" 
+                  class="embed-description"
                   v-html="formatTextContent(processedMessage.description)"
                 ></div>
               </div>
@@ -90,29 +84,26 @@ return text.replace(/(@[\p{L}\p{N}_-]+)/gu, '<span class="mention">$1</span>');
             </div>
 
             <div class="embed-footer">
-               <span class="footer-text">
-                 {{ BRANDING.DEFAULT_FOOTER_TEXT }}
-                 <span> • {{ t('dashboard.messagePreview.mockTimestamp') }}</span>
-               </span>
+              <span class="footer-text">
+                {{ BRANDING.DEFAULT_FOOTER_TEXT }}
+                <span> • {{ t('dashboard.messagePreview.mockTimestamp') }}</span>
+              </span>
             </div>
-
           </div>
         </div>
-
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-
 .discord-preview-wrapper {
   background-color: #313338; /* Discord Dark Theme BG */
   font-family: sans-serif;
   color: #dbdee1;
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid #1e1f22; 
+  border: 1px solid #1e1f22;
 }
 
 .discord-message {
@@ -124,7 +115,7 @@ return text.replace(/(@[\p{L}\p{N}_-]+)/gu, '<span class="mention">$1</span>');
 }
 
 .discord-avatar-col {
-  margin-top: 0px; 
+  margin-top: 0px;
   width: 40px;
   margin-right: 16px;
   flex-shrink: 0;
@@ -176,7 +167,7 @@ return text.replace(/(@[\p{L}\p{N}_-]+)/gu, '<span class="mention">$1</span>');
 }
 
 .bot-tag-text {
-  font-size: 0.625rem; 
+  font-size: 0.625rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1;
@@ -243,7 +234,6 @@ return text.replace(/(@[\p{L}\p{N}_-]+)/gu, '<span class="mention">$1</span>');
   font-weight: 400;
 }
 
-
 .embed-thumbnail-col {
   flex-shrink: 0;
   margin-top: 4px;
@@ -268,12 +258,11 @@ return text.replace(/(@[\p{L}\p{N}_-]+)/gu, '<span class="mention">$1</span>');
 }
 
 .footer-icon {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    margin-right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 8px;
 }
-
 
 :deep(.mention) {
   background-color: #3c4270;
@@ -282,12 +271,14 @@ return text.replace(/(@[\p{L}\p{N}_-]+)/gu, '<span class="mention">$1</span>');
   padding: 0 2px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.1s, color 0.1s;
+  transition:
+    background-color 0.1s,
+    color 0.1s;
 }
 
 :deep(.mention):hover {
-    background-color: #5865f2;
-    color: #ffffff;
+  background-color: #5865f2;
+  color: #ffffff;
 }
 
 :deep(strong) {

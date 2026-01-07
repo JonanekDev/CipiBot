@@ -3,7 +3,11 @@ import { handleMessageCreate } from './handlers/messageCreate';
 import { handleGuildEvent, handleGuildDelete } from './handlers/guildEvents';
 import { handleMemberAdd, handleMemberRemove } from './handlers/membersEvent';
 import { handleInteractionCreate } from './handlers/interactionCreate';
-import { handleChannelCreate, handleChannelUpdate, handleChannelDelete } from './handlers/channelEvents';
+import {
+  handleChannelCreate,
+  handleChannelUpdate,
+  handleChannelDelete,
+} from './handlers/channelEvents';
 import { handleRoleCreate, handleRoleUpdate, handleRoleDelete } from './handlers/roleEvents';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 import { DiscordRestRouter } from '@cipibot/discord-rest/router';
