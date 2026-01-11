@@ -26,6 +26,7 @@ import { useValidation } from '@/composables/useValidation';
 import InputError from '@/components/ui/InputError.vue';
 import StickySaveBar from '@/components/dashboard/StickySaveBar.vue';
 import { useI18n } from 'vue-i18n';
+import Button from '@/components/ui/Button.vue';
 
 const { t } = useI18n();
 
@@ -436,7 +437,7 @@ const resetSettings = () => {
               <span class="arrow">→</span>
               <span class="role-badge">{{ getItemName(reward.roleId, activeGuildRoles) }}</span>
             </div>
-            <button class="btn-icon" @click="removeRoleReward(reward.level)">×</button>
+            <Button variant="icon" @click="removeRoleReward(reward.level)">×</Button>
           </div>
         </div>
 
@@ -460,9 +461,9 @@ const resetSettings = () => {
               @{{ role.name }}
             </option>
           </select>
-          <button class="btn-secondary" @click="addRoleReward">
+          <Button variant="secondary" @click="addRoleReward">
             {{ t('dashboard.modules.leveling.roleRewards.addReward') }}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -495,9 +496,9 @@ const resetSettings = () => {
             />
           </div>
           <div class="feature-actions">
-            <button class="btn-edit" @click="activeModal = 'levelup'">
+            <Button variant="secondary" @click="activeModal = 'levelup'">
               {{ t('dashboard.modules.editMessage') }}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -530,13 +531,13 @@ const resetSettings = () => {
               />
             </div>
             <div class="feature-actions">
-              <button
-                class="btn-edit"
+              <Button
+                variant="secondary"
                 @click="activeModal = 'command_level'"
                 :disabled="!draft.commands.level.enabled"
               >
                 {{ t('dashboard.modules.editMessage') }}
-              </button>
+              </Button>
 
               <label class="checkbox-label small-muted mt-4">
                 <input type="checkbox" v-model="draft.commands.level.ephemeral" />
@@ -573,13 +574,13 @@ const resetSettings = () => {
               />
             </div>
             <div class="feature-actions">
-              <button
-                class="btn-edit"
+              <Button
+                variant="secondary"
                 @click="activeModal = 'command_leaderboard'"
                 :disabled="!draft.commands.leaderboard.enabled"
               >
                 {{ t('dashboard.modules.leveling.commands.leaderboard.editHeader') }}
-              </button>
+              </Button>
 
               <label class="checkbox-label small-muted mt-4">
                 <input type="checkbox" v-model="draft.commands.leaderboard.ephemeral" />

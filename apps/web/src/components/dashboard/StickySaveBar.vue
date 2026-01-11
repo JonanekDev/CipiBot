@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Button from '@/components/ui/Button.vue';
 defineProps<{
   isVisible: boolean;
   isSaving: boolean;
@@ -15,10 +16,10 @@ const emit = defineEmits<{
   <div class="sticky-save-bar" :class="{ visible: isVisible }">
     <div class="status-msg">You have unsaved changes</div>
     <div class="actions">
-      <button class="btn-secondary" @click="emit('reset')">Reset</button>
-      <button class="btn-primary" @click="emit('save')" :disabled="isSaving || disabled">
+      <Button variant="secondary" @click="emit('reset')">Reset</Button>
+      <Button variant="primary" @click="emit('save')" :loading="isSaving" :disabled="disabled">
         {{ isSaving ? 'Saving...' : 'Save Changes' }}
-      </button>
+      </Button>
     </div>
   </div>
 </template>

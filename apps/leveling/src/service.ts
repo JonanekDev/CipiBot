@@ -1,4 +1,4 @@
-import { DiscordMessagePayload, GuildConfigType, RolePayload } from '@cipibot/schemas';
+import { DiscordMessagePayload, GuildConfig, RolePayload } from '@cipibot/schemas';
 import { UserLevel } from './generated/prisma/browser';
 import { ConfigClient } from '@cipibot/config-client';
 import { t } from '@cipibot/i18n';
@@ -35,7 +35,7 @@ export class LevelingService {
 
   async processMessage(
     guildId: string,
-    config: GuildConfigType,
+    config: GuildConfig,
     user: User,
     message: string,
     channelId: string,

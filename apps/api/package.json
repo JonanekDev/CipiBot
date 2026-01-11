@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "description": "",
   "exports": {
-    "./router": "./src/router.ts"
+    "./router": {
+      "types": "./dist/router.d.ts"
+    }
   },
   "scripts": {
     "dev": "tsx -r dotenv/config src/index.ts",

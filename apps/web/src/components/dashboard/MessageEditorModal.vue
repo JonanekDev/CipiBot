@@ -6,6 +6,7 @@ import { VariableDef } from '@/types/variables';
 import { Embed } from '@cipibot/schemas';
 import { deepEqual } from '@/utils/guildConfig';
 import { useI18n } from 'vue-i18n';
+import Button from '@/components/ui/Button.vue';
 
 const { t } = useI18n();
 
@@ -124,7 +125,7 @@ const resetToDefault = () => {
       <!-- Header -->
       <div class="modal-header">
         <h3>{{ title }}</h3>
-        <button class="modal-close" @click="emit('close')">×</button>
+        <Button variant="icon" @click="emit('close')">×</Button>
       </div>
 
       <!-- Body: Split View (Builder | Preview) -->
@@ -155,15 +156,15 @@ const resetToDefault = () => {
       <!-- Footer -->
       <div class="modal-footer">
         <span v-if="error" class="error-msg">{{ error }}</span>
-        <button class="btn-text" @click="emit('close')">
+        <Button variant="text" @click="emit('close')">
           {{ t('dashboard.messageEditorModal.cancel') }}
-        </button>
-        <button v-if="defaultConfig" class="btn-danger" @click="resetToDefault">
+        </Button>
+        <Button v-if="defaultConfig" variant="danger" @click="resetToDefault">
           {{ t('dashboard.messageEditorModal.reset') }}
-        </button>
-        <button class="btn-primary" @click="save" :disabled="!!error">
+        </Button>
+        <Button variant="primary" @click="save" :disabled="!!error">
           {{ t('dashboard.messageEditorModal.save') }}
-        </button>
+        </Button>
       </div>
     </div>
   </div>
@@ -173,49 +174,6 @@ const resetToDefault = () => {
 .sticky-preview {
   position: sticky;
   top: 0;
-}
-
-.btn-danger {
-  background: var(--color-danger);
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.5rem;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-primary {
-  background: var(--color-primary);
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.5rem;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-primary:hover {
-  background: var(--color-primary-hover);
-}
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  filter: grayscale(0.5);
-}
-
-.btn-text {
-  background: none;
-  border: none;
-  color: var(--color-text-muted);
-  padding: 0.6rem 1.5rem;
-  cursor: pointer;
-  font-weight: 500;
-}
-.btn-text:hover {
-  color: var(--color-text);
-  text-decoration: underline;
 }
 
 .error-msg {

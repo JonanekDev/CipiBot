@@ -1,6 +1,7 @@
 {
   "extends": "@cipibot/tsconfig/base.json",
   "compilerOptions": {
+    "outDir": "./dist",
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "types": ["vite/client"],
     "paths": {

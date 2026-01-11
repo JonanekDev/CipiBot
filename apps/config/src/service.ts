@@ -2,7 +2,7 @@ import {
   DeepPartial,
   Guild,
   type GuildConfigPatchType,
-  type GuildConfigType,
+  type GuildConfig,
 } from '@cipibot/schemas';
 import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
 import { ConfigRepository } from './repository';
@@ -34,7 +34,7 @@ export class ConfigService {
 
     let rawConfig = guildData.config;
 
-    const config = (rawConfig ?? {}) as DeepPartial<GuildConfigType>;
+    const config = (rawConfig ?? {}) as DeepPartial<GuildConfig>;
 
     await this.redis.set(
       this.getGuildConfigCacheKey(guildId),
@@ -54,12 +54,12 @@ export class ConfigService {
     return guild;
   }
 
-  async getGuildConfig(guildId: string): Promise<DeepPartial<GuildConfigType>> {
+  async getGuildConfig(guildId: string): Promise<DeepPartial<GuildConfig>> {
     const cacheKey = this.getGuildConfigCacheKey(guildId);
 
     const cached = await this.redis.get(cacheKey);
     if (cached) {
-      const parsed = JSON.parse(cached) as DeepPartial<GuildConfigType>;
+      const parsed = JSON.parse(cached) as DeepPartial<GuildConfig>;
       // Ensure ignoreChannelIds doesn't contain null values
       if (parsed.leveling?.ignoreChannelIds) {
         parsed.leveling.ignoreChannelIds = parsed.leveling.ignoreChannelIds.filter(
@@ -71,7 +71,7 @@ export class ConfigService {
 
     const guild = await this.configRepository.getGuild(guildId);
 
-    const config = (guild?.config ?? {}) as unknown as DeepPartial<GuildConfigType>;
+    const config = (guild?.config ?? {}) as unknown as DeepPartial<GuildConfig>;
     await this.redis.set(cacheKey, JSON.stringify(config), 'EX', CACHE_TTL.GUILD_CONFIG);
 
     return config;
@@ -79,12 +79,12 @@ export class ConfigService {
 
   async updateGuildConfig(
     guildId: string,
-    patch: DeepPartial<GuildConfigType>,
-  ): Promise<DeepPartial<GuildConfigType>> {
+    patch: DeepPartial<GuildConfig>,
+  ): Promise<DeepPartial<GuildConfig>> {
     const current = await this.getGuildConfig(guildId);
 
     // Merge config with proper array handling
-    const merged = mergeConfig(current, patch) as DeepPartial<GuildConfigType>;
+    const merged = mergeConfig(current, patch) as DeepPartial<GuildConfig>;
 
     await this.configRepository.updateGuildConfig(guildId, merged);
 

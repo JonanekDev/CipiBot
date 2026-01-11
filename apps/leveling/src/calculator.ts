@@ -1,10 +1,10 @@
-import { LevelingConfigType } from '@cipibot/schemas';
+import { LevelingConfig } from '@cipibot/schemas';
 
 export function calculateXpForLevel(level: number): number {
   return 75 * level * level;
 }
 
-export function calculateXpFromMessage(message: string, config: LevelingConfigType): number {
+export function calculateXpFromMessage(message: string, config: LevelingConfig): number {
   const wordsCount = message.trim().split(/\s+/).length;
   const wordsXp = wordsCount * config.xpPerWord;
   const xpPerMessage = config.xpPerMessage;

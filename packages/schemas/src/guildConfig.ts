@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { EmbedSchema } from './discord/embeds';
 import { SUPPORTED_LANGUAGES } from '@cipibot/i18n';
 import { LevelingConfigSchema } from './modules/leveling';
 import { withDefaults } from './defaults';
@@ -12,7 +11,7 @@ export const GuildConfigSchema = z.object({
   welcoming: withDefaults(WelcomingConfigSchema),
   ticketing: withDefaults(TicketingConfigSchema),
 });
-export type GuildConfigType = z.infer<typeof GuildConfigSchema>;
+export type GuildConfig = z.infer<typeof GuildConfigSchema>;
 
 export const GuildSchema = z.object({
   id: z.string(),

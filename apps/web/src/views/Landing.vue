@@ -40,7 +40,7 @@ const features = [
               <div class="msg-content">
                 <span class="bot-name">CipiBot</span> <span class="bot-tag">APP</span>
                 <p>Ready to serve! Click below to configure me.</p>
-                <button class="discord-btn">Open Dashboard</button>
+                <Button to="/dashboard" variant="discord">Open Dashboard</Button>
               </div>
             </div>
           </div>

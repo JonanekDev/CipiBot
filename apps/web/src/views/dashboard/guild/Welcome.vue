@@ -14,6 +14,7 @@ import { createMessageAdapter } from '@/utils/messageAdapter';
 import { useValidation } from '@/composables/useValidation';
 import StickySaveBar from '@/components/dashboard/StickySaveBar.vue';
 import { getCommonUserVars } from '@/utils/dashboardVariables';
+import Button from '@/components/ui/Button.vue';
 
 const { t } = useI18n();
 
@@ -185,13 +186,13 @@ const resetSettings = () => {
             />
           </div>
           <div class="feature-actions">
-            <button
-              class="btn-edit"
+            <Button
+              variant="secondary"
               @click="activeModal = 'welcome'"
               :disabled="!draft.welcomeEnabled"
             >
               {{ t('dashboard.modules.editMessage') }}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -216,9 +217,9 @@ const resetSettings = () => {
             <MessagePreview :message="leaveMsgAdapter" :variables="userVars" class="mini-preview" />
           </div>
           <div class="feature-actions">
-            <button class="btn-edit" @click="activeModal = 'leave'" :disabled="!draft.leaveEnabled">
+            <Button variant="secondary" @click="activeModal = 'leave'" :disabled="!draft.leaveEnabled">
               {{ t('dashboard.modules.editMessage') }}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -247,9 +248,9 @@ const resetSettings = () => {
             />
           </div>
           <div class="feature-actions">
-            <button class="btn-edit" @click="activeModal = 'dm'">
+            <Button variant="secondary" @click="activeModal = 'dm'">
               {{ t('dashboard.modules.editMessage') }}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

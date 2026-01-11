@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { useGuildStore } from '../stores/guild';
+import { useGuildStore } from '@/stores/guild';
 import { getGuildIconURL } from '@cipibot/discord-utils';
-import UserMenu from '../components/UserMenu.vue';
-import LangMenu from '../components/LangMenu.vue';
+import UserMenu from '@/components/layout/UserMenu.vue';
+import LangMenu from '@/components/layout/LangMenu.vue';
 import { ref, computed } from 'vue';
 
 const route = useRoute();

@@ -4,7 +4,10 @@
   "description": "",
   "type": "module",
   "exports": {
-    "./router": "./src/router.ts"
+    "./router": {
+      "types": "./dist/router.d.ts",
+      "import": "./dist/router.js"
+    }
   },
   "scripts": {
     "dev": "tsx -r dotenv/config src/index.ts",

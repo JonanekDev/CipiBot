@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-
-import { useAuthStore } from '../stores/auth';
+import Button from '@/components/ui/Button.vue';
+import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 const authStore = useAuthStore();
 
@@ -38,7 +38,7 @@ onUnmounted(() => {
 
 <template>
   <div class="user-menu" ref="userDropdownRef">
-    <button class="btn btn-secondary user-btn" @click="toggleUserDropdown">
+    <Button variant="secondary" class="user-btn" @click="toggleUserDropdown">
       <img
         v-if="authStore.userAvatar"
         :src="authStore.userAvatar"
@@ -60,7 +60,7 @@ onUnmounted(() => {
       >
         <polyline points="6 9 12 15 18 9"></polyline>
       </svg>
-    </button>
+    </Button>
 
     <div v-if="isUserDropdownOpen" class="user-dropdown">
       <button class="dropdown-item danger" @click="handleLogout">

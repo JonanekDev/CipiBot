@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import enFlag from '../assets/flags/en.svg';
-import csFlag from '../assets/flags/cs.svg';
+import enFlag from '@/assets/flags/en.svg';
+import csFlag from '@/assets/flags/cs.svg';
 import { useI18n } from 'vue-i18n';
-import { loadZodLocale } from '../utils/i18n';
+import { loadZodLocale } from '@/utils/i18n';
 
 const { locale } = useI18n();
 

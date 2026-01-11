@@ -1,6 +1,6 @@
 import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
 import { RedisClient } from '@cipibot/redis';
-import { Guild, GuildConfigSchema, GuildConfigType, DeepPartial } from '@cipibot/schemas';
+import { Guild, GuildConfigSchema, GuildConfig, DeepPartial } from '@cipibot/schemas';
 import { createTRPCClient, httpBatchLink, TRPCClient } from '@trpc/client';
 import type { ConfigRouter } from '@cipibot/config/router';
 import { Logger } from '@cipibot/logger';
@@ -24,7 +24,7 @@ export class ConfigClient {
     });
   }
 
-  async getGuildConfig(guildId: string): Promise<GuildConfigType> {
+  async getGuildConfig(guildId: string): Promise<GuildConfig> {
     const cacheKey = `${REDIS_KEYS.GUILD_CONFIG}${guildId}`;
 
     try {

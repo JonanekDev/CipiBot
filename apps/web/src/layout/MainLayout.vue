@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import { addBotURL, loginURL } from '../urls';
-import { useAuthStore } from '../stores/auth';
-import UserMenu from '../components/UserMenu.vue';
-import LangMenu from '../components/LangMenu.vue';
+import { addBotURL, loginURL } from '@/urls';
+import { useAuthStore } from '@/stores/auth';
+import UserMenu from '@/components/layout/UserMenu.vue';
+import LangMenu from '@/components/layout/LangMenu.vue';
 
 const authStore = useAuthStore();
 </script>
