@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useGuildStore } from '@/stores/guild';
 import { useAuthStore } from '@/stores/auth';
 import { t as tLib } from '@cipibot/i18n';
 import MessagePreview from '@/components/dashboard/MessagePreview.vue';
 import MessageEditorModal from '@/components/dashboard/MessageEditorModal.vue';
-import { LevelingConfig, GuildConfigSchema } from '@cipibot/schemas';
-import router from '@/router';
-import { deepEqual } from '@/utils/guildConfig';
+import { GuildConfigSchema } from '@cipibot/schemas';
 import { renderTemplate } from '@cipibot/templating';
 import {
   LeaderboardEntryVariables,
@@ -22,48 +20,34 @@ import { getAssignableRoles } from '@/utils/roles';
 import { VariableDef } from '@/types/variables';
 import { createMessageAdapter } from '@/utils/messageAdapter';
 import { getCommonUserVars } from '@/utils/dashboardVariables';
-import { useValidation } from '@/composables/useValidation';
 import InputError from '@/components/ui/InputError.vue';
 import StickySaveBar from '@/components/dashboard/StickySaveBar.vue';
 import { useI18n } from 'vue-i18n';
 import Button from '@/components/ui/Button.vue';
+import { useModuleConfig } from '@/composables/useModuleConfig';
 
 const { t } = useI18n();
 
 const guildStore = useGuildStore();
 const authStore = useAuthStore();
-const { activeConfig, activeGuildChannels, activeGuildRoles, isSaving } = storeToRefs(guildStore);
+const { activeConfig, activeGuildChannels, activeGuildRoles } = storeToRefs(guildStore);
 
-onMounted(async () => {
-  if (!activeConfig.value) {
-    await router.push(`/dashboard/`);
-    throw new Error('No active config');
-  }
-});
-
-const draft = ref<LevelingConfig>(
-  JSON.parse(JSON.stringify(activeConfig.value?.leveling)) as LevelingConfig,
-);
-
-// Extract the specific schema for leveling
-const LevelingSchema = GuildConfigSchema.shape.leveling;
-const { validate, errors } = useValidation(LevelingSchema, draft, { mode: 'eager' });
-
-watch(
-  () => activeConfig.value?.leveling,
-  (newVal) => {
-    if (newVal) {
-      // Reset draft to match the new store state
-      draft.value = JSON.parse(JSON.stringify(newVal));
-    }
+const { draft, errors, hasChanged, isSaving, save, reset } = useModuleConfig(
+  'leveling',
+  GuildConfigSchema.shape.leveling,
+  {
+    onBeforeSave: (draftConfig) => {
+      if (!draftConfig.ignoreChannelIds) {
+        draftConfig.ignoreChannelIds = [];
+      } else {
+        // Remove undefined values
+        draftConfig.ignoreChannelIds = draftConfig.ignoreChannelIds.filter(
+          (id): id is string => !!id,
+        );
+      }
+    },
   },
-  { immediate: true },
 );
-
-const hasChanged = computed(() => {
-  if (!draft.value || !activeConfig.value?.leveling) return false;
-  return !deepEqual(draft.value, activeConfig.value.leveling);
-});
 
 // Level Up Message Adapter
 const { adapter: levelUpMsgAdapter, getDefault: getLevelUpDefault } = createMessageAdapter(
@@ -256,38 +240,10 @@ const insertLeaderboardVar = (varName: string | number | symbol) => {
 const activeModal = ref<'none' | 'levelup' | 'command_level' | 'command_leaderboard'>('none');
 
 const saveSettings = async () => {
-  if (!guildStore.activeGuildId || !draft.value) return;
-
-  if (!validate()) {
-    return;
-  }
-
   try {
-    // Ensure ignoreChannelIds is properly initialized and cleaned
-    if (!draft.value.ignoreChannelIds) {
-      draft.value.ignoreChannelIds = [];
-    } else {
-      // Remove undefined values and ensure it's a clean array
-      draft.value.ignoreChannelIds = draft.value.ignoreChannelIds.filter(
-        (id): id is string => !!id,
-      );
-    }
-
-    await guildStore.updateConfig(guildStore.activeGuildId, {
-      leveling: draft.value,
-    });
-
-    // After successful save, reset draft to match the new store state
-    draft.value = JSON.parse(JSON.stringify(draft.value));
+    await save();
   } catch (e) {
-    console.error(e);
     alert(t('common.saveFailed'));
-  }
-};
-
-const resetSettings = () => {
-  if (activeConfig.value?.leveling) {
-    draft.value = JSON.parse(JSON.stringify(activeConfig.value.leveling));
   }
 };
 </script>
@@ -418,9 +374,9 @@ const resetSettings = () => {
                 </option>
               </select>
             </div>
-            <span class="hint">{{
-              t('dashboard.modules.leveling.xpAlgorithm.noXPChannelsHint')
-            }}</span>
+            <span class="hint">
+              {{ t('dashboard.modules.leveling.xpAlgorithm.noXPChannelsHint') }}
+            </span>
           </div>
         </div>
       </div>
@@ -641,7 +597,7 @@ const resetSettings = () => {
       :isSaving="isSaving"
       :disabled="Object.keys(errors).length > 0"
       @save="saveSettings"
-      @reset="resetSettings"
+      @reset="reset"
     />
 
     <!-- MODALS -->

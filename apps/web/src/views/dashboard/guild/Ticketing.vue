@@ -1,49 +1,22 @@
 <script lang="ts" setup>
-import router from '@/router';
-import { useAuthStore } from '@/stores/auth';
 import { useGuildStore } from '@/stores/guild';
 import { storeToRefs } from 'pinia';
-import { computed, onMounted, ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { TicketingConfig, TicketingConfigSchema } from '@cipibot/schemas';
-import { useValidation } from '@/composables/useValidation';
-import { deepEqual } from '@/utils/guildConfig';
+import { GuildConfigSchema } from '@cipibot/schemas';
 import { createMessageAdapter } from '@/utils/messageAdapter';
 import MessageEditorModal from '@/components/dashboard/MessageEditorModal.vue';
+import { useModuleConfig } from '@/composables/useModuleConfig';
 
 const { t } = useI18n();
 
 const guildStore = useGuildStore();
-const authStore = useAuthStore();
-const { activeConfig, activeGuildChannels, activeGuildRoles, isSaving } = storeToRefs(guildStore);
+const { activeConfig } = storeToRefs(guildStore);
 
-onMounted(async () => {
-  if (!activeConfig.value) {
-    await router.push('/dashboard/');
-    throw new Error('No active config');
-  }
-});
-
-const draft = ref<TicketingConfig>(
-  JSON.parse(JSON.stringify(activeConfig.value?.ticketing)) as TicketingConfig,
+const { draft, errors, hasChanged, isSaving, save, reset } = useModuleConfig(
+  'ticketing',
+  GuildConfigSchema.shape.ticketing,
 );
-
-const { validate, errors } = useValidation(TicketingConfigSchema, draft);
-
-watch(
-  () => activeConfig.value?.ticketing,
-  (newVal) => {
-    if (newVal) {
-      draft.value = JSON.parse(JSON.stringify(newVal));
-    }
-  },
-  { immediate: true },
-);
-
-const hasChanged = computed(() => {
-  if (!draft.value || !activeConfig.value?.ticketing) return false;
-  return !deepEqual(draft.value, activeConfig.value.ticketing);
-});
 
 const { adapter: newTicketMessageAdapter, getDefault: getDefaultNewTicketMessage } =
   createMessageAdapter(
@@ -93,20 +66,10 @@ type ModalType = 'none' | 'newTicket' | 'ticketCreated' | 'ticketClosed' | 'tick
 const activeModal = ref<ModalType>('none');
 
 const saveSettings = async () => {
-  if (!validate()) return;
-
   try {
-    await guildStore.updateConfig(guildStore.activeGuildId!, {
-      ticketing: draft.value,
-    });
+    await save();
   } catch (e) {
-    console.error(e);
-  }
-};
-
-const resetSettings = () => {
-  if (activeConfig.value?.leveling) {
-    draft.value = JSON.parse(JSON.stringify(activeConfig.value.leveling));
+    alert(t('common.saveFailed'));
   }
 };
 </script>
@@ -135,7 +98,7 @@ const resetSettings = () => {
       :isSaving="isSaving"
       :disabled="Object.keys(errors).length > 0"
       @save="saveSettings"
-      @reset="resetSettings"
+      @reset="reset"
     />
 
     <!-- MODALS -->

@@ -92,7 +92,7 @@
         "xpAlgorithm": {
           "title": "Algoritmus XP",
           "xpMultiplier": "Násobič XP",
-          "xpMultiplierHint": "Globální násobič. Základní XP * {{ value }}",
+          "xpMultiplierHint": "Globální násobič. (XP za zprávu + XP za slova) × {value}, max. je omezeno limitem na zprávu",
           "xpPerMessage": "XP za zprávu",
           "xpPerWord": "XP za slovo",
           "maxXPPerMessage": "Max XP / Zprávu",

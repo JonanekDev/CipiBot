@@ -1,9 +1,4 @@
-import {
-  DeepPartial,
-  Guild,
-  type GuildConfigPatchType,
-  type GuildConfig,
-} from '@cipibot/schemas';
+import { DeepPartial, Guild, type GuildConfigPatchType, type GuildConfig } from '@cipibot/schemas';
 import { CACHE_TTL, REDIS_KEYS } from '@cipibot/constants';
 import { ConfigRepository } from './repository';
 import { GuildUpdatePayload } from '@cipibot/schemas/discord';

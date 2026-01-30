@@ -1,58 +1,29 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useGuildStore } from '@/stores/guild';
 import { useAuthStore } from '@/stores/auth';
 import { useI18n } from 'vue-i18n';
 import MessagePreview from '@/components/dashboard/MessagePreview.vue';
 import MessageEditorModal from '@/components/dashboard/MessageEditorModal.vue';
-import { GuildConfigSchema, WelcomingConfig } from '@cipibot/schemas';
-import router from '@/router';
-import { deepEqual } from '@/utils/guildConfig';
+import { WelcomingConfig, WelcomingConfigSchema } from '@cipibot/schemas';
 import { getTextChannels } from '@/utils/channels';
 import { createMessageAdapter } from '@/utils/messageAdapter';
-import { useValidation } from '@/composables/useValidation';
 import StickySaveBar from '@/components/dashboard/StickySaveBar.vue';
 import { getCommonUserVars } from '@/utils/dashboardVariables';
 import Button from '@/components/ui/Button.vue';
+import { useModuleConfig } from '@/composables/useModuleConfig';
 
 const { t } = useI18n();
 
 const guildStore = useGuildStore();
 const authStore = useAuthStore();
-const { activeConfig, activeGuildChannels, isSaving } = storeToRefs(guildStore);
+const { activeConfig, activeGuildChannels } = storeToRefs(guildStore);
 
-onMounted(async () => {
-  if (!activeConfig.value) {
-    await router.push(`/dashboard/`);
-    throw new Error('No active config');
-  }
-});
-
-const draft = ref<WelcomingConfig>(
-  JSON.parse(JSON.stringify(activeConfig.value?.welcoming)) as WelcomingConfig,
+const { draft, errors, hasChanged, isSaving, save, reset } = useModuleConfig<WelcomingConfig>(
+  'welcoming',
+  WelcomingConfigSchema,
 );
-
-// Validation
-const WelcomingSchema = GuildConfigSchema.shape.welcoming;
-const { validate, errors } = useValidation(WelcomingSchema, draft, { mode: 'eager' });
-
-// Watch for store changes to update draft
-watch(
-  () => activeConfig.value?.welcoming,
-  (newVal) => {
-    if (newVal) {
-      draft.value = JSON.parse(JSON.stringify(newVal));
-    }
-  },
-  { immediate: true },
-);
-
-// Check for unsaved changes
-const hasChanged = computed(() => {
-  if (!draft.value || !activeConfig.value?.welcoming) return false;
-  return !deepEqual(draft.value, activeConfig.value.welcoming);
-});
 
 // Channels
 const textChannels = computed(() => {
@@ -100,28 +71,10 @@ const activeModal = ref<ModalType>('none');
 
 // Save Action
 const saveSettings = async () => {
-  if (!guildStore.activeGuildId || !draft.value) return;
-
-  if (!validate()) {
-    return;
-  }
-
   try {
-    await guildStore.updateConfig(guildStore.activeGuildId, {
-      welcoming: draft.value,
-    });
-
-    // Reset draft logic handled by watch, but explicit update is safer for immediate UI feedback
-    draft.value = JSON.parse(JSON.stringify(draft.value));
+    await save();
   } catch (e) {
-    console.error(e);
     alert(t('common.saveFailed'));
-  }
-};
-
-const resetSettings = () => {
-  if (activeConfig.value?.welcoming) {
-    draft.value = JSON.parse(JSON.stringify(activeConfig.value.welcoming));
   }
 };
 </script>
@@ -217,7 +170,11 @@ const resetSettings = () => {
             <MessagePreview :message="leaveMsgAdapter" :variables="userVars" class="mini-preview" />
           </div>
           <div class="feature-actions">
-            <Button variant="secondary" @click="activeModal = 'leave'" :disabled="!draft.leaveEnabled">
+            <Button
+              variant="secondary"
+              @click="activeModal = 'leave'"
+              :disabled="!draft.leaveEnabled"
+            >
               {{ t('dashboard.modules.editMessage') }}
             </Button>
           </div>
@@ -262,7 +219,7 @@ const resetSettings = () => {
       :isSaving="isSaving"
       :disabled="Object.keys(errors).length > 0"
       @save="saveSettings"
-      @reset="resetSettings"
+      @reset="reset"
     />
 
     <!-- MODALS -->

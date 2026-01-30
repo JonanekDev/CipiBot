@@ -92,7 +92,7 @@
         "xpAlgorithm": {
           "title": "XP Algorithm",
           "xpMultiplier": "XP Multiplier",
-          "xpMultiplierHint": "Global multiplier. Base XP * {{ value }}",
+          "xpMultiplierHint": "Global multiplier. (XP per message + XP per word) × {value}, capped by max XP per message",
           "xpPerMessage": "XP Per Message",
           "xpPerWord": "XP Per Word",
           "maxXPPerMessage": "Max XP / Message",
