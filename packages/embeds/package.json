@@ -2,26 +2,29 @@
   "name": "@cipibot/embeds",
   "version": "0.0.1",
   "description": "",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
+    "build": "tsup src/index.ts src/discord.ts --format esm --dts --clean",
     "format": "prettier --write src/"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./discord": "./src/discord.ts"
+    ".": "./dist/index.js",
+    "./discord": "./dist/discord.js"
   },
   "keywords": [],
   "author": "JonanekDev",
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
   "devDependencies": {
-    "@cipibot/tsconfig": "workspace:*"
+    "@cipibot/tsconfig": "workspace:*",
+    "tsup": "^8.5.1"
   },
   "dependencies": {
     "@cipibot/constants": "workspace:*",
-    "@cipibot/schemas": "workspace:*",
     "@cipibot/i18n": "workspace:*",
+    "@cipibot/schemas": "workspace:*",
     "@cipibot/templating": "workspace:*",
     "discord-api-types": "^0.38.37"
   }

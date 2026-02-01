@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "turbo run format",
-    "build": "turbo run build",
+    "db:generate": "DATABASE_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\" turbo run db:generate",
+    "build": "DATABASE_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\" turbo run build",
     "format:check": "prettier --check ."
   },
   "keywords": [],

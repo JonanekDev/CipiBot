@@ -43,7 +43,22 @@ export class KafkaClient {
   constructor(logger: Logger, clientId?: string, brokers?: string[]) {
     this.logger = logger.child({ package: 'KafkaClient' });
     this.clientId = clientId || process.env.KAFKA_CLIENT_ID || 'cipibot';
-    this.brokers = brokers || process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'];
+
+    // Debug: log environment variable
+    this.logger.info(
+      {
+        KAFKA_BROKERS_env: process.env.KAFKA_BROKERS,
+        brokers_param: brokers,
+      },
+      'KafkaClient constructor debug',
+    );
+
+    this.brokers =
+      brokers && brokers.length > 0
+        ? brokers
+        : process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'];
+
+    this.logger.info({ brokers: this.brokers }, 'KafkaClient initialized with brokers');
 
     this.kafka = new Kafka({
       clientId: this.clientId,

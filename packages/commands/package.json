@@ -2,29 +2,32 @@
   "name": "@cipibot/commands",
   "version": "0.0.1",
   "description": "",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
+    "build": "tsup src/index.ts src/options.ts src/commandsMeta.ts --format esm --dts --clean",
     "format": "prettier --write src/"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./options": "./src/options.ts",
-    "./commandsMeta": "./src/commandsMeta.ts"
+    ".": "./dist/index.js",
+    "./options": "./dist/options.js",
+    "./commandsMeta": "./dist/commandsMeta.js"
   },
   "keywords": [],
   "author": "JonanekDev",
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
-    "devDependencies": {
+  "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",
-    "@types/node": "^25.0.1"
+    "@types/node": "^25.0.1",
+    "tsup": "^8.5.1"
   },
   "dependencies": {
-    "@cipibot/redis": "workspace:*",
     "@cipibot/constants": "workspace:*",
     "@cipibot/kafka": "workspace:*",
     "@cipibot/logger": "workspace:*",
+    "@cipibot/redis": "workspace:*",
     "@cipibot/schemas": "workspace:*",
     "discord-api-types": "^0.38.37"
   }

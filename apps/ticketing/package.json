@@ -2,11 +2,14 @@
   "name": "@cipibot/ticketing",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "type": "module",
   "scripts": {
+    "start": "node dist/index.js",
     "dev": "tsx -r dotenv/config src/index.ts",
-    "build": "tsc",
-    "format": "prettier --write src/"
+    "build": "tsup src/index.ts --format esm --clean",
+    "format": "prettier --write src/",
+    "db:generate": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +29,7 @@
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",
     "@types/node": "^25.0.1",
-    "prisma": "^7.2.0"
+    "prisma": "^7.2.0",
+    "tsup": "^8.5.1"
   }
 }

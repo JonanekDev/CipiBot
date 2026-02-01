@@ -1,4 +1,3 @@
-# Dependencies
 node_modules/
 .pnpm-store/
 
@@ -27,4 +26,3 @@ prisma/*.db
 prisma/*.db-journal
 .prisma/
 **/generated/
-

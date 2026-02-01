@@ -1,0 +1,224 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    environment:
+      - VITE_API_URL=/api/trpc
+
+  api:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=api
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://api_user:${API_DB_PASSWORD}@postgres:5432/api_service
+      - ENCRYPTION_KEY=${API_ENCRYPTION_KEY}
+      - JWT_SECRET=${API_JWT_SECRET}
+      - DISCORD_REDIRECT_URI=${DISCORD_REDIRECT_URI}
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+      - DISCORD_CLIENT_SECRET=${DISCORD_CLIENT_SECRET}
+      - REDIS_HOST=redis
+      - PORT=3000
+      - CONFIG_SERVICE_URL=http://config:3000/trpc
+      - LEVELING_SERVICE_URL=http://leveling:3000/trpc
+      - DISCORD_REST_SERVICE_URL=http://discord-rest:3000/trpc
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  config:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=config
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://config_user:${CONFIG_DB_PASSWORD}@postgres:5432/config_service?schema=public
+      - REDIS_HOST=redis
+      - KAFKA_BROKERS=kafka:9092
+      - PORT=3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+
+  discord-ws:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=discord-ws
+    restart: unless-stopped
+    environment:
+      - REDIS_HOST=redis
+      - KAFKA_BROKERS=kafka:9092
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+      - CONFIG_SERVICE_URL=http://config:3000/trpc
+      - DISCORD_REST_SERVICE_URL=http://discord-rest:3000/trpc
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+
+  discord-rest:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=discord-rest
+    restart: unless-stopped
+    environment:
+      - REDIS_HOST=redis
+      - KAFKA_BROKERS=kafka:9092
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+      - PORT=3000
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+
+  leveling:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=leveling
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://leveling_user:${LEVELING_DB_PASSWORD}@postgres:5432/leveling_service
+      - REDIS_HOST=redis
+      - KAFKA_BROKERS=kafka:9092
+      - CONFIG_SERVICE_URL=http://config:3000/trpc
+      - DISCORD_REST_SERVICE_URL=http://discord-rest:3000/trpc
+      - PORT=3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+
+  ticketing:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=ticketing
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://ticketing_user:${TICKETING_DB_PASSWORD}@postgres:5432/ticketing_service
+      - REDIS_HOST=redis
+      - KAFKA_BROKERS=kafka:9092
+      - CONFIG_SERVICE_URL=http://config:3000/trpc
+      - DISCORD_REST_SERVICE_URL=http://discord-rest:3000/trpc
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+
+  welcoming:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=welcoming
+    restart: unless-stopped
+    environment:
+      - REDIS_HOST=redis
+      - KAFKA_BROKERS=kafka:9092
+      - CONFIG_SERVICE_URL=http://config:3000/trpc
+      - DISCORD_REST_SERVICE_URL=http://discord-rest:3000/trpc
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+
+  postgres:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
+      POSTGRES_MULTIPLE_DATABASES: api_service:api_user:${API_DB_PASSWORD},config_service:config_user:${CONFIG_DB_PASSWORD},leveling_service:leveling_user:${LEVELING_DB_PASSWORD},ticketing_service:ticketing_user:${TICKETING_DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./scripts/init-db-users.sh:/docker-entrypoint-initdb.d/init-db-users.sh
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U admin']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  kafka:
+    image: apache/kafka:4.1.1
+    restart: unless-stopped
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+      CLUSTER_ID: cipibot-kafka-cluster
+    healthcheck:
+      test: ['CMD-SHELL', 'nc -z localhost 9092 || exit 1']
+      interval: 5s
+      timeout: 10s
+      retries: 15
+      start_period: 40s
+
+  kafka-init:
+    image: apache/kafka:4.1.1
+    restart: on-failure
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - ./scripts/create-topics.sh:/usr/bin/create-topics.sh
+    entrypoint: ['/bin/bash', '/usr/bin/create-topics.sh']
+
+volumes:
+  pgdata:
+  redisdata:

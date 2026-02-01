@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "type": "module",
+  "main": "dist/index.js",
   "exports": {
     "./router": {
       "types": "./dist/router.d.ts",
@@ -10,9 +11,12 @@
     }
   },
   "scripts": {
+    "start": "node dist/index.js",
     "dev": "tsx -r dotenv/config src/index.ts",
-    "build": "tsc",
-    "format": "prettier --write src/"
+    "build": "tsup src/index.ts src/router.ts --format esm --dts --clean",
+    "format": "prettier --write src/",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy"
   },
   "keywords": [],
   "author": "JonanekDev",
@@ -23,7 +27,8 @@
     "@types/node": "^25.0.1",
     "@types/pg": "^8.16.0",
     "dotenv": "^17.2.3",
-    "prisma": "^7.2.0"
+    "prisma": "^7.2.0",
+    "tsup": "^8.5.1"
   },
   "dependencies": {
     "@cipibot/constants": "workspace:*",

@@ -3,8 +3,10 @@
   "version": "0.0.1",
   "description": "",
   "type": "module",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
     "format": "prettier --write src/"
   },
   "keywords": [],
@@ -13,11 +15,12 @@
   "packageManager": "pnpm@10.25.0",
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",
-    "@types/node": "^25.0.1"
+    "@types/node": "^25.0.1",
+    "tsup": "^8.5.1"
   },
   "dependencies": {
+    "@cipibot/logger": "workspace:*",
     "kafkajs": "^2.2.4",
-    "zod": "^4.1.13",
-    "@cipibot/logger": "workspace:*"
+    "zod": "^4.1.13"
   }
 }

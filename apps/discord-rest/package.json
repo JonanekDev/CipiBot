@@ -2,15 +2,19 @@
   "name": "@cipibot/discord-rest",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "start": "node dist/index.js",
     "dev": "tsx -r dotenv/config src/index.ts",
-    "build": "tsc",
+    "build": "tsup src/index.ts src/router.ts --format esm --dts --clean",
     "format": "prettier --write src/"
   },
   "type": "module",
   "exports": {
-    "./router": "./src/router.ts"
+    "./router": {
+      "types": "./dist/router.d.ts",
+      "import": "./dist/router.js"
+    }
   },
   "keywords": [],
   "author": "JonanekDev",
@@ -19,9 +23,9 @@
   "dependencies": {
     "@cipibot/constants": "workspace:*",
     "@cipibot/kafka": "workspace:*",
+    "@cipibot/logger": "workspace:*",
     "@cipibot/redis": "workspace:*",
     "@cipibot/schemas": "workspace:*",
-    "@cipibot/logger": "workspace:*",
     "@discordjs/rest": "^2.6.0",
     "@trpc/server": "^11.8.1",
     "discord-api-types": "^0.38.37",
@@ -30,6 +34,7 @@
   },
   "devDependencies": {
     "@cipibot/tsconfig": "workspace:*",
-    "@types/node": "^25.0.1"
+    "@types/node": "^25.0.1",
+    "tsup": "^8.5.1"
   }
 }

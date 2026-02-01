@@ -43,7 +43,7 @@ async function main() {
 
   // Start server
   const APP_PORT = parseInt(process.env.PORT || '3000', 10);
-  await app.listen({ port: APP_PORT });
+  await app.listen({ port: APP_PORT, host: '0.0.0.0' });
 
   logger.info(`Config service listening on port ${APP_PORT}`);
 

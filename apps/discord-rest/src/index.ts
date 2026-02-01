@@ -65,7 +65,7 @@ async function main() {
 
   // Start server
   const APP_PORT = parseInt(process.env.PORT || '3003', 10);
-  await app.listen({ port: APP_PORT });
+  await app.listen({ host: '0.0.0.0', port: APP_PORT });
   logger.info(`Discord REST service listening on port ${APP_PORT}`);
 
   const shutdown = async () => {
