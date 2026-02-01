@@ -5,7 +5,7 @@ import { createTRPCClient, httpBatchLink, TRPCClient } from '@trpc/client';
 import type { ConfigRouter } from '@cipibot/config/router';
 import { Logger } from '@cipibot/logger';
 
-const CONFIG_SERVICE_URL = process.env.CONFIG_SERVICE_URL || 'http://localhost:3000/trpc';
+const CONFIG_SERVICE_URL = process.env.CONFIG_SERVICE_URL || 'http://localhost:3003/trpc';
 
 export class ConfigClient {
   private readonly redis: RedisClient;

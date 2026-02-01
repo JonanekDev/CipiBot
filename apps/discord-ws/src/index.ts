@@ -9,22 +9,39 @@ import { createLogger } from '@cipibot/logger';
 import { CommandRegistry } from '@cipibot/commands';
 import { RedisClient } from '@cipibot/redis';
 import { ConfigClient } from '@cipibot/config-client';
+import Fastify from 'fastify';
 
-const logger = createLogger('discord-ws');
+const SERVICE_NAME = 'discord-ws';
+const logger = createLogger(SERVICE_NAME);
 
 async function main() {
   const manager = createManager();
   const kafka = new KafkaClient(logger);
   const redis = new RedisClient(logger);
   const configClient = new ConfigClient(redis, logger);
-  const commandRegistry = new CommandRegistry('discord-ws', kafka, redis, logger);
+  const commandRegistry = new CommandRegistry(SERVICE_NAME, kafka, redis, logger);
 
   manager.on(WebSocketShardEvents.Ready, () => {
     logger.info('Gateway connection established and ready!');
   });
 
   const DISCORD_REST_SERVICE_URL =
-    process.env.DISCORD_REST_SERVICE_URL || 'http://localhost:3003/trpc';
+    process.env.DISCORD_REST_SERVICE_URL || 'http://localhost:3004/trpc';
+
+  const app = Fastify({
+    loggerInstance: logger,
+  });
+
+  app.get('/health', async (req, reply) => {
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      service: 'discord-ws',
+    };
+  });
+
+  const APP_PORT = parseInt(process.env.PORT || '3001', 10);
+  await app.listen({ port: APP_PORT, host: '0.0.0.0' });
 
   const trpc = createTRPCClient<DiscordRestRouter>({
     links: [

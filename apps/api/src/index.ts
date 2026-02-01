@@ -15,7 +15,8 @@ import { createLogger } from '@cipibot/logger';
 import { ConfigClient } from '@cipibot/config-client';
 import cors from '@fastify/cors';
 
-const logger = createLogger('api');
+const SERVICE_NAME = 'api';
+const logger = createLogger(SERVICE_NAME);
 
 async function main() {
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL || '' });
@@ -46,6 +47,25 @@ async function main() {
     },
   });
 
+  app.get('/health', async (req, reply) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+
+      return {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        service: SERVICE_NAME,
+      };
+    } catch (error) {
+      app.log.error(error);
+      return reply.status(503).send({
+        status: 'error',
+        service: SERVICE_NAME,
+        message: 'Database connection failed',
+      });
+    }
+  });
+
   const appRouter = createAppRouter(authService);
 
   await app.register(fastifyTRPCPlugin, {
@@ -57,7 +77,7 @@ async function main() {
   });
 
   // Start server
-  const APP_PORT = parseInt(process.env.PORT || '3002', 10);
+  const APP_PORT = parseInt(process.env.PORT || '3005', 10);
   await app.listen({ port: APP_PORT, host: '0.0.0.0' });
 
   logger.info(`API service listening on port ${APP_PORT}`);

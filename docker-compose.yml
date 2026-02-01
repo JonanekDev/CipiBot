@@ -32,6 +32,13 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      config:
+        condition: service_healthy
+      leveling:
+        condition: service_healthy
+      discord-rest:
+        condition: service_healthy
+      
 
   config:
     build:
@@ -73,6 +80,8 @@ services:
         condition: service_healthy
       kafka-init:
         condition: service_completed_successfully
+      config:
+        condition: service_healthy
 
   discord-rest:
     build:
@@ -114,6 +123,8 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+      config:
+        condition: service_healthy
       kafka-init:
         condition: service_completed_successfully
 
@@ -136,6 +147,8 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+      config:
+        condition: service_healthy
       kafka-init:
         condition: service_completed_successfully
 
@@ -157,6 +170,8 @@ services:
         condition: service_healthy
       kafka-init:
         condition: service_completed_successfully
+      config:
+        condition: service_healthy
 
   postgres:
     image: postgres:18

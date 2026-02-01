@@ -56,6 +56,25 @@ async function main() {
     loggerInstance: logger,
   });
 
+  app.get('/health', async (req, reply) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+
+      return {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        service: SERVICE_NAME,
+      };
+    } catch (error) {
+      app.log.error(error);
+      return reply.status(503).send({
+        status: 'error',
+        service: SERVICE_NAME,
+        message: 'Database connection failed',
+      });
+    }
+  });
+
   const levelingRouter = createLevelingRouter(levelingService);
 
   app.register(fastifyTRPCPlugin, {
@@ -66,8 +85,8 @@ async function main() {
   });
 
   // Start server
-  const APP_PORT = parseInt(process.env.PORT || '3001', 10);
-  await app.listen({ port: APP_PORT });
+  const APP_PORT = parseInt(process.env.PORT || '3002', 10);
+  await app.listen({ port: APP_PORT, host: '0.0.0.0' });
 
   logger.info(`Leveling service listening on port ${APP_PORT}`);
 

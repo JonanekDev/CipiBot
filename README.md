@@ -48,11 +48,20 @@ All contributions and constructive criticism are welcome! 🙌
 
 ## Microservices
 
-- **Discord-WS** - Receives Discord events and publishes to Kafka
-- **Leveling** - Manages XP and level progression system
-- **Config** - Handles guild-specific feature toggles and settings
-- **Discord-REST** - Centralized Discord API interactions
-- **More coming...**
+| Service | Description | Native Port (Local) |
+| :--- | :--- | :---: |
+| **Web** | User dashboard and landing page (Vue.js) | 3000 |
+| **Discord-WS** | Receives Discord events and publishes to Kafka | 3001 |
+| **Leveling** | Manages XP and level progression system | 3002 |
+| **Config** | Handles guild-specific feature toggles and settings | 3003 |
+| **Discord-REST** | Centralized Discord API interactions | 3004 |
+| **API** | Public API for frontend | 3005 |
+| **Welcoming** | Welcome and leave messages | 3006 |
+| **Ticketing** | Support ticketing system | 3007 |
+| *More coming...* | 
+
+> **Docker Note:**
+> Within the Docker environment, all microservices are configured to run on a uniform internal port (3000). Only the **web** service (Nginx) is exposed to the host. It acts as a reverse proxy, routing traffic to api service
 
 ## Planned Features
 

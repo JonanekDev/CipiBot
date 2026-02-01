@@ -12,16 +12,16 @@ import { ConfigValidator } from './utils/configValidation';
 
 // Initialize tRPC Clients for Microservices
 const configClient = createTRPCClient<ConfigRouter>({
-  links: [httpBatchLink({ url: process.env.CONFIG_SERVICE_URL || 'http://localhost:3000/trpc' })],
+  links: [httpBatchLink({ url: process.env.CONFIG_SERVICE_URL || 'http://localhost:3003/trpc' })],
 });
 
 const levelingClient = createTRPCClient<LevelingRouter>({
-  links: [httpBatchLink({ url: process.env.LEVELING_SERVICE_URL || 'http://localhost:3001/trpc' })],
+  links: [httpBatchLink({ url: process.env.LEVELING_SERVICE_URL || 'http://localhost:3002/trpc' })],
 });
 
 const discordRestClient = createTRPCClient<DiscordRestRouter>({
   links: [
-    httpBatchLink({ url: process.env.DISCORD_REST_SERVICE_URL || 'http://localhost:3003/trpc' }),
+    httpBatchLink({ url: process.env.DISCORD_REST_SERVICE_URL || 'http://localhost:3004/trpc' }),
   ],
 });
 

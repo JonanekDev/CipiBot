@@ -7,10 +7,16 @@ import { RedisClient } from '@cipibot/redis';
 import { createTicketingRouter } from './router';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 import Fastify from 'fastify';
+import { PrismaClient } from './generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-const logger = createLogger('ticketing');
+const SERVICE_NAME = 'ticketing';
+const logger = createLogger(SERVICE_NAME);
 
 async function main() {
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL || '' });
+
+  const prisma = new PrismaClient({ adapter });
   const kafka = new KafkaClient(logger);
   const redis = new RedisClient(logger);
   const configClient = new ConfigClient(redis, logger);
@@ -26,6 +32,25 @@ async function main() {
     loggerInstance: logger,
   });
 
+  app.get('/health', async (req, reply) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+
+      return {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        service: SERVICE_NAME,
+      };
+    } catch (error) {
+      app.log.error(error);
+      return reply.status(503).send({
+        status: 'error',
+        service: SERVICE_NAME,
+        message: 'Database connection failed',
+      });
+    }
+  });
+
   const ticketingRouter = createTicketingRouter(ticketingService);
 
   app.register(fastifyTRPCPlugin, {
@@ -36,8 +61,8 @@ async function main() {
   });
 
   // Start server
-  const APP_PORT = parseInt(process.env.PORT || '3004', 10);
-  await app.listen({ port: APP_PORT });
+  const APP_PORT = parseInt(process.env.PORT || '3007', 10);
+  await app.listen({ port: APP_PORT, host: '0.0.0.0' });
 
   logger.info(`Ticketing service listening on port ${APP_PORT}`);
 

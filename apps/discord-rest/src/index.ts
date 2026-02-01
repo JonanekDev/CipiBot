@@ -12,7 +12,9 @@ import { KafkaClient } from '@cipibot/kafka';
 import { RedisClient } from '@cipibot/redis';
 import { ChannelsService } from './services/channels.service';
 
-const logger = createLogger('discord-rest');
+const SERVICE_NAME = 'discord-rest';
+
+const logger = createLogger(SERVICE_NAME);
 
 async function main() {
   const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
@@ -49,6 +51,14 @@ async function main() {
     loggerInstance: logger,
   });
 
+  app.get('/health', async (req, reply) => {
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      service: SERVICE_NAME,
+    };
+  });
+
   // Register routes
   const discordRestRouter = createDiscordRestRouter(
     interactionsService,
@@ -64,7 +74,7 @@ async function main() {
   });
 
   // Start server
-  const APP_PORT = parseInt(process.env.PORT || '3003', 10);
+  const APP_PORT = parseInt(process.env.PORT || '3004', 10);
   await app.listen({ host: '0.0.0.0', port: APP_PORT });
   logger.info(`Discord REST service listening on port ${APP_PORT}`);
 

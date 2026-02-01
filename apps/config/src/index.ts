@@ -10,7 +10,8 @@ import { ConfigRepository } from './repository';
 import { KafkaClient } from '@cipibot/kafka';
 import { createLogger } from '@cipibot/logger';
 
-const logger = createLogger('config');
+const SERVICE_NAME = 'config';
+const logger = createLogger(SERVICE_NAME);
 
 async function main() {
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL || '' });
@@ -23,12 +24,31 @@ async function main() {
   const configService = new ConfigService(redis, configRepository);
 
   registerConsumers(configService, kafka).catch((error) => {
-    console.error('Failed to start consumers: ', error);
+    logger.error(error, 'Failed to start consumers');
     process.exit(1);
   });
 
   const app = Fastify({
     loggerInstance: logger,
+  });
+
+  app.get('/health', async (req, reply) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+
+      return {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        service: SERVICE_NAME,
+      };
+    } catch (error) {
+      app.log.error(error);
+      return reply.status(503).send({
+        status: 'error',
+        service: SERVICE_NAME,
+        message: 'Database connection failed',
+      });
+    }
   });
 
   // Register routes
@@ -42,7 +62,7 @@ async function main() {
   });
 
   // Start server
-  const APP_PORT = parseInt(process.env.PORT || '3000', 10);
+  const APP_PORT = parseInt(process.env.PORT || '3003', 10);
   await app.listen({ port: APP_PORT, host: '0.0.0.0' });
 
   logger.info(`Config service listening on port ${APP_PORT}`);
