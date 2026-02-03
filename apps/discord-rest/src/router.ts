@@ -4,6 +4,7 @@ import z from 'zod';
 import { DiscordInteractionReplyUpdateSchema } from '@cipibot/schemas';
 import { ChannelsService } from './services/channels.service';
 import { RolesService } from './services/roles.service';
+import { CategoriesService } from './services/categories.service';
 
 const t = initTRPC.create();
 
@@ -11,6 +12,7 @@ export function createDiscordRestRouter(
   interactionService: InteractionsService,
   channelsService: ChannelsService,
   rolesService: RolesService,
+  categoriesService: CategoriesService,
 ) {
   return t.router({
     // Defer interaction and sendreply are tRPC endpoint bcs of Discord interaction time limits
@@ -56,6 +58,16 @@ export function createDiscordRestRouter(
       )
       .query(async ({ input }) => {
         return await rolesService.getGuildRoles(input.guildId);
+      }),
+    createCategory: t.procedure
+      .input(
+        z.object({
+          guildId: z.string(),
+          name: z.string(),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        return await categoriesService.createCategory(input.guildId, input.name);
       }),
   });
 }

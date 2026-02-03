@@ -23,11 +23,14 @@ import { InteractionsService } from './services/interactions.service';
 import { MessagesService } from './services/messages.service';
 import { RolesService } from './services/roles.service';
 import { ChannelsService } from './services/channels.service';
+import { Logger } from '@cipibot/logger';
+import { channel } from 'process';
 
 const CONSUMER_GROUP = 'discord-rest-service-group';
 
 export async function registerConsumers(
   kafka: KafkaClient,
+  logger: Logger,
   commandsService: CommandsService,
   interactionsService: InteractionsService,
   messagesService: MessagesService,
@@ -39,6 +42,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_MESSAGE,
     DiscordMessagePayloadSchema,
     async (payload) => {
+      logger.debug({ channelId: payload.channelId }, `Processing SEND_MESSAGE`);
       await messagesService.sendMessage(payload.channelId, payload.body);
     },
   );
@@ -48,6 +52,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_OUTBOUND.SEND_DM,
     DiscordDMPayloadSchema,
     async (payload) => {
+      logger.debug({ userId: payload.userId }, `Processing SEND_DM`);
       await messagesService.sendDirectMessage(payload.userId, payload.body);
     },
   );
@@ -57,6 +62,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_ADD,
     RolePayloadSchema,
     async (payload) => {
+      logger.debug({ guildId: payload.guildId, userId: payload.userId, roleId: payload.roleId }, `Processing MEMBER_ROLE_ADD`);
       await rolesService.addRoleToMember(payload.guildId, payload.userId, payload.roleId);
     },
   );
@@ -66,6 +72,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_OUTBOUND.MEMBER_ROLE_REMOVE,
     RolePayloadSchema,
     async (payload) => {
+      logger.debug({ guildId: payload.guildId, userId: payload.userId, roleId: payload.roleId }, `Processing MEMBER_ROLE_REMOVE`);
       await rolesService.removeRoleFromMember(payload.guildId, payload.userId, payload.roleId);
     },
   );
@@ -75,6 +82,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.SYSTEM.COMMANDS_UPDATE,
     UpdateCommandPayloadSchema,
     async (payload) => {
+      logger.debug({ serviceName: payload.serviceName }, `Processing COMMANDS_UPDATE`);
       commandsService.triggerSync(payload.serviceName);
     },
   );
@@ -84,6 +92,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_OUTBOUND.INTERACTION_REPLY_UPDATE,
     DiscordInteractionReplyUpdateSchema,
     async (payload) => {
+      logger.debug({ interactionId: payload.interactionId }, `Processing INTERACTION_REPLY_UPDATE`);
       await interactionsService.updateReply(
         payload.interactionId,
         payload.interactionToken,
@@ -97,6 +106,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_INBOUND.CHANNEL_CREATE,
     ChannelEventPayloadSchema,
     async (payload) => {
+      logger.debug({ guildId: payload.guildId }, `Processing CHANNEL_CREATE`);
       await channelsService.invalidateCache(payload.guildId);
     },
   );
@@ -106,6 +116,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_INBOUND.CHANNEL_UPDATE,
     ChannelEventPayloadSchema,
     async (payload) => {
+      logger.debug({ guildId: payload.guildId }, `Processing CHANNEL_UPDATE`);
       await channelsService.invalidateCache(payload.guildId);
     },
   );
@@ -115,6 +126,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_INBOUND.CHANNEL_DELETE,
     ChannelEventPayloadSchema,
     async (payload) => {
+      logger.debug({ guildId: payload.guildId }, `Processing CHANNEL_DELETE`);
       await channelsService.invalidateCache(payload.guildId);
     },
   );
@@ -124,6 +136,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_ROLE_CREATE,
     RoleEventPayloadSchema,
     async (payload) => {
+      logger.debug({ guildId: payload.guildId }, `Processing GUILD_ROLE_CREATE`);
       await rolesService.invalidateCache(payload.guildId);
     },
   );
@@ -133,6 +146,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_ROLE_UPDATE,
     RoleEventPayloadSchema,
     async (payload) => {
+      logger.debug({ guildId: payload.guildId }, `Processing GUILD_ROLE_UPDATE`);
       await rolesService.invalidateCache(payload.guildId);
     },
   );
@@ -142,6 +156,7 @@ export async function registerConsumers(
     KAFKA_TOPICS.DISCORD_INBOUND.GUILD_ROLE_DELETE,
     RoleEventPayloadSchema,
     async (payload) => {
+      logger.debug({ guildId: payload.guildId }, `Processing GUILD_ROLE_DELETE`);
       await rolesService.invalidateCache(payload.guildId);
     },
   );

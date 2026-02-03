@@ -3,7 +3,8 @@
     "addToDiscord": "Přidat na Discord",
     "logout": "Odhlásit se",
     "loading": "Načítání...",
-    "saveFailed": "Nepodařilo se uložit nastavení."
+    "saveFailed": "Nepodařilo se uložit nastavení.",
+    "unsavedChangesConfirm": "Máte neuložené změny. Opravdu chcete odejít?"
   },
   "mainlayout": {
     "nav": {
@@ -76,6 +77,8 @@
       "enabled": "Zapnuto",
       "disabled": "Vypnuto",
       "editMessage": "Upravit zprávu",
+      "selectChannel": "Vybrat kanál",
+      "selectCategory": "Vybrat kategorii",
       "generalSettings": {
         "title": "Obecná nastavení",
         "description": "Nastavení základních funkcí serveru a lokalizace.",
@@ -99,8 +102,7 @@
           "maxXPPerMessageHint": "Limit proti spamu.",
           "noXPChannels": "Kanály bez XP",
           "noXPChannelsHint": "Uživatelé zde nezískávají XP.",
-          "addChannel": "+ Přidat",
-          "selectChannel": "Vybrat kanál"
+          "addChannel": "+ Přidat"
         },
         "roleRewards": {
           "title": "Role za odměnu",
@@ -141,7 +143,6 @@
         "general": {
           "title": "Obecná nastavení",
           "channelLabel": "Kanál pro uvítací/odchodové zprávy",
-          "selectChannel": "Vybrat kanál",
           "channelHint": "Vyber kanál, kam budou odesílány uvítací a odchodové zprávy."
         },
         "welcomeMessage": {
@@ -162,7 +163,44 @@
       },
       "ticketing": {
         "title": "Ticket systém",
-        "description": "Správa podpůrných ticketů"
+        "description": "Správa podpůrných ticketů",
+        "general": {
+          "title": "Obecná nastavení",
+          "ticketChannel": "Kanál pro vytvoření tiketu",
+          "ticketCategory": "Kategorie tiketů",
+          "ticketCategoryHint": "Pokud není vybrána, vytvoří se nová.",
+          "ticketChannelHint": "Pokud není vybrán, vytvoří se nový ve vybrané kategorii.",
+          "autoCreate": "Vytvořit automaticky"
+        },
+        "cleanup": {
+          "title": "Úklid tiketů",
+          "deleteAfterHours": "Smazat tiket po (hodinách)",
+          "deleteAfterHoursHint": "Po kolika hodinách od uzavření má být tiket smazán. Nastavte na 0 pro vypnutí.",
+          "closeInactiveAfterHours": "Uzavřít neaktivní tikety po (hodinách)",
+          "closeInactiveAfterHoursHint": "Po kolika hodinách neaktivity má být tiket automaticky uzavřen. Nastavte na 0 pro vypnutí.",
+          "enableTranscripts": "Povolit přepisy tiketů",
+          "enableTranscriptsHint": "Povolit ukládání přepisů, které jsou přistupné přes web po přihlášení.",
+          "deleteTranscriptDays": "Smazat přepis po (dnech)"
+        },
+        "messages": {
+          "title": "Zprávy tiket systému",
+          "newTicket": {
+            "title": "Vytvoření tiketu",
+            "description": "Zpráva pro vytvoření nového tiketu."
+          },
+          "ticketCreated": {
+            "title": "Tiket vytvořen",
+            "description": "Zpráva o vytvoření tiketu."
+          },
+          "ticketClosed": {
+            "title": "Tiket uzavřen",
+            "description": "Zpráva o uzavření tiketu."
+          },
+          "ticketClosedDM": {
+            "title": "Tiket uzavřen - DM",
+            "description": "Zpráva o uzavření tiketu zaslaná do DM autora tiketu."
+          }
+        }
       }
     },
     "messageBuilder": {

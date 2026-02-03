@@ -1,5 +1,5 @@
 import { initTRPC } from '@trpc/server';
-import { TicketingService } from './service';
+import { TicketingService } from './services/ticketing.service';
 import { z } from '@cipibot/schemas';
 
 const t = initTRPC.create();

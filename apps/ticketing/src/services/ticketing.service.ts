@@ -12,4 +12,6 @@ export class TicketingService {
     this.configClient = configClient;
     this.logger = logger.child({ module: 'TicketingService' });
   }
+
+  
 }

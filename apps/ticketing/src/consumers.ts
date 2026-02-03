@@ -1,5 +1,5 @@
 import { KafkaClient } from '@cipibot/kafka';
-import { TicketingService } from './service';
+import { TicketingService } from './services/ticketing.service';
 import { KAFKA_TOPICS } from '@cipibot/constants';
 
 const CONSUMER_GROUP = 'ticketing-service-group';

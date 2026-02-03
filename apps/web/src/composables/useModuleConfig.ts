@@ -6,9 +6,11 @@ import { useValidation } from '@/composables/useValidation';
 import { deepEqual } from '@/utils/guildConfig';
 import router from '@/router';
 import { GuildConfig, GuildConfigPatchType } from '@cipibot/schemas';
+import { useUnsavedChanges } from './useUnsavedChanges';
 
 export interface UseModuleConfigOptions<T> {
   onBeforeSave?: (draft: T) => void | Promise<void>;
+  preventNavigation?: boolean;
 }
 
 export interface UseModuleConfigReturn<T> {
@@ -26,6 +28,7 @@ export function useModuleConfig<T extends GuildConfig[keyof GuildConfig]>(
   schema: z.ZodType<T>,
   options: UseModuleConfigOptions<T> = {},
 ): UseModuleConfigReturn<T> {
+  const { preventNavigation = true } = options;
   const guildStore = useGuildStore();
   const { activeConfig, isSaving } = storeToRefs(guildStore);
 
@@ -40,14 +43,14 @@ export function useModuleConfig<T extends GuildConfig[keyof GuildConfig]>(
   const getSourceConfig = () => activeConfig.value?.[moduleName];
 
   // Initialize draft with copy of current config
-  const draft = ref<T>(schema.parse(getSourceConfig() || {}));
+  const draft = ref<T>(schema.parse(JSON.parse(JSON.stringify(getSourceConfig() || {}))));
 
   // Sync draft when store updates
   watch(
     () => getSourceConfig(),
     (newVal) => {
       if (newVal) {
-        draft.value = schema.parse(getSourceConfig() || {});
+        draft.value = schema.parse(JSON.parse(JSON.stringify(newVal)));
       }
     },
     { immediate: true },
@@ -62,6 +65,11 @@ export function useModuleConfig<T extends GuildConfig[keyof GuildConfig]>(
     if (!draft.value || !current) return false;
     return !deepEqual(draft.value, current);
   });
+
+  // Prevent navigation if changed
+  if (preventNavigation) {
+    useUnsavedChanges(hasChanged);
+  }
 
   // Save function
   const save = async () => {
@@ -90,7 +98,7 @@ export function useModuleConfig<T extends GuildConfig[keyof GuildConfig]>(
   const reset = () => {
     const current = getSourceConfig();
     if (current) {
-      draft.value = schema.parse(JSON.stringify(current));
+      draft.value = schema.parse(JSON.parse(JSON.stringify(current)));
     }
   };
 

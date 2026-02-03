@@ -1,4 +1,4 @@
-import { TicketingService } from './service';
+import { TicketingService } from './services/ticketing.service';
 import { registerConsumers } from './consumers';
 import { createLogger } from '@cipibot/logger';
 import { KafkaClient } from '@cipibot/kafka';

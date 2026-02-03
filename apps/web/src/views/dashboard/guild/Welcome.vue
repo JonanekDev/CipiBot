@@ -107,7 +107,7 @@ const saveSettings = async () => {
           <label>{{ t('dashboard.modules.welcome.general.channelLabel') }}</label>
           <select v-model="draft.channelId" class="input">
             <option :value="null" disabled>
-              {{ t('dashboard.modules.welcome.general.selectChannel') }}
+              {{ t('dashboard.modules.selectChannel') }}
             </option>
             <option v-for="ch in textChannels" :key="ch.id" :value="ch.id">#{{ ch.name }}</option>
           </select>

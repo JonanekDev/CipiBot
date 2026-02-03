@@ -3,6 +3,7 @@ import { Routes, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-type
 import { RedisClient } from '@cipibot/redis';
 import { REDIS_KEYS } from '@cipibot/constants';
 import { Logger } from '@cipibot/logger';
+import { safeDiscordRequest } from '../utils/discord';
 
 export class CommandsService {
   private debounceTimer: NodeJS.Timeout | null = null;
@@ -30,7 +31,7 @@ export class CommandsService {
 
     this.debounceTimer = setTimeout(() => {
       this.syncCommands().catch((err) => {
-        console.error('[CommandsService] Sync failed:', err);
+        this.logger.error(err, '[CommandsService] Sync failed');
       });
     }, this.DEBOUNCE_MS);
   }
@@ -61,9 +62,9 @@ export class CommandsService {
         `Aggregated ${allCommands.length} commands from ${Object.keys(data).length} services.`,
       );
 
-      await this.rest.put(Routes.applicationCommands(this.clientId), {
+      await safeDiscordRequest(() => this.rest.put(Routes.applicationCommands(this.clientId), {
         body: allCommands,
-      });
+      }), this.logger, { commandCount: allCommands.length });
 
       this.logger.info('Successfully synced commands with Discord API.');
     } catch (error) {

@@ -1,6 +1,6 @@
 import { GuildChannel, GuildChannelSchema } from '@cipibot/schemas';
 import { REST } from '@discordjs/rest';
-import { RESTGetAPIGuildChannelsResult, Routes } from 'discord-api-types/v10';
+import { ChannelType, RESTGetAPIGuildChannelsResult, Routes } from 'discord-api-types/v10';
 import { safeDiscordRequest } from '../utils/discord';
 import { Logger } from '@cipibot/logger';
 import { RedisClient } from '@cipibot/redis';
@@ -64,5 +64,26 @@ export class ChannelsService {
     const cacheKey = this.getCacheKey(guildId);
     await this.redis.del(cacheKey);
     this.logger.info({ guildId }, 'Invalidated guild channels cache');
+  }
+
+  async createTextChannel(guildId: string, name: string): Promise<GuildChannel> {
+    this.logger.info({ guildId, name }, 'Creating text channel');
+
+    const body = {
+      name,
+      type: ChannelType.GuildText,
+    };
+
+    const channel = (await safeDiscordRequest(
+      () => this.rest.post(Routes.guildChannels(guildId), { body }),
+      this.logger,
+      { guildId, name },
+    )) as GuildChannel;
+
+    this.logger.info({ guildId, channelId: channel.id, name }, 'Text channel created');
+
+    await this.invalidateCache(guildId);
+
+    return channel;
   }
 }

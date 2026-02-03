@@ -363,7 +363,7 @@ const saveSettings = async () => {
                 autoFocus
               >
                 <option :value="null" disabled selected>
-                  {{ t('dashboard.modules.leveling.xpAlgorithm.selectChannel') }}
+                  {{ t('dashboard.modules.selectChannel') }}
                 </option>
                 <option
                   v-for="ch in getNotUsedChannels(textChannels, draft.ignoreChannelIds)"

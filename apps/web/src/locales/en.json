@@ -3,7 +3,8 @@
     "addToDiscord": "Add to Discord",
     "logout": "Log out",
     "loading": "Loading...",
-    "saveFailed": "Failed to save settings."
+    "saveFailed": "Failed to save settings.",
+    "unsavedChangesConfirm": "You have unsaved changes. Are you sure you want to leave?"
   },
   "mainlayout": {
     "nav": {
@@ -76,6 +77,8 @@
       "enabled": "Enabled",
       "disabled": "Disabled",
       "editMessage": "Edit Message",
+      "selectChannel": "Select Channel",
+      "selectCategory": "Select Category",
       "generalSettings": {
         "title": "General Settings",
         "description": "Configure basic server settings and localization.",
@@ -99,8 +102,7 @@
           "maxXPPerMessageHint": "Cap for spam prevention.",
           "noXPChannels": "No-XP Channels",
           "noXPChannelsHint": "Users won't gain XP here.",
-          "addChannel": "+ Add",
-          "selectChannel": "Select Channel"
+          "addChannel": "+ Add"
         },
         "roleRewards": {
           "title": "Role Rewards",
@@ -141,7 +143,6 @@
         "general": {
           "title": "General Settings",
           "channelLabel": "Welcome/Leave Message Channel",
-          "selectChannel": "Select Channel",
           "channelHint": "Choose the channel where welcome and leave messages will be sent."
         },
         "welcomeMessage": {
@@ -162,7 +163,44 @@
       },
       "ticketing": {
         "title": "Ticketing System",
-        "description": "Manage support tickets"
+        "description": "Manage support ticket settings",
+        "general": {
+          "title": "General Settings",
+          "ticketChannel": "Ticket Creation Channel",
+          "ticketCategory": "Ticket Category",
+          "ticketCategoryHint": "If not selected, a new one will be created.",
+          "ticketChannelHint": "If not selected, a new one will be created in the selected category.",
+          "autoCreate": "Auto Create"
+        },
+        "cleanup": {
+          "title": "Ticket Cleanup",
+          "deleteAfterHours": "Delete Ticket After (Hours)",
+          "deleteAfterHoursHint": "After how many hours of being closed should the ticket be deleted? Set to 0 to disable.",
+          "closeInactiveAfterHours": "Close Inactive Tickets After (Hours)",
+          "closeInactiveAfterHoursHint": "After how many hours of inactivity should the ticket be automatically closed? Set to 0 to disable.",
+          "enableTranscripts": "Enable Ticket Transcripts",
+          "enableTranscriptsHint": "Enable saving transcripts that are accessible via the web after logging in.",
+          "deleteTranscriptDays": "Delete Transcript After (Days)"
+        },
+        "messages": {
+          "title": "Ticket System Messages",
+          "newTicket": {
+            "title": "New Ticket",
+            "description": "Message for creating a new ticket."
+          },
+          "ticketCreated": {
+            "title": "Ticket Created",
+            "description": "Message for ticket creation."
+          },
+          "ticketClosed": {
+            "title": "Ticket Closed",
+            "description": "Message for ticket closure."
+          },
+          "ticketClosedDM": {
+            "title": "Ticket Closed - DM",
+            "description": "Message for ticket closure sent to the ticket creator's DM."
+          }
+        }
       }
     },
     "messageBuilder": {
